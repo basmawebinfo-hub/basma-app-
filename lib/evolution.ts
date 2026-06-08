@@ -115,19 +115,41 @@ export async function sendText(
 export async function fetchMessages(
   instanceName: string,
   remoteJid: string,
-  count = 30
+  count = 40
 ): Promise<EvoMessage[]> {
-  return evoFetch<EvoMessage[]>(`/chat/findMessages/${instanceName}`, {
-    method: "POST",
-    body: JSON.stringify({ where: { key: { remoteJid } }, limit: count }),
-  })
+  // Evolution v2: POST /chat/findMessages/{instance} with where + limit
+  try {
+    const res = await evoFetch<EvoMessage[] | { messages: EvoMessage[] }>(
+      `/chat/findMessages/${instanceName}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          where: { key: { remoteJid } },
+          limit: count,
+        }),
+      }
+    )
+    // Some versions return { messages: [...] }, others return array directly
+    return Array.isArray(res) ? res : (res as { messages: EvoMessage[] }).messages ?? []
+  } catch {
+    return []
+  }
 }
 
 export async function fetchChats(instanceName: string): Promise<unknown[]> {
-  return evoFetch<unknown[]>(`/chat/findChats/${instanceName}`, {
-    method: "POST",
-    body: JSON.stringify({}),
-  })
+  // Evolution v2: POST /chat/findChats/{instance}
+  try {
+    const res = await evoFetch<unknown[] | { chats: unknown[] }>(
+      `/chat/findChats/${instanceName}`,
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+      }
+    )
+    return Array.isArray(res) ? res : (res as { chats: unknown[] }).chats ?? []
+  } catch {
+    return []
+  }
 }
 
 // ─── Webhook registration ─────────────────────────────────────────────────────
