@@ -73,7 +73,7 @@ def webhook():
 const tabs = Object.keys(codeExamples) as (keyof typeof codeExamples)[]
 
 export function QuickStart() {
-  const [activeTab, setActiveTab] = useState<keyof typeof codeExamples>("CLI")
+  const [activeTab, setActiveTab] = useState<keyof typeof codeExamples>("Webhook")
   const [copied, setCopied] = useState(false)
   const shouldReduceMotion = useReducedMotion()
 

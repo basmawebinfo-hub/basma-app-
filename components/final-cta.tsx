@@ -13,9 +13,7 @@ export function FinalCTA() {
       <div
         className="relative max-w-5xl mx-auto bg-background rounded-3xl overflow-hidden py-16 lg:py-24 px-6 sm:px-12"
         style={{
-          border: "1px dashed",
-          borderColor: "oklch(0.92 0.16 130 / 0.4)",
-          borderDasharray: "12 8",
+          border: "1px dashed oklch(0.92 0.16 130 / 0.4)",
         }}
       >
         <div className="relative max-w-3xl mx-auto text-center">
