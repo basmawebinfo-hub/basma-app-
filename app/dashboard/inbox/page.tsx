@@ -1,131 +1,229 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Paperclip, Send, Phone, MoreVertical } from "lucide-react"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { Search, Paperclip, Send, Loader2, RefreshCw, MessageSquare } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-interface Message {
-  id: number
-  from: "me" | "them"
-  text: string
-  time: string
-  type: "text" | "image" | "audio"
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface Instance {
+  id: string
+  instance_name: string
+  display_name: string
+  status: string
 }
 
-interface Chat {
-  id: number
-  name: string
-  phone: string
-  preview: string
-  time: string
-  unread: number
-  status: "online" | "offline" | "away"
-  messages: Message[]
+interface EvoChat {
+  id: string
+  remoteJid: string
+  name?: string
+  pushName?: string
+  unreadCount?: number
+  lastMsgTimestamp?: number
 }
 
-const CHATS: Chat[] = [
-  {
-    id: 1,
-    name: "Ahmed Mohamed",
-    phone: "+20 123 456 7890",
-    preview: "What is the price?",
-    time: "Just now",
-    unread: 2,
-    status: "online",
-    messages: [
-      { id: 1, from: "them", text: "Hello, I need some information.", time: "10:28", type: "text" },
-      { id: 2, from: "me", text: "Hi Ahmed! Of course, how can I help you?", time: "10:29", type: "text" },
-      { id: 3, from: "them", text: "What is the price for the Pro plan?", time: "10:31", type: "text" },
-      { id: 4, from: "them", text: "What is the price?", time: "10:32", type: "text" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Fatima Al-Rashid",
-    phone: "+966 50 123 4567",
-    preview: "When is my order ready?",
-    time: "3m ago",
-    unread: 1,
-    status: "online",
-    messages: [
-      { id: 1, from: "them", text: "Hi, I placed an order yesterday.", time: "10:10", type: "text" },
-      { id: 2, from: "me", text: "Hello Fatima! Let me check on that for you.", time: "10:11", type: "text" },
-      { id: 3, from: "them", text: "When is my order ready?", time: "10:15", type: "text" },
-    ],
-  },
-  {
-    id: 3,
-    name: "James Wilson",
-    phone: "+44 7911 123456",
-    preview: "Do you offer delivery?",
-    time: "12m ago",
-    unread: 0,
-    status: "away",
-    messages: [
-      { id: 1, from: "them", text: "Do you offer delivery to the UK?", time: "09:55", type: "text" },
-      { id: 2, from: "me", text: "Yes, we ship internationally! Delivery to UK takes 5–7 business days.", time: "10:00", type: "text" },
-      { id: 3, from: "them", text: "Do you offer delivery?", time: "10:02", type: "text" },
-      { id: 4, from: "me", text: "We sure do! Free delivery on orders over $50.", time: "10:05", type: "text" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Nour Hassan",
-    phone: "+20 100 987 6543",
-    preview: "Is this product available?",
-    time: "1h ago",
-    unread: 0,
-    status: "offline",
-    messages: [
-      { id: 1, from: "them", text: "Is the blue variant still available?", time: "09:20", type: "text" },
-      { id: 2, from: "me", text: "Let me check stock for you!", time: "09:22", type: "text" },
-      { id: 3, from: "them", text: "Is this product available?", time: "09:30", type: "text" },
-      { id: 4, from: "me", text: "Yes, the blue variant is in stock. Would you like to place an order?", time: "09:35", type: "text" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Carlos Rivera",
-    phone: "+52 55 1234 5678",
-    preview: "How do I track my shipment?",
-    time: "2h ago",
-    unread: 0,
-    status: "offline",
-    messages: [
-      { id: 1, from: "them", text: "I ordered last week, order #5521.", time: "08:10", type: "text" },
-      { id: 2, from: "me", text: "Hi Carlos! I can help you track that.", time: "08:12", type: "text" },
-      { id: 3, from: "them", text: "How do I track my shipment?", time: "08:15", type: "text" },
-      { id: 4, from: "me", text: "Visit track.basmaweb.com and enter your order number.", time: "08:20", type: "text" },
-    ],
-  },
-]
-
-const statusColor: Record<Chat["status"], string> = {
-  online: "bg-green-500",
-  away: "bg-yellow-500",
-  offline: "bg-zinc-500",
+interface EvoMessage {
+  key: { id: string; remoteJid: string; fromMe: boolean }
+  message: {
+    conversation?: string
+    extendedTextMessage?: { text: string }
+  }
+  messageTimestamp: number
+  pushName?: string
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getMessageText(msg: EvoMessage): string {
+  return (
+    msg.message?.conversation ??
+    msg.message?.extendedTextMessage?.text ??
+    "[media]"
+  )
+}
+
+function formatTime(ts: number): string {
+  const d = new Date(ts * 1000)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffMin = Math.round(diffMs / 60000)
+
+  if (diffMin < 1) return "Just now"
+  if (diffMin < 60) return `${diffMin}m ago`
+  if (diffMin < 1440) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  return d.toLocaleDateString([], { day: "numeric", month: "short" })
+}
+
+function jidToPhone(jid: string): string {
+  return "+" + jid.replace(/@.*/, "").replace(/[^0-9]/g, "")
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function InboxPage() {
-  const [selectedChat, setSelectedChat] = useState<Chat>(CHATS[0])
+  const [instances, setInstances] = useState<Instance[]>([])
+  const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
+  const [chats, setChats] = useState<EvoChat[]>([])
+  const [selectedChat, setSelectedChat] = useState<EvoChat | null>(null)
+  const [messages, setMessages] = useState<EvoMessage[]>([])
   const [search, setSearch] = useState("")
   const [input, setInput] = useState("")
 
-  const filtered = CHATS.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.phone.includes(search)
+  const [loadingInstances, setLoadingInstances] = useState(true)
+  const [loadingChats, setLoadingChats] = useState(false)
+  const [loadingMessages, setLoadingMessages] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState("")
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // ─── Load instances ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch("/api/instances")
+      .then((r) => r.json())
+      .then((data: Instance[]) => {
+        setInstances(data)
+        const connected = data.find((i) => i.status === "CONNECTED")
+        if (connected) setSelectedInstance(connected)
+      })
+      .finally(() => setLoadingInstances(false))
+  }, [])
+
+  // ─── Load chats when instance selected ───────────────────────────────────────
+  const loadChats = useCallback(async (inst: Instance) => {
+    setLoadingChats(true)
+    setError("")
+    setChats([])
+    setSelectedChat(null)
+    setMessages([])
+    try {
+      const res = await fetch(`/api/messages?instance_id=${inst.id}`)
+      if (!res.ok) throw new Error("Failed to load chats")
+      const data = await res.json()
+      const chatList: EvoChat[] = (data.chats ?? [])
+        .filter((c: EvoChat) => c.remoteJid && !c.remoteJid.includes("@g.us")) // exclude groups for now
+        .sort((a: EvoChat, b: EvoChat) => (b.lastMsgTimestamp ?? 0) - (a.lastMsgTimestamp ?? 0))
+      setChats(chatList)
+      if (chatList.length > 0) setSelectedChat(chatList[0])
+    } catch (e: unknown) {
+      setError((e as Error).message)
+    } finally {
+      setLoadingChats(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedInstance) loadChats(selectedInstance)
+  }, [selectedInstance, loadChats])
+
+  // ─── Load messages when chat selected ────────────────────────────────────────
+  useEffect(() => {
+    if (!selectedChat || !selectedInstance) return
+    setLoadingMessages(true)
+    setMessages([])
+    fetch(`/api/messages?instance_id=${selectedInstance.id}&jid=${encodeURIComponent(selectedChat.remoteJid)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const sorted = (data.messages ?? []).sort(
+          (a: EvoMessage, b: EvoMessage) => a.messageTimestamp - b.messageTimestamp
+        )
+        setMessages(sorted)
+      })
+      .finally(() => setLoadingMessages(false))
+  }, [selectedChat, selectedInstance])
+
+  // ─── Scroll to bottom on new messages ────────────────────────────────────────
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  // ─── Send message ─────────────────────────────────────────────────────────────
+  const handleSend = async () => {
+    if (!input.trim() || !selectedChat || !selectedInstance) return
+    const text = input.trim()
+    setInput("")
+    setSending(true)
+    try {
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instance_id: selectedInstance.id,
+          to: jidToPhone(selectedChat.remoteJid),
+          text,
+        }),
+      })
+      // Optimistically add the message
+      const optimistic: EvoMessage = {
+        key: { id: `opt_${Date.now()}`, remoteJid: selectedChat.remoteJid, fromMe: true },
+        message: { conversation: text },
+        messageTimestamp: Math.floor(Date.now() / 1000),
+      }
+      setMessages((prev) => [...prev, optimistic])
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const filteredChats = chats.filter((c) =>
+    (c.pushName ?? c.name ?? jidToPhone(c.remoteJid))
+      .toLowerCase()
+      .includes(search.toLowerCase())
   )
 
+  // ─── No instances ─────────────────────────────────────────────────────────────
+  if (!loadingInstances && instances.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-8">
+        <div className="w-16 h-16 rounded-full bg-muted/40 flex items-center justify-center">
+          <MessageSquare className="w-8 h-8 text-muted-foreground/50" />
+        </div>
+        <div>
+          <h2 className="text-base font-semibold text-foreground">No WhatsApp connections yet</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Go to <a href="/dashboard/connect" className="text-primary underline">Connections</a> to link a WhatsApp number first.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex h-[calc(100vh-0px)] lg:h-screen">
-      {/* Chat list */}
+    <div className="flex h-[calc(100dvh-65px)] lg:h-screen">
+
+      {/* ─── Chat list ──────────────────────────────────────────────────────── */}
       <div className="w-full lg:w-[30%] border-r border-border flex flex-col shrink-0">
-        <div className="p-4 border-b border-border">
-          <h1 className="text-base font-semibold text-foreground mb-3">Inbox</h1>
+        {/* Header + instance selector */}
+        <div className="p-4 border-b border-border space-y-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-base font-semibold text-foreground">Inbox</h1>
+            {instances.length > 1 && (
+              <select
+                className="text-xs bg-muted/30 border border-border rounded-md px-2 py-1 text-foreground"
+                value={selectedInstance?.id ?? ""}
+                onChange={(e) => {
+                  const inst = instances.find((i) => i.id === e.target.value)
+                  if (inst) setSelectedInstance(inst)
+                }}
+              >
+                {instances.map((i) => (
+                  <option key={i.id} value={i.id}>{i.display_name}</option>
+                ))}
+              </select>
+            )}
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Refresh chats"
+              onClick={() => selectedInstance && loadChats(selectedInstance)}
+              disabled={loadingChats}
+            >
+              <RefreshCw className={cn("w-3.5 h-3.5", loadingChats && "animate-spin")} />
+            </Button>
+          </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
@@ -136,139 +234,142 @@ export default function InboxPage() {
             />
           </div>
         </div>
+
+        {/* Chat items */}
         <div className="flex-1 overflow-y-auto">
-          {filtered.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => setSelectedChat(chat)}
-              className={cn(
-                "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors border-b border-border/30",
-                selectedChat.id === chat.id
-                  ? "bg-primary/10 border-l-2 border-l-primary"
-                  : "hover:bg-muted/30"
-              )}
-            >
-              {/* Avatar */}
-              <div className="relative shrink-0">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary">
-                  {chat.name.charAt(0)}
-                </div>
-                <span
+          {loadingChats ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? (
+            <p className="text-xs text-destructive p-4">{error}</p>
+          ) : filteredChats.length === 0 ? (
+            <p className="text-xs text-muted-foreground p-4">No chats found</p>
+          ) : (
+            filteredChats.map((chat) => {
+              const name = chat.pushName ?? chat.name ?? jidToPhone(chat.remoteJid)
+              const phone = jidToPhone(chat.remoteJid)
+              const isSelected = selectedChat?.remoteJid === chat.remoteJid
+              return (
+                <button
+                  key={chat.remoteJid}
+                  onClick={() => setSelectedChat(chat)}
                   className={cn(
-                    "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background",
-                    statusColor[chat.status]
+                    "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors border-b border-border/30",
+                    isSelected
+                      ? "bg-primary/10 border-l-2 border-l-primary"
+                      : "hover:bg-muted/30"
                   )}
-                />
-              </div>
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-sm font-medium text-foreground truncate">{chat.name}</span>
-                  <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{chat.time}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground truncate">{chat.preview}</span>
-                  {chat.unread > 0 && (
-                    <Badge className="ml-2 shrink-0 w-4 h-4 p-0 flex items-center justify-center text-[10px]">
-                      {chat.unread}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </button>
-          ))}
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                    {name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-sm font-medium text-foreground truncate">{name}</span>
+                      {chat.lastMsgTimestamp && (
+                        <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
+                          {formatTime(chat.lastMsgTimestamp)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground truncate">{phone}</span>
+                      {(chat.unreadCount ?? 0) > 0 && (
+                        <Badge className="ml-2 shrink-0 w-4 h-4 p-0 flex items-center justify-center text-[10px]">
+                          {chat.unreadCount}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              )
+            })
+          )}
         </div>
       </div>
 
-      {/* Chat window — hidden on mobile when no chat selected via the list */}
+      {/* ─── Chat window ────────────────────────────────────────────────────── */}
       <div className="hidden lg:flex flex-1 flex-col min-w-0">
-        {/* Chat header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/50">
-          <div className="flex items-center gap-3">
-            <div className="relative">
+        {!selectedChat ? (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+            Select a chat to start messaging
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-card/50">
               <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary">
-                {selectedChat.name.charAt(0)}
+                {(selectedChat.pushName ?? jidToPhone(selectedChat.remoteJid)).charAt(0).toUpperCase()}
               </div>
-              <span
-                className={cn(
-                  "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background",
-                  statusColor[selectedChat.status]
-                )}
-              />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">{selectedChat.name}</p>
-              <p className="text-xs text-muted-foreground">{selectedChat.phone}</p>
-            </div>
-            <Badge
-              variant={selectedChat.status === "online" ? "default" : "secondary"}
-              className="text-[10px]"
-            >
-              {selectedChat.status}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon-sm" aria-label="Call">
-              <Phone className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" aria-label="More options">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-3">
-          {selectedChat.messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={cn("flex", msg.from === "me" ? "justify-end" : "justify-start")}
-            >
-              <div
-                className={cn(
-                  "max-w-[70%] px-4 py-2.5 rounded-2xl text-sm",
-                  msg.from === "me"
-                    ? "bg-green-600 text-white rounded-br-sm"
-                    : "bg-zinc-800 text-foreground rounded-bl-sm"
-                )}
-              >
-                <p>{msg.text}</p>
-                <p
-                  className={cn(
-                    "text-[10px] mt-1 text-right",
-                    msg.from === "me" ? "text-white/70" : "text-muted-foreground"
-                  )}
-                >
-                  {msg.time}
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {selectedChat.pushName ?? selectedChat.name ?? jidToPhone(selectedChat.remoteJid)}
                 </p>
+                <p className="text-xs text-muted-foreground">{jidToPhone(selectedChat.remoteJid)}</p>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Send bar */}
-        <div className="px-6 py-4 border-t border-border bg-card/30">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon-sm" aria-label="Attach file">
-              <Paperclip className="w-4 h-4" />
-            </Button>
-            <Input
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && setInput("")}
-              className="flex-1 bg-muted/30"
-            />
-            <Button
-              size="icon-sm"
-              onClick={() => setInput("")}
-              aria-label="Send message"
-              disabled={!input.trim()}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-3">
+              {loadingMessages ? (
+                <div className="flex justify-center pt-10">
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : messages.length === 0 ? (
+                <p className="text-center text-xs text-muted-foreground pt-10">No messages yet</p>
+              ) : (
+                messages.map((msg, i) => (
+                  <div
+                    key={msg.key.id ?? i}
+                    className={cn("flex", msg.key.fromMe ? "justify-end" : "justify-start")}
+                  >
+                    <div className={cn(
+                      "max-w-[70%] px-4 py-2.5 rounded-2xl text-sm",
+                      msg.key.fromMe
+                        ? "bg-green-600 text-white rounded-br-sm"
+                        : "bg-card border border-border text-foreground rounded-bl-sm"
+                    )}>
+                      <p>{getMessageText(msg)}</p>
+                      <p className={cn(
+                        "text-[10px] mt-1 text-right",
+                        msg.key.fromMe ? "text-white/70" : "text-muted-foreground"
+                      )}>
+                        {formatTime(msg.messageTimestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="px-6 py-4 border-t border-border bg-card/30">
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" size="icon-sm" aria-label="Attach file">
+                  <Paperclip className="w-4 h-4" />
+                </Button>
+                <Input
+                  placeholder="Type a message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                  className="flex-1 bg-muted/30"
+                  disabled={sending}
+                />
+                <Button
+                  size="icon-sm"
+                  onClick={handleSend}
+                  aria-label="Send message"
+                  disabled={!input.trim() || sending}
+                >
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

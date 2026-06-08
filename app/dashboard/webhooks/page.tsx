@@ -1,13 +1,42 @@
 "use client"
 
-import { useState } from "react"
-import { Eye, EyeOff, Send } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { Eye, EyeOff, Send, Trash2, Loader2, Plus, ToggleLeft, ToggleRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface WebhookConfig {
+  id: string
+  name: string
+  destination_type: string
+  destination_url: string | null
+  destination_email: string | null
+  events: string[]
+  is_active: boolean
+  secret: string | null
+  created_at: string
+}
+
+interface DeliveryLog {
+  id: string
+  status: string
+  attempts: number
+  last_attempt_at: string | null
+  response_status: number | null
+  error: string | null
+  created_at: string
+  webhook_configs: { name: string; destination_type: string; destination_url: string | null } | null
+  webhook_events: { event_type: string } | null
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const EVENTS = [
   { key: "MESSAGE_RECEIVED", label: "New incoming message" },
@@ -25,37 +54,54 @@ const EVENTS = [
   { key: "GROUP_UPDATE", label: "Group info updated" },
   { key: "GROUP_PARTICIPANTS_UPDATE", label: "Group members changed" },
   { key: "PRESENCE_UPDATE", label: "Online presence update" },
-  { key: "CONTACTS_SET", label: "Contacts list set" },
-  { key: "CHATS_SET", label: "Chats list set" },
-  { key: "LABELS_EDIT", label: "Label edited" },
-  { key: "LABELS_ASSOCIATION", label: "Label associated" },
   { key: "CALL", label: "Incoming call" },
-  { key: "TYPEBOT_START", label: "Typebot started" },
-  { key: "TYPEBOT_CHANGE_STATUS", label: "Typebot status changed" },
-]
-
-const DELIVERY_LOG = [
-  { event: "MESSAGE_RECEIVED", dest: "n8n workflow", status: "success", time: "Just now", code: 200, attempts: 1 },
-  { event: "MESSAGE_STATUS", dest: "Zapier", status: "success", time: "1m ago", code: 200, attempts: 1 },
-  { event: "MESSAGE_RECEIVED", dest: "https://api.client.com/wh", status: "success", time: "2m ago", code: 200, attempts: 1 },
-  { event: "CALL", dest: "Make", status: "failed", time: "5m ago", code: 500, attempts: 3 },
-  { event: "MESSAGE_RECEIVED", dest: "n8n workflow", status: "retrying", time: "8m ago", code: 503, attempts: 2 },
-  { event: "CONTACT_UPDATED", dest: "HubSpot CRM", status: "success", time: "10m ago", code: 200, attempts: 1 },
-  { event: "MESSAGE_RECEIVED", dest: "Slack", status: "success", time: "12m ago", code: 200, attempts: 1 },
-  { event: "CONNECTION_UPDATE", dest: "Airtable", status: "failed", time: "15m ago", code: 404, attempts: 3 },
 ]
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
-  success: "default",
-  failed: "destructive",
-  retrying: "secondary",
+  SUCCESS: "default",
+  FAILED: "destructive",
+  RETRYING: "secondary",
+  PENDING: "secondary",
 }
 
-export default function WebhooksPage() {
-  const [destType, setDestType] = useState("")
-  const [showSecret, setShowSecret] = useState(false)
-  const [selectedEvents, setSelectedEvents] = useState<string[]>(["MESSAGE_RECEIVED", "MESSAGE_STATUS"])
+const EMPTY_FORM = {
+  name: "",
+  destination_type: "",
+  destination_url: "",
+  destination_email: "",
+  secret: "",
+}
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function WebhooksPage() {
+  const [configs, setConfigs] = useState<WebhookConfig[]>([])
+  const [logs, setLogs] = useState<DeliveryLog[]>([])
+  const [loadingConfigs, setLoadingConfigs] = useState(true)
+  const [loadingLogs, setLoadingLogs] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState("")
+
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [selectedEvents, setSelectedEvents] = useState<string[]>(["MESSAGE_RECEIVED"])
+  const [showSecret, setShowSecret] = useState(false)
+
+  // ─── Load data ───────────────────────────────────────────────────────────────
+  const loadConfigs = useCallback(async () => {
+    const res = await fetch("/api/webhooks")
+    if (res.ok) setConfigs(await res.json())
+    setLoadingConfigs(false)
+  }, [])
+
+  const loadLogs = useCallback(async () => {
+    const res = await fetch("/api/webhooks/logs")
+    if (res.ok) setLogs(await res.json())
+    setLoadingLogs(false)
+  }, [])
+
+  useEffect(() => { loadConfigs(); loadLogs() }, [loadConfigs, loadLogs])
+
+  // ─── Event toggles ────────────────────────────────────────────────────────────
   const toggleEvent = (key: string) => {
     setSelectedEvents((prev) =>
       prev.includes(key) ? prev.filter((e) => e !== key) : [...prev, key]
@@ -68,6 +114,72 @@ export default function WebhooksPage() {
     )
   }
 
+  // ─── Save config ──────────────────────────────────────────────────────────────
+  const handleSave = async () => {
+    setSaving(true)
+    setSaveError("")
+    try {
+      const body: Record<string, unknown> = {
+        name: form.name,
+        destination_type: form.destination_type,
+        events: selectedEvents,
+        secret: form.secret || undefined,
+      }
+      if (form.destination_type === "EMAIL") {
+        body.destination_email = form.destination_email
+      } else {
+        body.destination_url = form.destination_url
+      }
+
+      const res = await fetch("/api/webhooks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? "Failed to save")
+      setConfigs((prev) => [data, ...prev])
+      setForm(EMPTY_FORM)
+      setSelectedEvents(["MESSAGE_RECEIVED"])
+    } catch (e: unknown) {
+      setSaveError((e as Error).message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // ─── Toggle active ────────────────────────────────────────────────────────────
+  const handleToggle = async (id: string, current: boolean) => {
+    const res = await fetch(`/api/webhooks?id=${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: !current }),
+    })
+    if (res.ok) {
+      setConfigs((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, is_active: !current } : c))
+      )
+    }
+  }
+
+  // ─── Delete ───────────────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/webhooks?id=${id}`, { method: "DELETE" })
+    setConfigs((prev) => prev.filter((c) => c.id !== id))
+  }
+
+  // ─── Send test ────────────────────────────────────────────────────────────────
+  const handleTest = async (config: WebhookConfig) => {
+    if (!config.destination_url) return
+    await fetch(config.destination_url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ test: true, event: "TEST_EVENT", timestamp: Date.now() }),
+    }).catch(() => {})
+  }
+
+  const destIsUrl = form.destination_type !== "EMAIL"
+
   return (
     <div className="p-6 space-y-8 max-w-4xl">
       <div>
@@ -75,61 +187,121 @@ export default function WebhooksPage() {
         <p className="text-sm text-muted-foreground mt-1">Configure where WhatsApp events are delivered</p>
       </div>
 
-      {/* Section A: Config form */}
+      {/* ─── Existing configs ─────────────────────────────────────────────────── */}
+      {!loadingConfigs && configs.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-foreground">Active Configs</h2>
+          <div className="space-y-2">
+            {configs.map((cfg) => (
+              <div
+                key={cfg.id}
+                className="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3 gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-foreground">{cfg.name}</p>
+                    <Badge variant="outline" className="text-[10px] uppercase">{cfg.destination_type}</Badge>
+                    {!cfg.is_active && <Badge variant="secondary" className="text-[10px]">Paused</Badge>}
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">
+                    {cfg.destination_url ?? cfg.destination_email ?? "—"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    {cfg.events.length} event{cfg.events.length !== 1 ? "s" : ""}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleToggle(cfg.id, cfg.is_active)}
+                    aria-label={cfg.is_active ? "Pause" : "Resume"}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {cfg.is_active
+                      ? <ToggleRight className="w-5 h-5 text-primary" />
+                      : <ToggleLeft className="w-5 h-5" />
+                    }
+                  </button>
+                  {cfg.destination_url && (
+                    <Button variant="ghost" size="icon-sm" aria-label="Test" onClick={() => handleTest(cfg)}>
+                      <Send className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon-sm" aria-label="Delete" onClick={() => handleDelete(cfg.id)}>
+                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Create form ──────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-6">
-        <h2 className="text-sm font-semibold text-foreground">Create Webhook Config</h2>
+        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Plus className="w-4 h-4" /> New Webhook Config
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* Destination name */}
           <div className="space-y-2">
-            <Label htmlFor="dest-name">Destination name</Label>
-            <Input id="dest-name" placeholder="e.g. My n8n Workflow" />
+            <Label htmlFor="dest-name">Name</Label>
+            <Input
+              id="dest-name"
+              placeholder="e.g. My n8n Workflow"
+              value={form.name}
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+            />
           </div>
 
-          {/* Destination type */}
           <div className="space-y-2">
             <Label>Destination type</Label>
-            <Select onValueChange={setDestType}>
+            <Select
+              value={form.destination_type}
+              onValueChange={(v) => setForm((p) => ({ ...p, destination_type: v }))}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select type..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="url">URL</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="n8n">n8n</SelectItem>
-                <SelectItem value="zapier">Zapier</SelectItem>
-                <SelectItem value="make">Make</SelectItem>
+                <SelectItem value="URL">URL</SelectItem>
+                <SelectItem value="EMAIL">Email</SelectItem>
+                <SelectItem value="N8N">n8n</SelectItem>
+                <SelectItem value="ZAPIER">Zapier</SelectItem>
+                <SelectItem value="MAKE">Make</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* URL or email */}
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="dest-url">
-              {destType === "email" ? "Email address" : "Destination URL"}
-            </Label>
+            <Label htmlFor="dest-url">{!destIsUrl ? "Email address" : "Destination URL"}</Label>
             <Input
               id="dest-url"
               placeholder={
-                destType === "email"
-                  ? "notify@yourdomain.com"
-                  : destType === "n8n"
-                  ? "https://your-n8n.io/webhook/..."
-                  : destType === "zapier"
-                  ? "https://hooks.zapier.com/hooks/catch/..."
+                !destIsUrl ? "notify@yourdomain.com"
+                  : form.destination_type === "N8N" ? "https://your-n8n.io/webhook/..."
+                  : form.destination_type === "ZAPIER" ? "https://hooks.zapier.com/hooks/catch/..."
                   : "https://your-endpoint.com/webhook"
+              }
+              value={destIsUrl ? form.destination_url : form.destination_email}
+              onChange={(e) =>
+                setForm((p) =>
+                  destIsUrl
+                    ? { ...p, destination_url: e.target.value }
+                    : { ...p, destination_email: e.target.value }
+                )
               }
             />
           </div>
 
-          {/* Signing secret */}
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="secret">Signing secret (optional)</Label>
             <div className="relative">
               <Input
                 id="secret"
                 type={showSecret ? "text" : "password"}
-                placeholder="Enter a secret for HMAC signing"
+                placeholder="HMAC signing secret"
+                value={form.secret}
+                onChange={(e) => setForm((p) => ({ ...p, secret: e.target.value }))}
                 className="pr-10"
               />
               <button
@@ -144,14 +316,11 @@ export default function WebhooksPage() {
           </div>
         </div>
 
-        {/* Events grid */}
+        {/* Events */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <Label>Events to subscribe</Label>
-            <button
-              onClick={toggleAll}
-              className="text-xs text-primary hover:underline"
-            >
+            <button onClick={toggleAll} className="text-xs text-primary hover:underline">
               {selectedEvents.length === EVENTS.length ? "Deselect all" : "Select all"}
             </button>
           </div>
@@ -175,52 +344,69 @@ export default function WebhooksPage() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button className="gap-2">Save Config</Button>
-          <Button variant="outline" className="gap-2">
-            <Send className="w-4 h-4" />
-            Send Test Payload
-          </Button>
-        </div>
+        {saveError && <p className="text-xs text-destructive">{saveError}</p>}
+
+        <Button
+          className="gap-2"
+          onClick={handleSave}
+          disabled={!form.name || !form.destination_type || selectedEvents.length === 0 || saving}
+        >
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : "Save Config"}
+        </Button>
       </div>
 
-      {/* Section B: Delivery log */}
+      {/* ─── Delivery log ─────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
           <h2 className="text-sm font-semibold text-foreground">Delivery Log</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Event</th>
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Destination</th>
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Sent At</th>
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Code</th>
-                <th className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">Attempts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {DELIVERY_LOG.map((row, i) => (
-                <tr key={i} className="border-b border-border/40 hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-foreground">{row.event}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground max-w-[160px] truncate">{row.dest}</td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      variant={statusVariant[row.status]}
-                      className="text-[10px] uppercase tracking-wide"
-                    >
-                      {row.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{row.time}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{row.code}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{row.attempts}</td>
+          {loadingLogs ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : logs.length === 0 ? (
+            <p className="text-xs text-muted-foreground px-6 py-8">No delivery logs yet.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  {["Event", "Destination", "Status", "Sent At", "Code", "Attempts"].map((h) => (
+                    <th key={h} className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {logs.map((row) => (
+                  <tr key={row.id} className="border-b border-border/40 hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs text-foreground">
+                      {row.webhook_events?.event_type ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground max-w-[160px] truncate">
+                      {row.webhook_configs?.destination_url ?? row.webhook_configs?.name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={statusVariant[row.status?.toUpperCase()] ?? "secondary"}
+                        className="text-[10px] uppercase tracking-wide"
+                      >
+                        {row.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {row.last_attempt_at
+                        ? new Date(row.last_attempt_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {row.response_status ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">{row.attempts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
