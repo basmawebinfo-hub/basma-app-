@@ -48,12 +48,22 @@ export async function register(formData: FormData) {
     return { error: error.message }
   }
 
-  // If Supabase email confirmation is enabled, the user won't have a session
-  // yet — show the "check your email" success screen instead of redirecting.
+  // If we have a session immediately → email confirmation is OFF → go to dashboard
   if (data.session) {
     redirect("/dashboard")
   }
 
+  // Email confirmation is ON → try signing in immediately with the same credentials
+  // (works when Supabase "confirm email" is disabled at the project level)
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (!signInError && signInData.session) {
+    redirect("/dashboard")
+  }
+
+  // Fall back to "check your email" screen
   return { success: true }
 }
 

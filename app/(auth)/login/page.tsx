@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Eye, EyeOff, MessageSquare } from "lucide-react"
+import { motion } from "framer-motion"
 import { login } from "@/app/actions/auth"
 
 export default function LoginPage() {
@@ -24,110 +24,165 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-stretch">
-      {/* ── Left panel — image ── */}
-      <div className="hidden lg:flex relative w-[480px] shrink-0 flex-col overflow-hidden">
-        <Image
-          src="/auth-panel.png"
-          alt="Basma Web — WhatsApp platform"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+    <div className="min-h-screen bg-background flex">
 
-        {/* Brand top-left */}
-        <div className="relative z-10 flex items-center gap-2 p-8">
-          <MessageSquare className="w-5 h-5 text-primary" />
-          <span className="font-[family-name:var(--font-pt-mono)] font-bold text-sm text-foreground tracking-[-0.05em]">
-            BASMA
-          </span>
+      {/* ── Left panel ── */}
+      <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden bg-card border-r border-border">
+
+        {/* Animated grid background */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* Lime glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+
+        {/* Brand */}
+        <div className="relative z-10 flex items-center gap-2.5 p-10">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <MessageSquare className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <span className="font-mono font-bold text-foreground tracking-tight">basma</span>
         </div>
 
-        {/* Bottom tagline */}
-        <div className="relative z-10 mt-auto p-8">
-          <p className="text-foreground/90 text-2xl font-light leading-snug text-balance">
-            Connect WhatsApp
-            <br />
-            <span className="text-primary">to any tool.</span>
-          </p>
-          <p className="mt-3 text-foreground/40 text-sm">
-            Webhooks. Inbox. Automation. All in one place.
-          </p>
+        {/* Center content */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-12 text-center">
+          {/* Floating chat bubbles */}
+          <div className="relative w-72 h-64 mb-10">
+            {[
+              { top: "0%",   left: "0%",   delay: 0,   msg: "Order confirmed ✓" },
+              { top: "18%",  left: "40%",  delay: 0.4, msg: "New lead from web 🎯" },
+              { top: "42%",  left: "5%",   delay: 0.8, msg: "Payment received 💳" },
+              { top: "62%",  left: "38%",  delay: 1.2, msg: "Webhook sent ⚡" },
+            ].map((bubble) => (
+              <motion.div
+                key={bubble.msg}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: bubble.delay, duration: 0.5 }}
+                style={{ top: bubble.top, left: bubble.left }}
+                className="absolute"
+              >
+                <div className="px-4 py-2 rounded-2xl bg-secondary border border-border text-xs text-foreground whitespace-nowrap shadow-lg">
+                  {bubble.msg}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-3xl font-bold text-foreground mb-3 tracking-tight"
+          >
+            Connect WhatsApp<br />
+            <span className="text-primary">to any tool</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="text-sm text-muted-foreground max-w-xs"
+          >
+            Webhooks, inbox, and automation — all in one place.
+          </motion.p>
+
+          {/* Stats row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="flex items-center gap-8 mt-10"
+          >
+            {[
+              { value: "200+", label: "Integrations" },
+              { value: "99.9%", label: "Uptime" },
+              { value: "Free", label: "to start" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-xl font-bold text-primary">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Back to website */}
+        <div className="relative z-10 p-10">
+          <Link href="/" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            &larr; Back to website
+          </Link>
         </div>
       </div>
 
       {/* ── Right panel — form ── */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-card">
-        <div className="w-full max-w-[400px]">
-
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-[400px]"
+        >
           {/* Mobile brand */}
-          <div className="flex items-center gap-2 mb-10 lg:hidden">
-            <MessageSquare className="w-5 h-5 text-primary" />
-            <span className="font-[family-name:var(--font-pt-mono)] font-bold text-sm text-foreground tracking-[-0.05em]">
-              BASMA
-            </span>
+          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <span className="font-mono font-bold text-foreground tracking-tight">basma</span>
           </div>
 
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight mb-1">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight mb-1">
             Welcome back
           </h1>
           <p className="text-sm text-muted-foreground mb-8">
             {"Don't have an account? "}
-            <Link
-              href="/register"
-              className="text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
-            >
+            <Link href="/register" className="text-primary hover:text-primary/80 transition-colors font-medium underline underline-offset-2">
               Sign up free
             </Link>
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="login-email"
-                className="block text-xs font-medium text-muted-foreground tracking-wide uppercase"
-              >
-                Email
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-xs font-medium text-muted-foreground">
+                Email address
               </label>
               <input
-                id="login-email"
+                id="email"
                 name="email"
                 type="email"
                 required
                 autoComplete="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:bg-secondary/80 transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
               />
             </div>
 
             {/* Password */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label
-                  htmlFor="login-password"
-                  className="text-xs font-medium text-muted-foreground tracking-wide uppercase"
-                >
+                <label htmlFor="password" className="text-xs font-medium text-muted-foreground">
                   Password
                 </label>
-                <a
-                  href="#"
-                  className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-                >
+                <a href="#" className="text-xs text-muted-foreground/50 hover:text-primary transition-colors">
                   Forgot password?
                 </a>
               </div>
               <div className="relative">
                 <input
-                  id="login-password"
+                  id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-11 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:bg-secondary/80 transition-all"
+                  className="w-full px-4 py-3 pr-11 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
                 <button
                   type="button"
@@ -143,7 +198,7 @@ export default function LoginPage() {
 
             {/* Error */}
             {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2">
+              <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3">
                 <p className="text-xs text-destructive">{error}</p>
               </div>
             )}
@@ -152,7 +207,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 mt-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 active:bg-primary/80 transition-colors tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 mt-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
@@ -165,13 +220,12 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          {/* Back to landing */}
-          <p className="text-center text-xs text-muted-foreground/40">
+          <p className="text-center text-xs text-muted-foreground/40 lg:hidden">
             <Link href="/" className="hover:text-muted-foreground transition-colors">
               &larr; Back to website
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
