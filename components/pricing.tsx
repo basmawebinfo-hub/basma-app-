@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 const plans = [
   {
@@ -109,9 +110,11 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Button variant={plan.featured ? "default" : "outline"} size="lg" rounded="full" className="w-full gap-2">
-                {plan.cta}
-                <ArrowRight className="w-4 h-4" />
+              <Button variant={plan.featured ? "default" : "outline"} size="lg" rounded="full" className="w-full gap-2" asChild>
+                <Link href="/register">
+                  {plan.cta}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </Button>
             </motion.div>
           ))}

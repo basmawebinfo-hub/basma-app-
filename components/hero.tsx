@@ -186,14 +186,14 @@ export function Hero() {
             className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
-              <Link href="#pricing">
+              <Link href="/register">
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
             <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto" asChild>
-              <Link href="/dashboard">
-                Watch Demo
+              <Link href="/login">
+                Sign in
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
