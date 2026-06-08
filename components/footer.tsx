@@ -1,20 +1,22 @@
 import Link from "next/link"
-import { Zap } from "lucide-react"
+import { MessageSquare } from "lucide-react"
 
 const footerLinks = {
-  Product: [
-    { label: "Features", href: "#features" },
+  Platform: [
+    { label: "Inbox", href: "#inbox" },
+    { label: "Webhooks", href: "#webhooks" },
+    { label: "Integrations", href: "#integrations" },
     { label: "Pricing", href: "#pricing" },
-    { label: "API Docs", href: "#docs" },
   ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
+  Dashboard: [
+    { label: "Overview", href: "/dashboard" },
+    { label: "Connect", href: "/dashboard/connect" },
+    { label: "Analytics", href: "/dashboard/analytics" },
   ],
   Legal: [
     { label: "Privacy", href: "#" },
     { label: "Terms", href: "#" },
+    { label: "Docs", href: "#" },
   ],
 }
 
@@ -25,12 +27,12 @@ export function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <Zap className="w-5 h-5 text-primary" />
-              <span className="font-bold text-foreground" style={{ letterSpacing: "-0.05em" }}>
-                Electric
+              <MessageSquare className="w-5 h-5 text-primary" />
+              <span className="font-[family-name:var(--font-pt-mono)] font-bold text-foreground" style={{ letterSpacing: "-0.05em" }}>
+                BASMA
               </span>
             </Link>
-            <p className="text-xs sm:text-sm text-muted-foreground">AI customer support made simple.</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Smart WhatsApp platform for your business.</p>
           </div>
 
           {/* Link columns */}
@@ -57,7 +59,7 @@ export function Footer() {
 
         <div className="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[10px] sm:text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Electric. All rights reserved.
+            &copy; 2026 Basma Web. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">

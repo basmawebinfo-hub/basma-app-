@@ -4,21 +4,22 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Command, CornerDownLeft } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 const examplePrompts = [
-  "Help me reset my password...",
-  "Where is my order #12345...",
-  "How do I upgrade my plan...",
-  "I need a refund for my purchase...",
-  "Can you help me with billing...",
+  "What is the price?",
+  "When is my order ready?",
+  "Do you offer delivery?",
+  "Is this product available?",
+  "How do I track my shipment?",
 ]
 
 const trustedLogos = [
-  { name: "TechCrunch", text: "TechCrunch" },
-  { name: "Forbes", text: "Forbes" },
-  { name: "Wired", text: "WIRED" },
-  { name: "The Verge", text: "The Verge" },
-  { name: "Product Hunt", text: "Product Hunt" },
+  { name: "n8n", text: "n8n" },
+  { name: "Zapier", text: "Zapier" },
+  { name: "Make", text: "Make" },
+  { name: "Notion", text: "Notion" },
+  { name: "Airtable", text: "Airtable" },
 ]
 
 export function Hero() {
@@ -81,15 +82,25 @@ export function Hero() {
     <section className="relative min-h-screen flex flex-col overflow-hidden">
       <div className="flex-1 flex items-center justify-center pt-28 lg:pt-32 pb-40 sm:pb-32">
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={shouldReduceMotion ? {} : fadeUp.initial}
+            animate={fadeUp.animate}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            WhatsApp Business API
+          </motion.div>
+
           <motion.h1
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-display text-balance mb-6 leading-[1.1]"
           >
-            <span className="text-gradient-lime">AI customer support</span>
+            <span className="text-gradient-lime">Connect WhatsApp</span>
             <br />
-            <span className="text-foreground">that actually resolves issues</span>
+            <span className="text-foreground">to any tool.</span>
           </motion.h1>
 
           <motion.p
@@ -98,8 +109,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 text-pretty leading-relaxed px-2"
           >
-            Electric transforms your customer support with AI agents that understand context, resolve issues instantly,
-            and learn from every conversation. 24/7 support that scales with your business.
+            Receive messages, trigger any event, and forward data to n8n, Zapier, or any Webhook endpoint.
           </motion.p>
 
           <motion.div
@@ -128,7 +138,7 @@ export function Hero() {
                 )}
                 {!prompt && isFocused && (
                   <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground/50">
-                    Ask a support question...
+                    Simulate a WhatsApp message...
                   </div>
                 )}
               </div>
@@ -164,9 +174,9 @@ export function Hero() {
             className="mb-6"
           >
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-              <span className="text-gradient-lime">1,000</span> free conversations
+              <span className="text-gradient-lime">200+</span> integrations supported
             </p>
-            <p className="text-muted-foreground text-xs sm:text-sm">deploy AI support agents instantly</p>
+            <p className="text-muted-foreground text-xs sm:text-sm">connect to n8n, Zapier, Make, and any webhook endpoint</p>
           </motion.div>
 
           <motion.div
@@ -175,13 +185,17 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto">
-              Start Free Trial
-              <ArrowRight className="w-4 h-4" />
+            <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
+              <Link href="#pricing">
+                Get Started Free
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </Button>
-            <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto">
-              View Docs
-              <ArrowRight className="w-4 h-4" />
+            <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto" asChild>
+              <Link href="/dashboard">
+                Watch Demo
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </Button>
           </motion.div>
         </div>
@@ -195,7 +209,7 @@ export function Hero() {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-xs sm:text-sm text-muted-foreground/60 mb-4 sm:mb-6 text-center">
-            Trusted by innovative teams worldwide
+            Integrates with your favorite tools
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-12 gap-y-3 sm:gap-y-4">
             {trustedLogos.map((logo) => (

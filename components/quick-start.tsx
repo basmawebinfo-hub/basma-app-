@@ -6,49 +6,68 @@ import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const codeExamples = {
-  CLI: `# Install the Electric CLI
-  curl https://electric.ai/install.sh | bash
-
-# Log in
-  electric login
-
-# Create a new support agent
-  electric create my-agent
-
-# Deploy the agent
-  electric deploy -a my-agent
-
-# Test your agent
-  electric chat -a my-agent`,
-  "REST API": `# Create a conversation
-  curl -X POST https://api.electric.ai/v1/conversations \\
+  Webhook: `# Configure your webhook endpoint
+  curl -X POST https://api.basmaweb.com/v1/webhooks \\
     -H "Authorization: Bearer YOUR_API_KEY" \\
     -H "Content-Type: application/json" \\
-    -d '{"message": "I need help with my order"}'
+    -d '{
+      "name": "My n8n Workflow",
+      "url": "https://my-n8n.io/webhook/abc123",
+      "events": ["MESSAGE_RECEIVED", "MESSAGE_STATUS"]
+    }'
 
-# Get conversation history
-  curl https://api.electric.ai/v1/conversations/CONV_ID \\
+# List active webhooks
+  curl https://api.basmaweb.com/v1/webhooks \\
     -H "Authorization: Bearer YOUR_API_KEY"`,
-  JavaScript: `import { Electric } from '@electric/sdk';
+  "Send Message": `# Send a WhatsApp message
+  curl -X POST https://api.basmaweb.com/v1/messages \\
+    -H "Authorization: Bearer YOUR_API_KEY" \\
+    -H "Content-Type: application/json" \\
+    -d '{
+      "instanceId": "INSTANCE_ID",
+      "to": "+20123456789",
+      "text": "Hello from Basma Web!"
+    }'`,
+  JavaScript: `// Verify incoming webhook signature
+  import crypto from 'crypto';
 
-const client = new Electric({
-  apiKey: "YOUR_API_KEY"
-});
+  function verifySignature(payload, signature, secret) {
+    const expected = crypto
+      .createHmac('sha256', secret)
+      .update(payload)
+      .digest('hex');
+    return expected === signature;
+  }
 
-const response = await client.chat({
-  agentId: "support-agent",
-  message: "I need help with my order",
-  context: { userId: "user_123" }
-});`,
-  Python: `import electric
+  // Handle incoming message
+  app.post('/webhook', (req, res) => {
+    const sig = req.headers['x-basma-signature'];
+    if (!verifySignature(req.rawBody, sig, process.env.WEBHOOK_SECRET)) {
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+    const { event, data } = req.body;
+    console.log('Received event:', event, data);
+    res.status(200).json({ ok: true });
+  });`,
+  Python: `import hmac, hashlib
 
-client = electric.Client(api_key="YOUR_API_KEY")
+def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+    expected = hmac.new(
+        secret.encode(),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
 
-response = client.chat(
-    agent_id="support-agent",
-    message="I need help with my order",
-    context={"user_id": "user_123"}
-)`,
+# Flask webhook handler
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    sig = request.headers.get('X-Basma-Signature', '')
+    if not verify_signature(request.get_data(), sig, WEBHOOK_SECRET):
+        return jsonify(error='Invalid signature'), 401
+    event = request.json
+    print(f"Event: {event['event']} from {event['data']['pushName']}")
+    return jsonify(ok=True)`,
 }
 
 const tabs = Object.keys(codeExamples) as (keyof typeof codeExamples)[]
@@ -88,7 +107,7 @@ export function QuickStart() {
   }
 
   return (
-    <section id="docs" className="relative py-16 sm:py-24 lg:py-32">
+    <section id="inbox" className="relative py-16 sm:py-24 lg:py-32">
       <div className="max-w-4xl mx-auto px-2 sm:px-4 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -104,7 +123,7 @@ export function QuickStart() {
               <div className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-primary" />
             </div>
             <span className="ml-2 sm:ml-3 text-xs sm:text-sm font-medium text-foreground tracking-wider uppercase">
-              Quick Start
+              API Reference
             </span>
           </div>
 

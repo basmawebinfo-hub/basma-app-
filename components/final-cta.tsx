@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function FinalCTA() {
   const shouldReduceMotion = useReducedMotion()
@@ -24,18 +25,22 @@ export function FinalCTA() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-display mb-6 text-foreground">
-              Ready to transform your customer support?
+              Start connecting WhatsApp
+              <br />
+              to your business today.
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-              Start with 1,000 free conversations. No credit card required.
+              Join hundreds of businesses managing their customers with Basma Web.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="xl" rounded="full" className="gap-2 min-w-[200px]">
-                Get Started Free
-                <ArrowRight className="w-4 h-4" />
+              <Button size="xl" rounded="full" className="gap-2 min-w-[200px]" asChild>
+                <Link href="#pricing">
+                  Join Waitlist
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </Button>
-              <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-[200px] bg-transparent">
-                Talk to Sales
+              <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-[200px] bg-transparent" asChild>
+                <Link href="/dashboard">View Dashboard</Link>
               </Button>
             </div>
           </motion.div>

@@ -3,9 +3,9 @@
 import { motion, useReducedMotion } from "framer-motion"
 
 const stats = [
-  { value: "70%", label: "reduction in ticket volume" },
-  { value: "< 5s", label: "average response time" },
-  { value: "10K+", label: "support teams using Electric" },
+  { value: "200+", label: "integrations supported" },
+  { value: "99.9%", label: "platform uptime" },
+  { value: "<200ms", label: "webhook delivery latency" },
 ]
 
 export function Stats() {

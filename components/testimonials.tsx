@@ -6,21 +6,21 @@ import { Star } from "lucide-react"
 const testimonials = [
   {
     quote:
-      "Electric cut our support ticket volume by 70%. Our team now focuses on complex issues while AI handles the rest.",
+      "Basma Web connects our WhatsApp directly to n8n. Every customer message now triggers an automation instantly — no code, no hassle.",
     author: "Sarah Chen",
-    role: "Head of Support",
+    role: "Head of Operations",
     company: "TechFlow",
     avatar: "/professional-woman-headshot.png",
   },
   {
-    quote: "Response times went from hours to seconds. Customer satisfaction scores have never been higher.",
+    quote: "We went from manually checking WhatsApp all day to having every message routed to the right team automatically. Game changer.",
     author: "Marcus Williams",
     role: "Customer Success Director",
     company: "Studio Nine",
     avatar: "/professional-man-headshot.png",
   },
   {
-    quote: "Finally, 24/7 support without the 24/7 staffing costs. Electric pays for itself within the first month.",
+    quote: "Setup took under 30 seconds. Scanned the QR, linked our number, and webhooks started firing into Zapier immediately.",
     author: "Emily Rodriguez",
     role: "VP of Operations",
     company: "Launchpad",
@@ -41,9 +41,9 @@ export function Testimonials() {
           className="text-center mb-10 sm:mb-16"
         >
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
-            Loved by <span className="text-gradient-lime">support teams</span>
+            Loved by <span className="text-gradient-lime">businesses</span>
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">Join thousands of teams already using Electric</p>
+          <p className="text-sm sm:text-base text-muted-foreground">Join hundreds of businesses already using Basma Web</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">

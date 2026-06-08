@@ -16,74 +16,60 @@ import {
   ArrowRight,
   ChevronDown,
   MessageSquare,
-  Sparkles,
-  Layers,
-  Wand2,
-  Bot,
+  Webhook,
   BarChart3,
-  Megaphone,
+  Plug,
   Zap,
   Lock,
+  Settings,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const navLinks = [
-  { href: "#features", label: "Features" },
+  { href: "#platform", label: "Platform" },
+  { href: "#inbox", label: "Inbox" },
+  { href: "#webhooks", label: "Webhooks" },
+  { href: "#integrations", label: "Integrations" },
   { href: "#pricing", label: "Pricing" },
-  { href: "#docs", label: "Docs" },
 ]
 
-const workflowItems = [
-  { href: "/workflows/chat-support", label: "Chat Support", icon: MessageSquare },
-  { href: "/workflows/ticket-routing", label: "Ticket Routing", icon: Sparkles },
-  { href: "/workflows/multi-channel", label: "Multi-Channel", icon: Layers },
-  { href: "/workflows/custom-agents", label: "Custom Agents", icon: Wand2 },
+const platformItems = [
+  { href: "/dashboard/inbox", label: "Inbox", icon: MessageSquare },
+  { href: "/dashboard/connect", label: "Connections", icon: Plug },
+  { href: "/dashboard/webhooks", label: "Webhooks", icon: Webhook },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 
 const toolsMenu = {
   free: [
     {
-      category: "Chat",
+      category: "Messaging",
       items: [
-        { href: "/tools/free/chat-widget", label: "Chat Widget", icon: MessageSquare },
-        { href: "/tools/free/response-templates", label: "Response Templates", icon: Bot },
+        { href: "#inbox", label: "Unified Inbox", icon: MessageSquare },
+        { href: "#integrations", label: "Integrations", icon: Plug },
       ],
     },
     {
       category: "Analytics",
       items: [
-        { href: "/tools/free/basic-analytics", label: "Basic Analytics", icon: BarChart3 },
-        { href: "/tools/free/satisfaction-surveys", label: "Satisfaction Surveys", icon: BarChart3 },
+        { href: "#platform", label: "Analytics Dashboard", icon: BarChart3 },
       ],
     },
   ],
   paid: [
     {
-      category: "AI Agents",
-      items: [
-        { href: "/tools/paid/ai-agent-builder", label: "AI Agent Builder", icon: Bot },
-        { href: "/tools/paid/intent-detection", label: "Intent Detection", icon: Sparkles },
-      ],
-    },
-    {
       category: "Automation",
       items: [
-        { href: "/tools/paid/workflow-automation", label: "Workflow Automation", icon: Zap },
-        { href: "/tools/paid/smart-escalation", label: "Smart Escalation", icon: Zap },
+        { href: "#webhooks", label: "Webhook Engine", icon: Webhook },
+        { href: "#webhooks", label: "Auto-Retry", icon: Zap },
       ],
     },
     {
-      category: "Campaigns",
+      category: "Enterprise",
       items: [
-        { href: "/tools/paid/proactive-chat", label: "Proactive Chat", icon: Megaphone },
-        { href: "/tools/paid/targeted-messages", label: "Targeted Messages", icon: Megaphone },
-      ],
-    },
-    {
-      category: "Insights",
-      items: [
-        { href: "/tools/paid/sentiment-analysis", label: "Sentiment Analysis", icon: BarChart3 },
-        { href: "/tools/paid/conversation-insights", label: "Conversation Insights", icon: BarChart3 },
+        { href: "#pricing", label: "HMAC Signing", icon: Lock },
+        { href: "#pricing", label: "Guaranteed SLA", icon: Settings },
       ],
     },
   ],
@@ -107,22 +93,22 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8 py-4" aria-label="Main navigation">
         <div className="flex h-14 items-center justify-between bg-background/60 backdrop-blur-xl border border-border/50 rounded-full px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2" aria-label="Electric home">
-            <Zap className="w-5 sm:w-6 h-5 sm:h-6 text-primary" aria-hidden="true" />
+          <Link href="/" className="flex items-center gap-2" aria-label="Basma Web home">
+            <MessageSquare className="w-5 sm:w-6 h-5 sm:h-6 text-primary" aria-hidden="true" />
             <span
               className="font-[family-name:var(--font-pt-mono)] font-bold text-base sm:text-lg text-foreground"
               style={{ letterSpacing: "-0.05em" }}
             >
-              Electric
+              BASMA
             </span>
           </Link>
 
           {/* Desktop Navigation - hidden below lg */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Tools Dropdown */}
+            {/* Platform Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors outline-none">
-                Tools
+                Platform
                 <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -183,14 +169,14 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Workflows Dropdown */}
+            {/* Dashboard Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors outline-none">
-                Workflows
+                Dashboard
                 <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border">
-                {workflowItems.map((item) => (
+                {platformItems.map((item) => (
                   <DropdownMenuItem key={item.href} asChild className="group">
                     <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
                       <item.icon
@@ -218,12 +204,14 @@ export function Navbar() {
 
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="ghost" size="sm" rounded="full">
-              Log in
+            <Button variant="ghost" size="sm" rounded="full" asChild>
+              <Link href="/dashboard">Dashboard</Link>
             </Button>
-            <Button size="sm" rounded="full" className="gap-1.5">
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            <Button size="sm" rounded="full" className="gap-1.5" asChild>
+              <Link href="#pricing">
+                Get Started Free
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
             </Button>
           </div>
 
@@ -260,12 +248,12 @@ export function Navbar() {
             >
               <div className="flex items-center justify-between px-6 py-4 bg-background border-b border-border/50">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <Zap className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <MessageSquare className="w-5 h-5 text-primary" aria-hidden="true" />
                   <span
                     className="font-[family-name:var(--font-pt-mono)] font-bold text-base text-foreground"
                     style={{ letterSpacing: "-0.05em" }}
                   >
-                    Electric
+                    BASMA
                   </span>
                 </Link>
                 <button
@@ -279,56 +267,9 @@ export function Navbar() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 pt-4 pb-4">
-                {/* Tools Section */}
-                <div className="px-4 py-2 text-xs font-medium text-primary uppercase tracking-wider">Free Tools</div>
-                {toolsMenu.free.map((cat) => (
-                  <div key={cat.category}>
-                    <div className="px-4 py-1 text-xs text-muted-foreground">{cat.category}</div>
-                    {cat.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="group flex items-center gap-2 px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/10"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <item.icon
-                          className="w-5 h-5 text-primary group-hover:text-black transition-colors"
-                          aria-hidden="true"
-                        />
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-                <div className="px-4 py-2 text-xs font-medium text-primary uppercase tracking-wider flex items-center gap-1">
-                  <Lock className="w-3 h-3" aria-hidden="true" />
-                  Pro Tools
-                </div>
-                {toolsMenu.paid.map((cat) => (
-                  <div key={cat.category}>
-                    <div className="px-4 py-1 text-xs text-muted-foreground">{cat.category}</div>
-                    {cat.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="group flex items-center gap-2 px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/10"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <item.icon
-                          className="w-5 h-5 text-primary group-hover:text-black transition-colors"
-                          aria-hidden="true"
-                        />
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-                <div className="border-t border-border/50 my-3" />
-                {/* Workflows Section */}
-                <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Workflows
-                </div>
-                {workflowItems.map((item) => (
+                {/* Platform Section */}
+                <div className="px-4 py-2 text-xs font-medium text-primary uppercase tracking-wider">Platform</div>
+                {platformItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -357,11 +298,11 @@ export function Navbar() {
               </div>
 
               <div className="px-6 py-4 border-t border-border/50 bg-background flex flex-col gap-3">
-                <Button variant="ghost" rounded="lg" className="justify-center text-base py-6 w-full">
-                  Log in
+                <Button variant="ghost" rounded="lg" className="justify-center text-base py-6 w-full" asChild>
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
                 </Button>
-                <Button rounded="full" className="py-6 text-base w-full">
-                  Get Started
+                <Button rounded="full" className="py-6 text-base w-full" asChild>
+                  <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>Get Started Free</Link>
                 </Button>
               </div>
             </motion.div>

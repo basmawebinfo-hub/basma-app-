@@ -13,27 +13,11 @@ const _ptMono = PT_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Electric - AI Customer Support",
+  title: "Basma Web — Smart WhatsApp Platform",
   description:
-    "Transform your customer support with Electric. AI-powered support agents that resolve issues instantly, 24/7.",
+    "Send and receive WhatsApp messages, track customers, and automate your replies with Basma Web.",
+  keywords: ["whatsapp", "whatsapp business", "basma web", "automation", "messaging", "webhook"],
   generator: "v0.app",
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
-  },
 }
 
 export const viewport: Viewport = {

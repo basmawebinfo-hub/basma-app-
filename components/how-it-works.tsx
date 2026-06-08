@@ -1,23 +1,23 @@
 "use client"
 
 import { motion, useReducedMotion } from "framer-motion"
-import { Upload, Sparkles, MessageSquare } from "lucide-react"
+import { QrCode, Webhook, Zap } from "lucide-react"
 
 const steps = [
   {
-    icon: Upload,
-    title: "Connect",
-    description: "Import your knowledge base, FAQs, and past tickets. Electric learns your business instantly.",
+    icon: QrCode,
+    title: "Scan & Connect",
+    description: "Open the dashboard, scan the QR code with WhatsApp, and your number is live in under 30 seconds.",
   },
   {
-    icon: Sparkles,
-    title: "Train",
-    description: "Our AI customizes responses to match your brand voice and support policies automatically.",
+    icon: Webhook,
+    title: "Configure Webhooks",
+    description: "Choose which events to forward — messages, status updates, calls — and set your destination URLs.",
   },
   {
-    icon: MessageSquare,
-    title: "Deploy",
-    description: "Go live across chat, email, and social. AI handles inquiries 24/7 while you focus on growth.",
+    icon: Zap,
+    title: "Automate Everything",
+    description: "Every WhatsApp event triggers your n8n, Zapier, or custom workflow automatically, in real time.",
   },
 ]
 
@@ -25,7 +25,7 @@ export function HowItWorks() {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <section className="relative py-24 lg:py-32 border-t border-border">
+    <section id="webhooks" className="relative py-24 lg:py-32 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -36,7 +36,7 @@ export function HowItWorks() {
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
             How it <span className="text-gradient-lime">works</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">From setup to live support in three simple steps</p>
+          <p className="text-muted-foreground max-w-xl mx-auto">From zero to live WhatsApp webhooks in three simple steps</p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">

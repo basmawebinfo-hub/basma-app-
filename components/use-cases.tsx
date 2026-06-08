@@ -1,48 +1,48 @@
 "use client"
 
 import { motion, useReducedMotion } from "framer-motion"
-import { Megaphone, ShoppingCart, CreditCard, RefreshCw, HelpCircle, Clock, Globe, Shield } from "lucide-react"
+import { Webhook, MessageSquare, BarChart3, Plug, Zap, ShieldCheck, Clock, Globe } from "lucide-react"
 
 const useCases = [
   {
-    category: "E-commerce",
-    question: "How can we handle order tracking and shipping inquiries automatically?",
-    icon: ShoppingCart,
+    category: "n8n",
+    question: "How can we forward every WhatsApp message into an n8n workflow automatically?",
+    icon: Zap,
   },
   {
-    category: "Billing",
-    question: "Need to automate subscription management and payment questions?",
-    icon: CreditCard,
+    category: "Zapier",
+    question: "Want to trigger Zapier zaps the moment a customer sends a WhatsApp message?",
+    icon: Webhook,
   },
   {
-    category: "Returns",
-    question: "Want to streamline refund requests and return processes?",
-    icon: RefreshCw,
+    category: "Make",
+    question: "Need to pass WhatsApp events directly into Make scenarios with zero code?",
+    icon: Plug,
   },
   {
-    category: "FAQ",
-    question: "How do we deflect common questions before they reach agents?",
-    icon: HelpCircle,
+    category: "Inbox",
+    question: "How do we manage thousands of WhatsApp conversations in one unified place?",
+    icon: MessageSquare,
   },
   {
-    category: "24/7 Support",
-    question: "Need round-the-clock support without overnight staffing?",
+    category: "Analytics",
+    question: "Want live data on message volume, response rates, and peak hours?",
+    icon: BarChart3,
+  },
+  {
+    category: "24/7 Events",
+    question: "Need every event — messages, calls, status updates — delivered around the clock?",
     icon: Clock,
   },
   {
-    category: "Multilingual",
-    question: "Want to support customers in multiple languages instantly?",
+    category: "Security",
+    question: "Looking for HMAC-signed webhook payloads with automatic retry on failure?",
+    icon: ShieldCheck,
+  },
+  {
+    category: "Global",
+    question: "Want to support customers across any country on WhatsApp at scale?",
     icon: Globe,
-  },
-  {
-    category: "Compliance",
-    question: "Looking to ensure consistent, compliant responses every time?",
-    icon: Shield,
-  },
-  {
-    category: "Outreach",
-    question: "How can we proactively engage customers before issues arise?",
-    icon: Megaphone,
   },
 ]
 
@@ -64,7 +64,7 @@ export function UseCases() {
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/grade.png')" }} />
       </div>
 
-      <div className="text-center mb-8 sm:mb-12 px-4">
+      <div id="integrations" className="text-center mb-8 sm:mb-12 px-4">
         <motion.h2
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export function UseCases() {
           transition={{ duration: 0.5 }}
           className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
         >
-          What will you automate?
+          What will you connect?
         </motion.h2>
         <motion.p
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ export function UseCases() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto"
         >
-          From simple FAQs to complex workflows, Electric handles it all
+          From simple inboxes to complex automations, Basma Web handles it all
         </motion.p>
       </div>
 

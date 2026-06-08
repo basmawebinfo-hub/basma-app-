@@ -315,18 +315,18 @@ function MultiChannelIllustration() {
 
 const demos = [
   {
-    title: "Live Chat Demo",
-    description: "See Electric handle real customer inquiries",
+    title: "Unified Inbox",
+    description: "All your WhatsApp conversations in one place",
     Illustration: LiveChatIllustration,
   },
   {
-    title: "Ticket Resolution",
-    description: "Watch AI resolve complex support tickets",
+    title: "Webhook Engine",
+    description: "Forward every event to n8n, Zapier, or any endpoint",
     Illustration: TicketResolutionIllustration,
   },
   {
-    title: "Multi-Channel Support",
-    description: "Seamless support across all channels",
+    title: "200+ Integrations",
+    description: "Connect to any tool with a single webhook",
     Illustration: MultiChannelIllustration,
   },
 ]
@@ -343,11 +343,11 @@ export function VideoGallery() {
           viewport={{ once: true }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
-            See <span className="text-gradient-lime">Electric</span> in action
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4" id="platform">
+            See <span className="text-gradient-lime">Basma Web</span> in action
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-            Watch how AI transforms customer support experiences
+            Everything you need to manage WhatsApp at scale
           </p>
         </motion.div>
 

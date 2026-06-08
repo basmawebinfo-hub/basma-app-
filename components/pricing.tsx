@@ -6,29 +6,49 @@ import { Button } from "@/components/ui/button"
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
+    name: "Starter",
+    price: "Free",
     period: "forever",
-    description: "Perfect for trying things out",
-    features: ["1,000 conversations/month", "Basic AI responses", "Email support", "Community access"],
-    cta: "Get Started",
+    description: "Try the platform",
+    features: [
+      "1 WhatsApp number",
+      "1,000 messages/mo",
+      "1 Webhook destination",
+      "Basic analytics",
+    ],
+    cta: "Get Started Free",
     featured: false,
   },
   {
     name: "Pro",
-    price: "$49",
-    period: "/month",
-    description: "For growing support teams",
+    price: "$29",
+    period: "/mo",
+    description: "For growing businesses",
     features: [
-      "Unlimited conversations",
-      "Advanced AI training",
-      "Multi-channel support",
+      "5 WhatsApp numbers",
+      "Unlimited messages",
+      "Unlimited webhooks",
+      "Full analytics",
       "Priority support",
-      "API access",
-      "Custom integrations",
+      "HMAC signing",
     ],
     cta: "Start Free Trial",
     featured: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "For large organizations",
+    features: [
+      "Unlimited numbers",
+      "Guaranteed SLA",
+      "Dedicated support",
+      "On-premise available",
+      "Custom API",
+    ],
+    cta: "Contact Us",
+    featured: false,
   },
 ]
 
@@ -37,7 +57,7 @@ export function Pricing() {
 
   return (
     <section id="pricing" className="relative py-16 sm:py-24 lg:py-32">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -48,10 +68,10 @@ export function Pricing() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
             <span className="text-gradient-lime">Simple</span> pricing
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime.</p>
+          <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
