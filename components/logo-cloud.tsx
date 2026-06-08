@@ -3,11 +3,13 @@
 import { motion, useReducedMotion } from "framer-motion"
 
 const logos = [
-  { name: "TechCrunch", text: "TechCrunch" },
-  { name: "Forbes", text: "Forbes" },
-  { name: "Wired", text: "WIRED" },
-  { name: "The Verge", text: "The Verge" },
-  { name: "Product Hunt", text: "Product Hunt" },
+  { name: "n8n", text: "n8n" },
+  { name: "Zapier", text: "Zapier" },
+  { name: "Make", text: "Make" },
+  { name: "HubSpot", text: "HubSpot" },
+  { name: "Airtable", text: "Airtable" },
+  { name: "Notion", text: "Notion" },
+  { name: "Slack", text: "Slack" },
 ]
 
 export function LogoCloud() {
@@ -22,7 +24,7 @@ export function LogoCloud() {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mb-8"
         >
-          Trusted by teams at
+          Integrates with the tools you already use
         </motion.p>
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
           {logos.map((logo, index) => (
