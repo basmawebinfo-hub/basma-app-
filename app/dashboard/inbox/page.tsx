@@ -119,21 +119,32 @@ export default function InboxPage() {
     if (selectedInstance) loadChats(selectedInstance)
   }, [selectedInstance, loadChats])
 
-  // ─── Load messages when chat selected ────────────────────────────────────────
+  // ─── Load messages when chat selected + poll every 5s ────────────────────────
+  const loadMessages = useCallback(async (inst: Instance, chat: EvoChat, initial = false) => {
+    if (initial) setLoadingMessages(true)
+    try {
+      const res = await fetch(`/api/messages?instance_id=${inst.id}&jid=${encodeURIComponent(chat.remoteJid)}`)
+      const data = await res.json()
+      const sorted = (data.messages ?? []).sort(
+        (a: EvoMessage, b: EvoMessage) => a.messageTimestamp - b.messageTimestamp
+      )
+      setMessages(sorted)
+    } finally {
+      if (initial) setLoadingMessages(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (!selectedChat || !selectedInstance) return
-    setLoadingMessages(true)
     setMessages([])
-    fetch(`/api/messages?instance_id=${selectedInstance.id}&jid=${encodeURIComponent(selectedChat.remoteJid)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        const sorted = (data.messages ?? []).sort(
-          (a: EvoMessage, b: EvoMessage) => a.messageTimestamp - b.messageTimestamp
-        )
-        setMessages(sorted)
-      })
-      .finally(() => setLoadingMessages(false))
-  }, [selectedChat, selectedInstance])
+    loadMessages(selectedInstance, selectedChat, true)
+
+    // Poll every 5 seconds for new messages
+    const timer = setInterval(() => {
+      loadMessages(selectedInstance, selectedChat, false)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [selectedChat, selectedInstance, loadMessages])
 
   // ─── Scroll to bottom on new messages ────────────────────────────────────────
   useEffect(() => {
