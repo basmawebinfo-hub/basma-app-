@@ -12,6 +12,8 @@ import {
   Menu,
   X,
   LogOut,
+  Megaphone,
+  Bot,
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -19,12 +21,14 @@ import { Button } from "@/components/ui/button"
 import { logout } from "@/app/actions/auth"
 
 const SIDEBAR_LINKS = [
-  { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
-  { icon: MessageSquare, label: "Inbox", href: "/dashboard/inbox" },
-  { icon: Plug, label: "Connections", href: "/dashboard/connect" },
-  { icon: Webhook, label: "Webhooks", href: "/dashboard/webhooks" },
-  { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  { icon: LayoutDashboard, label: "Overview",     href: "/dashboard" },
+  { icon: MessageSquare,   label: "Inbox",        href: "/dashboard/inbox" },
+  { icon: Plug,            label: "Connections",  href: "/dashboard/connect" },
+  { icon: Megaphone,       label: "Campaigns",    href: "/dashboard/campaigns" },
+  { icon: Bot,             label: "Auto Reply",   href: "/dashboard/auto-reply" },
+  { icon: Webhook,         label: "Webhooks",     href: "/dashboard/webhooks" },
+  { icon: BarChart2,       label: "Analytics",    href: "/dashboard/analytics" },
+  { icon: Settings,        label: "Settings",     href: "/dashboard/settings" },
 ]
 
 interface SidebarProps {
@@ -93,7 +97,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
             BASMA
           </span>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5" aria-label="Sidebar navigation">
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
           <NavLinks />
         </nav>
         <SidebarFooter />
@@ -128,13 +132,13 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           <NavLinks onClick={() => setSidebarOpen(false)} />
         </nav>
         <SidebarFooter />
       </aside>
 
-      {/* Mobile topbar (rendered inside the main flex container by the layout) */}
+      {/* Mobile topbar */}
       <header className="lg:hidden fixed top-0 inset-x-0 z-30 flex items-center gap-3 px-4 py-4 border-b border-border bg-background">
         <Button
           variant="ghost"
