@@ -57,11 +57,12 @@ export async function GET() {
     .eq("user_id", user.id)
 
   const configIds = (cfgIds ?? []).map((c) => c.id)
+  const cfgFallback = configIds.length ? configIds : fallback
 
   const { data: deliveries } = await supabase
     .from("webhook_deliveries")
     .select("status")
-    .in("webhook_config_id", configIds.length ? configIds : fallback)
+    .in("webhook_config_id", cfgFallback)
     .gte("created_at", yesterday.toISOString())
 
   const total = deliveries?.length ?? 0
@@ -70,12 +71,8 @@ export async function GET() {
 
   const { data: recentDeliveries } = await supabase
     .from("webhook_deliveries")
-    .select(\`
-      status, response_status, created_at,
-      webhook_configs ( name, destination_url, destination_type ),
-      webhook_events ( event_type )
-    \`)
-    .in("webhook_config_id", configIds.length ? configIds : fallback)
+    .select("status, response_status, created_at, webhook_configs ( name, destination_url, destination_type ), webhook_events ( event_type )")
+    .in("webhook_config_id", cfgFallback)
     .order("created_at", { ascending: false })
     .limit(10)
 
@@ -83,10 +80,10 @@ export async function GET() {
     const cfg = d.webhook_configs as { name: string; destination_url: string | null } | null
     const evt = d.webhook_events as { event_type: string } | null
     const diffMin = Math.round((Date.now() - new Date(d.created_at).getTime()) / 60000)
-    const timeStr = diffMin < 1 ? "Just now" : diffMin < 60 ? \`\${diffMin}m ago\` : \`\${Math.round(diffMin / 60)}h ago\`
+    const timeStr = diffMin < 1 ? "Just now" : diffMin < 60 ? diffMin + "m ago" : Math.round(diffMin / 60) + "h ago"
     return {
       event: evt?.event_type ?? "UNKNOWN",
-      dest: cfg?.destination_url ?? cfg?.name ?? "—",
+      dest: cfg?.destination_url ?? cfg?.name ?? "-",
       status: d.status?.toLowerCase() ?? "pending",
       time: timeStr,
       code: d.response_status ?? 0,
@@ -97,7 +94,7 @@ export async function GET() {
     messages_today: messagesToday ?? 0,
     active_chats: activeChats ?? 0,
     webhook_success_rate: webhookSuccessRate,
-    avg_reply_time: "—",
+    avg_reply_time: "-",
     messages_week: messagesWeek,
     recent_events: recentEvents,
   })
