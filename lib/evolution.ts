@@ -40,7 +40,7 @@ export interface EvoInstance {
 }
 
 export interface EvoQRCode {
-  code: string   // base64 PNG
+  code: string
   base64: string
 }
 
@@ -117,7 +117,6 @@ export async function fetchMessages(
   remoteJid: string,
   count = 40
 ): Promise<EvoMessage[]> {
-  // Evolution v2: POST /chat/findMessages/{instance} with where + limit
   try {
     const res = await evoFetch<EvoMessage[] | { messages: EvoMessage[] }>(
       `/chat/findMessages/${instanceName}`,
@@ -129,7 +128,6 @@ export async function fetchMessages(
         }),
       }
     )
-    // Some versions return { messages: [...] }, others return array directly
     return Array.isArray(res) ? res : (res as { messages: EvoMessage[] }).messages ?? []
   } catch {
     return []
@@ -137,14 +135,10 @@ export async function fetchMessages(
 }
 
 export async function fetchChats(instanceName: string): Promise<unknown[]> {
-  // Evolution v2: POST /chat/findChats/{instance}
   try {
     const res = await evoFetch<unknown[] | { chats: unknown[] }>(
       `/chat/findChats/${instanceName}`,
-      {
-        method: "POST",
-        body: JSON.stringify({}),
-      }
+      { method: "POST", body: JSON.stringify({}) }
     )
     return Array.isArray(res) ? res : (res as { chats: unknown[] }).chats ?? []
   } catch {
@@ -152,20 +146,24 @@ export async function fetchChats(instanceName: string): Promise<unknown[]> {
   }
 }
 
-// ─── Webhook registration ─────────────────────────────────────────────────────
+// ─── Webhook — auto-configured when instance is created ──────────────────────
 
 export async function setInstanceWebhook(
   instanceName: string,
   webhookUrl: string,
   events: string[]
 ): Promise<unknown> {
+  // Evolution API v2 format
   return evoFetch(`/webhook/set/${instanceName}`, {
     method: "POST",
     body: JSON.stringify({
-      url: webhookUrl,
-      webhook_by_events: false,
-      webhook_base64: false,
-      events,
+      webhook: {
+        enabled: true,
+        url: webhookUrl,
+        webhookByEvents: false,
+        webhookBase64: false,
+        events,
+      },
     }),
   })
 }
