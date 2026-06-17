@@ -25,12 +25,22 @@ interface EvoChat {
   lastMsgTimestamp?: number
 }
 
+interface EvoMedia {
+  thumbnail?: string | null
+  mimetype?: string | null
+  fileName?: string | null
+  mediaUrl?: string | null
+  seconds?: number | null
+}
 interface EvoMessage {
   key: { id: string; remoteJid: string; fromMe: boolean }
   message: {
     conversation?: string
     extendedTextMessage?: { text: string }
   }
+  messageType?: string
+  text?: string | null
+  media?: EvoMedia | null
   messageTimestamp: number
   pushName?: string
 }
@@ -39,10 +49,58 @@ interface EvoMessage {
 
 function getMessageText(msg: EvoMessage): string {
   return (
+    msg.text ??
     msg.message?.conversation ??
     msg.message?.extendedTextMessage?.text ??
     "[media]"
   )
+}
+
+function renderMessageBody(msg: EvoMessage) {
+  const type = msg.messageType ?? "TEXT"
+  const media = msg.media
+  const caption = msg.text && !msg.text.startsWith("[") ? msg.text : null
+
+  if (type === "IMAGE" || type === "STICKER") {
+    const src = media?.thumbnail
+    return (
+      <div className="space-y-1">
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt="image" className="rounded-lg max-w-[220px] max-h-[220px] object-cover" />
+        ) : (
+          <p className="opacity-80">[image]</p>
+        )}
+        {caption && <p>{caption}</p>}
+      </div>
+    )
+  }
+  if (type === "VIDEO") {
+    return (
+      <div className="space-y-1">
+        {media?.thumbnail ? (
+          <div className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={media.thumbnail} alt="video" className="rounded-lg max-w-[220px] object-cover" />
+            <span className="absolute inset-0 flex items-center justify-center text-2xl">▶</span>
+          </div>
+        ) : (
+          <p className="opacity-80">[video]</p>
+        )}
+        {caption && <p>{caption}</p>}
+      </div>
+    )
+  }
+  if (type === "AUDIO") {
+    const secs = media?.seconds ? `${Math.round(media.seconds)}s` : ""
+    return <p className="flex items-center gap-2">🎤 <span>Voice message {secs}</span></p>
+  }
+  if (type === "DOCUMENT") {
+    return <p className="flex items-center gap-2">📄 <span>{media?.fileName ?? "Document"}</span></p>
+  }
+  if (type === "LOCATION") return <p>📍 Location</p>
+  if (type === "CONTACT") return <p>👤 Contact card</p>
+  return <p>{getMessageText(msg)}</p>
 }
 
 function formatTime(ts: number): string {
@@ -356,7 +414,7 @@ export default function InboxPage() {
                         ? "bg-green-600 text-white rounded-br-sm"
                         : "bg-card border border-border text-foreground rounded-bl-sm"
                     )}>
-                      <p>{getMessageText(msg)}</p>
+                      {renderMessageBody(msg)}
                       <p className={cn(
                         "text-[10px] mt-1 text-right",
                         msg.key.fromMe ? "text-white/70" : "text-muted-foreground"
