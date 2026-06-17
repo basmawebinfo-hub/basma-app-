@@ -32,29 +32,36 @@ export async function GET(req: NextRequest) {
 
   if (!jid) {
     // Chat list: from Supabase only (no Evolution fallback -> no ghost numbers)
+    // NOTE: chats and contacts have no direct FK, so we fetch them separately
+    // and merge in code (a PostgREST embedded join here returns PGRST200).
     const { data: dbChats } = await supabase
       .from("chats")
-      .select(`
-        id,
-        remote_jid,
-        last_message_at,
-        unread_count,
-        contacts ( push_name, profile_pic )
-      `)
+      .select("id, remote_jid, last_message_at, unread_count")
       .eq("instance_id", instance_id)
       .order("last_message_at", { ascending: false })
       .limit(100)
+
+    // Fetch contact names for this instance and build a lookup by remote_jid
+    const { data: dbContacts } = await supabase
+      .from("contacts")
+      .select("remote_jid, push_name, profile_pic")
+      .eq("instance_id", instance_id)
+
+    const contactMap = new Map<string, { push_name: string | null; profile_pic: string | null }>()
+    for (const ct of (dbContacts ?? []) as { remote_jid: string; push_name: string | null; profile_pic: string | null }[]) {
+      contactMap.set(ct.remote_jid, { push_name: ct.push_name, profile_pic: ct.profile_pic })
+    }
 
     const chats = (dbChats ?? []).map((c: {
       id: string
       remote_jid: string
       last_message_at: string | null
       unread_count: number | null
-      contacts: { push_name: string | null; profile_pic: string | null }[] | null
     }) => ({
       id: c.id,
       remoteJid: c.remote_jid,
-      pushName: Array.isArray(c.contacts) ? (c.contacts[0]?.push_name ?? null) : null,
+      pushName: contactMap.get(c.remote_jid)?.push_name ?? null,
+      profilePic: contactMap.get(c.remote_jid)?.profile_pic ?? null,
       unreadCount: c.unread_count ?? 0,
       lastMsgTimestamp: c.last_message_at
         ? Math.floor(new Date(c.last_message_at).getTime() / 1000)
