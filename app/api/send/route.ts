@@ -192,6 +192,11 @@ export async function POST(req: NextRequest) {
 
     // Update last_used_at on the key (best-effort)
     db.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("key_hash", keyHash).then(() => {})
+    // Log the API call (best-effort)
+    db.from("api_usage_log").insert({
+      user_id: keyRow.user_id, endpoint: "/api/send", method: "POST", status: 200,
+      detail: `${type} -> ${remoteJid}`,
+    }).then(() => {})
 
     return NextResponse.json({ ok: true, instance: inst.instance_name, to: remoteJid, result }, { headers: CORS })
   } catch (e: unknown) {
