@@ -35,6 +35,16 @@ export async function GET() {
   const dOk = (deliv ?? []).filter((d: { status: string }) => d.status === "SUCCESS").length
   const webhookSuccess = dTotal ? Math.round((dOk / dTotal) * 100) : 100
 
+  // Last 7 days message volume
+  const days: { day: string; count: number }[] = []
+  for (let i = 6; i >= 0; i--) {
+    const start = new Date(); start.setDate(start.getDate() - i); start.setHours(0,0,0,0)
+    const end = new Date(start); end.setHours(23,59,59,999)
+    const { count: c } = await db.from("messages").select("id", { count: "exact", head: true })
+      .gte("timestamp", start.toISOString()).lte("timestamp", end.toISOString())
+    days.push({ day: start.toLocaleDateString("ar-EG", { weekday: "short" }), count: c ?? 0 })
+  }
+
   return NextResponse.json({
     total_users: totalUsers,
     suspended_users: suspendedUsers,
@@ -44,5 +54,6 @@ export async function GET() {
     messages_today: messagesToday,
     total_balance: totalBalance,
     webhook_success_rate: webhookSuccess,
+    messages_week: days,
   })
 }
