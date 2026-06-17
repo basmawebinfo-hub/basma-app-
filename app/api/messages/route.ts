@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { fetchMessages, sendText, fetchChats } from "@/lib/evolution"
+import { sendText } from "@/lib/evolution"
 
 // GET /api/messages?instance_id=xxx&jid=xxx
 export async function GET(req: NextRequest) {
@@ -12,13 +12,11 @@ export async function GET(req: NextRequest) {
   const jid = req.nextUrl.searchParams.get("jid")
 
   if (!instance_id) {
-    // Return all chats for user across all instances
     const { data: instances } = await supabase
       .from("instances")
       .select("id, instance_name, display_name, status")
       .eq("user_id", user.id)
       .eq("status", "CONNECTED")
-
     return NextResponse.json({ instances: instances ?? [] })
   }
 
@@ -33,7 +31,7 @@ export async function GET(req: NextRequest) {
   if (!inst) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   if (!jid) {
-    // 1. Try Supabase first (populated by webhook)
+    // Chat list: from Supabase only (no Evolution fallback -> no ghost numbers)
     const { data: dbChats } = await supabase
       .from("chats")
       .select(`
@@ -45,76 +43,53 @@ export async function GET(req: NextRequest) {
       `)
       .eq("instance_id", instance_id)
       .order("last_message_at", { ascending: false })
-      .limit(50)
+      .limit(100)
 
-    if (dbChats && dbChats.length > 0) {
-      // Normalise to the EvoChat shape the inbox expects
-      const chats = dbChats.map((c: {
-        id: string;
-        remote_jid: string;
-        last_message_at: string | null;
-        unread_count: number | null;
-        contacts: { push_name: string | null; profile_pic: string | null }[] | null;
-      }) => ({
-        id: c.id,
-        remoteJid: c.remote_jid,
-        pushName: Array.isArray(c.contacts) ? (c.contacts[0]?.push_name ?? null) : null,
-        unreadCount: c.unread_count ?? 0,
-        lastMsgTimestamp: c.last_message_at
-          ? Math.floor(new Date(c.last_message_at).getTime() / 1000)
-          : null,
-      }))
-      return NextResponse.json({ chats })
-    }
-
-    // 2. Fallback: fetch from Evolution and return (will be empty until first message)
-    try {
-      const chats = await fetchChats(inst.instance_name)
-      return NextResponse.json({ chats })
-    } catch (e: unknown) {
-      return NextResponse.json({ chats: [], error: (e as Error).message })
-    }
+    const chats = (dbChats ?? []).map((c: {
+      id: string
+      remote_jid: string
+      last_message_at: string | null
+      unread_count: number | null
+      contacts: { push_name: string | null; profile_pic: string | null }[] | null
+    }) => ({
+      id: c.id,
+      remoteJid: c.remote_jid,
+      pushName: Array.isArray(c.contacts) ? (c.contacts[0]?.push_name ?? null) : null,
+      unreadCount: c.unread_count ?? 0,
+      lastMsgTimestamp: c.last_message_at
+        ? Math.floor(new Date(c.last_message_at).getTime() / 1000)
+        : null,
+    }))
+    return NextResponse.json({ chats })
   }
 
-  // Return messages for a specific JID
-  // 1. Try Supabase first
+  // Messages for a specific JID: from Supabase only
   const { data: dbMsgs } = await supabase
     .from("messages")
     .select("id, message_id, from_me, remote_jid, content, status, timestamp")
     .eq("instance_id", instance_id)
     .eq("remote_jid", jid)
     .order("timestamp", { ascending: true })
-    .limit(60)
+    .limit(200)
 
-  if (dbMsgs && dbMsgs.length > 0) {
-    // Normalise to EvoMessage shape
-    const messages = dbMsgs.map((m: {
-      id: string;
-      message_id: string;
-      from_me: boolean;
-      remote_jid: string;
-      content: { text?: string; raw?: Record<string, unknown> };
-      status: string;
-      timestamp: string;
-    }) => ({
-      key: { id: m.message_id, remoteJid: m.remote_jid, fromMe: m.from_me },
-      message: m.content?.raw ?? { conversation: m.content?.text ?? "" },
-      messageTimestamp: Math.floor(new Date(m.timestamp).getTime() / 1000),
-      status: m.status,
-    }))
-    return NextResponse.json({ messages })
-  }
-
-  // 2. Fallback: fetch from Evolution API
-  try {
-    const messages = await fetchMessages(inst.instance_name, jid)
-    return NextResponse.json({ messages })
-  } catch (e: unknown) {
-    return NextResponse.json({ messages: [], error: (e as Error).message })
-  }
+  const messages = (dbMsgs ?? []).map((m: {
+    id: string
+    message_id: string
+    from_me: boolean
+    remote_jid: string
+    content: { text?: string; raw?: Record<string, unknown> }
+    status: string
+    timestamp: string
+  }) => ({
+    key: { id: m.message_id, remoteJid: m.remote_jid, fromMe: m.from_me },
+    message: m.content?.raw ?? { conversation: m.content?.text ?? "" },
+    messageTimestamp: Math.floor(new Date(m.timestamp).getTime() / 1000),
+    status: m.status,
+  }))
+  return NextResponse.json({ messages })
 }
 
-// POST /api/messages — send a message
+// POST /api/messages - send a message
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -127,7 +102,7 @@ export async function POST(req: NextRequest) {
 
   const { data: inst } = await supabase
     .from("instances")
-    .select("instance_name")
+    .select("id, instance_name")
     .eq("id", instance_id)
     .eq("user_id", user.id)
     .single()
@@ -136,6 +111,36 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await sendText(inst.instance_name, to, text)
+
+    // Persist the outgoing message immediately (do not wait for the webhook)
+    const remoteJid = to.includes("@") ? to : `${to.replace(/[^0-9]/g, "")}@s.whatsapp.net`
+    const { data: chat } = await supabase
+      .from("chats")
+      .upsert(
+        { instance_id: inst.id, remote_jid: remoteJid, last_message_at: new Date().toISOString() },
+        { onConflict: "instance_id,remote_jid", ignoreDuplicates: false }
+      )
+      .select("id")
+      .single()
+
+    if (chat) {
+      const r = result as { key?: { id?: string } }
+      await supabase.from("messages").upsert(
+        {
+          instance_id: inst.id,
+          chat_id: chat.id,
+          message_id: r?.key?.id ?? `local_${Date.now()}`,
+          from_me: true,
+          remote_jid: remoteJid,
+          message_type: "TEXT",
+          content: { text },
+          status: "SENT",
+          timestamp: new Date().toISOString(),
+        },
+        { onConflict: "instance_id,message_id", ignoreDuplicates: false }
+      )
+    }
+
     return NextResponse.json(result)
   } catch (e: unknown) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 })
