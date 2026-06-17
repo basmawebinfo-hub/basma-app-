@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
+import { sendTelegram } from "@/lib/telegram"
 
 /**
  * Daily cron: expire subscriptions whose plan_expires_at has passed.
@@ -29,39 +30,41 @@ export async function GET(req: NextRequest) {
   // 1) Expired paid plans -> downgrade to free
   const { data: expired } = await db
     .from("profiles")
-    .select("id, plan, plan_expires_at")
+    .select("id, plan, plan_expires_at, telegram_chat_id")
     .neq("plan", "free")
     .not("plan_expires_at", "is", null)
     .lt("plan_expires_at", now)
 
   let downgraded = 0
-  for (const u of (expired ?? []) as { id: string; plan: string }[]) {
+  for (const u of (expired ?? []) as { id: string; plan: string; telegram_chat_id: string | null }[]) {
     await db.from("profiles").update({ plan: "free", plan_expires_at: null }).eq("id", u.id)
     await db.from("notifications").insert({
       user_id: u.id, title: "انتهى اشتراكك",
       body: "انتهت صلاحية باقتك وتم تحويلك للباقة التجريبية. جدّد الآن لاستعادة كامل المميزات.",
       level: "critical",
     })
+    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, "<b>انتهى اشتراكك</b>\nتم تحويلك للباقة التجريبية. جدّد الآن.")
     downgraded++
   }
 
   // 2) Expiring within 3 days -> reminder notification (once per day)
   const { data: soon } = await db
     .from("profiles")
-    .select("id, plan, plan_expires_at")
+    .select("id, plan, plan_expires_at, telegram_chat_id")
     .neq("plan", "free")
     .not("plan_expires_at", "is", null)
     .gte("plan_expires_at", now)
     .lte("plan_expires_at", in3days)
 
   let reminded = 0
-  for (const u of (soon ?? []) as { id: string; plan_expires_at: string }[]) {
+  for (const u of (soon ?? []) as { id: string; plan_expires_at: string; telegram_chat_id: string | null }[]) {
     const days = Math.ceil((new Date(u.plan_expires_at).getTime() - Date.now()) / 86400000)
     await db.from("notifications").insert({
       user_id: u.id, title: "اشتراكك قارب على الانتهاء",
       body: `باقي ${days} يوم على انتهاء باقتك. جدّد قبل الانتهاء لتجنّب توقف الخدمة.`,
       level: "warning",
     })
+    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, `<b>اشتراكك قارب على الانتهاء</b>\nباقي ${days} يوم. جدّد قبل توقف الخدمة.`)
     reminded++
     // TODO: send email reminder here once an email provider is configured
   }
