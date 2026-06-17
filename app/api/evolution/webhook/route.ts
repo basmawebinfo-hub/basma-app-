@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Forward to user webhook configs (n8n, Zapier, etc.)
+      // Forward to user webhook configs (n8n, Zapier, Make, etc.)
       const { data: configs } = await supabase
         .from("webhook_configs")
         .select("*")
@@ -117,9 +117,43 @@ export async function POST(request: NextRequest) {
         .eq("is_active", true)
 
       if (configs?.length) {
+        // Accept any naming the UI may use for the "incoming message" event
+        const incomingAliases = ["MESSAGES_UPSERT", "MESSAGE_RECEIVED", "messages.upsert"]
+        const wantsIncoming = (evts: string[] | null) =>
+          !evts || evts.length === 0 || evts.some((e) => incomingAliases.includes(e))
+
+        // Log the inbound event once so deliveries can reference it
+        const { data: evtRow } = await supabase
+          .from("webhook_events")
+          .insert({ instance_id: instance.id, event_type: "MESSAGES_UPSERT", payload: body })
+          .select("id")
+          .single()
+
         for (const cfg of configs) {
-          if (cfg.destination_url && cfg.events?.includes("MESSAGES_UPSERT")) {
-            deliverToDestination(cfg.destination_url, body, cfg.secret).catch(() => {})
+          if (cfg.destination_url && wantsIncoming(cfg.events)) {
+            // Create a delivery row (PENDING) then attempt delivery + update status
+            const { data: del } = await supabase
+              .from("webhook_deliveries")
+              .insert({
+                event_id: evtRow?.id ?? null,
+                webhook_config_id: cfg.id,
+                status: "PENDING",
+                attempts: 0,
+              })
+              .select("id")
+              .single()
+
+            deliverToDestination(cfg.destination_url, body, cfg.secret)
+              .then(async (res) => {
+                await supabase.from("webhook_deliveries").update({
+                  status: res.ok ? "SUCCESS" : "FAILED",
+                  attempts: res.attempts,
+                  response_status: res.status,
+                  last_attempt_at: new Date().toISOString(),
+                  error: res.ok ? null : res.error ?? null,
+                }).eq("id", del?.id ?? "")
+              })
+              .catch(() => {})
           }
         }
       }
@@ -153,8 +187,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function deliverToDestination(url: string, payload: unknown, secret?: string) {
+async function deliverToDestination(
+  url: string,
+  payload: unknown,
+  secret?: string
+): Promise<{ ok: boolean; status: number; attempts: number; error?: string }> {
   const maxAttempts = 3
+  let lastStatus = 0
+  let lastError: string | undefined
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       const res = await fetch(url, {
@@ -165,8 +205,13 @@ async function deliverToDestination(url: string, payload: unknown, secret?: stri
         },
         body: JSON.stringify(payload),
       })
-      if (res.ok) return
-    } catch {}
+      lastStatus = res.status
+      if (res.ok) return { ok: true, status: res.status, attempts: attempt }
+      lastError = `HTTP ${res.status}`
+    } catch (e) {
+      lastError = (e as Error).message
+    }
     if (attempt < maxAttempts) await new Promise((r) => setTimeout(r, attempt * 2000))
   }
+  return { ok: false, status: lastStatus, attempts: maxAttempts, error: lastError }
 }
