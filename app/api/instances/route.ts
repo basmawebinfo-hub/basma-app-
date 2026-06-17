@@ -48,10 +48,15 @@ export async function POST(req: NextRequest) {
 
   // 2. Auto-set webhook in Evolution API — user never needs to touch Evolution API
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.basmaweb.com"
+  // Append the shared secret so the inbound webhook can reject forged requests
+  const secret = process.env.EVOLUTION_WEBHOOK_SECRET
+  const webhookUrl = secret
+    ? `${appUrl}/api/evolution/webhook?key=${encodeURIComponent(secret)}`
+    : `${appUrl}/api/evolution/webhook`
   try {
     await setInstanceWebhook(
       instance_name,
-      `${appUrl}/api/evolution/webhook`,
+      webhookUrl,
       WEBHOOK_EVENTS
     )
   } catch (e) {
