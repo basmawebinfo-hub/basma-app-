@@ -33,6 +33,12 @@ export async function GET() {
     else received.set(uid, (received.get(uid) ?? 0) + 1)
   }
 
+  // Plans + subscriptions (the real source of plan/limits)
+  const { data: subs } = await db.from("subscriptions").select("user_id, plan_id, status, current_period_end")
+  const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo")
+  const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number }) => [p.id, p]))
+  const subByUser = new Map((subs ?? []).map((s: { user_id: string; plan_id: string; status: string; current_period_end: string|null }) => [s.user_id, s]))
+
   const instCount = new Map<string, number>()
   const instConnected = new Map<string, number>()
   for (const i of (instances ?? []) as { user_id: string; status: string }[]) {
@@ -40,13 +46,22 @@ export async function GET() {
     if (i.status === "CONNECTED") instConnected.set(i.user_id, (instConnected.get(i.user_id) ?? 0) + 1)
   }
 
-  const enriched = users.map((u) => ({
-    ...u,
-    instances_total: instCount.get(u.id) ?? 0,
-    instances_connected: instConnected.get(u.id) ?? 0,
-    messages_sent: sent.get(u.id) ?? 0,
-    messages_received: received.get(u.id) ?? 0,
-  }))
+  const enriched = users.map((u) => {
+    const sub = subByUser.get(u.id)
+    const plan = sub ? planById.get(sub.plan_id) : null
+    return {
+      ...u,
+      plan_name: plan?.name ?? "—",
+      plan_max_instances: plan?.max_instances ?? 1,
+      plan_max_messages: plan?.max_messages_mo ?? 500,
+      sub_status: sub?.status ?? "none",
+      period_end: sub?.current_period_end ?? null,
+      instances_total: instCount.get(u.id) ?? 0,
+      instances_connected: instConnected.get(u.id) ?? 0,
+      messages_sent: sent.get(u.id) ?? 0,
+      messages_received: received.get(u.id) ?? 0,
+    }
+  })
 
   return NextResponse.json({ users: enriched })
 }
