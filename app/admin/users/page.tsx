@@ -1,10 +1,11 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download } from "lucide-react"
+import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard } from "lucide-react"
 
 interface AdminUser {
   id: string; email: string | null; full_name: string | null
   role: string; status: string; balance: number; plan: string
+  plan_name?: string; plan_id?: string; sub_status?: string
   max_instances: number; max_messages: number
   instances_total: number; instances_connected: number
   messages_sent: number; messages_received: number
@@ -21,12 +22,15 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [planFilter, setPlanFilter] = useState("all")
+  const [plans, setPlans] = useState<{id:string;name:string;max_instances:number;price_monthly:number}[]>([])
+  const [selPlan, setSelPlan] = useState("")
 
   const load = () => {
     setLoading(true)
     fetch("/api/admin/users").then((r) => r.json()).then((d) => setUsers(d.users ?? [])).finally(() => setLoading(false))
   }
   useEffect(load, [])
+  useEffect(() => { fetch("/api/admin/plans").then(r=>r.json()).then(d=>setPlans(d.plans??[])).catch(()=>{}) }, [])
 
   async function act(userId: string, action: string, payload: Record<string, unknown> = {}) {
     setBusy(userId)
@@ -109,7 +113,7 @@ export default function AdminUsers() {
                     {u.status === "active" ? "نشط" : "موقوف"}
                   </span>
                 </td>
-                <td className="p-3">{u.plan}</td>
+                <td className="p-3">{u.plan_name ?? "—"}</td>
                 <td className="p-3 font-medium">{Number(u.balance).toFixed(2)}</td>
                 <td className="p-3">{u.instances_connected}/{u.instances_total}</td>
                 <td className="p-3">{u.messages_sent} / {u.messages_received}</td>
@@ -128,6 +132,8 @@ export default function AdminUsers() {
                       className="p-1.5 rounded-md hover:bg-blue-500/15 text-blue-600"><Bell className="w-4 h-4" /></button>
                     <button title="الحدود" onClick={() => setModal({ type: "limits", user: u })}
                       className="p-1.5 rounded-md hover:bg-muted text-foreground"><Settings2 className="w-4 h-4" /></button>
+                    <button title="تغيير الباقة" onClick={() => { setSelPlan(u.plan_id ?? ""); setModal({ type: "plan", user: u }) }}
+                      className="p-1.5 rounded-md hover:bg-amber-500/15 text-amber-600"><CreditCard className="w-4 h-4" /></button>
                     <button title="حذف" onClick={() => { if (confirm("متأكد من حذف المستخدم نهائياً؟")) act(u.id, "delete") }}
                       className="p-1.5 rounded-md hover:bg-red-500/15 text-red-600"><Trash2 className="w-4 h-4" /></button>
                   </div>
@@ -146,6 +152,7 @@ export default function AdminUsers() {
               <h3 className="font-semibold">
                 {modal.type === "topup" && "شحن رصيد"}
                 {modal.type === "notify" && "إرسال إشعار"}
+                {modal.type === "plan" && "تغيير الباقة"}
                 {modal.type === "limits" && "تعديل الحدود"}
               </h3>
               <button onClick={() => setModal(null)}><X className="w-4 h-4" /></button>
@@ -170,6 +177,17 @@ export default function AdminUsers() {
                   className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" rows={3} />
                 <button onClick={() => act(modal.user.id, "notify", { title: input, body: input2 })}
                   className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">إرسال</button>
+              </>
+            )}
+            {modal.type === "plan" && (
+              <>
+                <label className="text-xs text-muted-foreground">اختر الباقة</label>
+                <select value={selPlan} onChange={(e)=>setSelPlan(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm">
+                  <option value="">— اختر —</option>
+                  {plans.map(p => <option key={p.id} value={p.id}>{p.name} ({p.max_instances} رقم - {p.price_monthly}ج)</option>)}
+                </select>
+                <button onClick={() => act(modal.user.id, "set_plan", { plan_id: selPlan })} disabled={!selPlan}
+                  className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">تفعيل الباقة</button>
               </>
             )}
             {modal.type === "limits" && (
