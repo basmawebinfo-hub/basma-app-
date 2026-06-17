@@ -26,6 +26,6 @@ export async function POST() {
   return NextResponse.json({
     code,
     bot_link: botUser ? `https://t.me/${botUser}?start=${code}` : null,
-    instructions: "افتح بوت تليجرام وأرسل هذا الكود لربط حسابك.",
+    instructions: "Open the Telegram bot and send this code to link your account.",
   })
 }
