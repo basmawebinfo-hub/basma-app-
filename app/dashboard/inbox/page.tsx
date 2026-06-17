@@ -116,7 +116,22 @@ export default function InboxPage() {
   }, [])
 
   useEffect(() => {
-    if (selectedInstance) loadChats(selectedInstance)
+    if (!selectedInstance) return
+    loadChats(selectedInstance)
+
+    // Poll chat list every 8s for new chats / new messages (silent, no flicker)
+    const timer = setInterval(() => {
+      fetch(`/api/messages?instance_id=${selectedInstance.id}`)
+        .then((r) => r.json())
+        .then((data) => {
+          const chatList: EvoChat[] = (data.chats ?? [])
+            .filter((c: EvoChat) => c.remoteJid && !c.remoteJid.includes("@g.us"))
+            .sort((a: EvoChat, b: EvoChat) => (b.lastMsgTimestamp ?? 0) - (a.lastMsgTimestamp ?? 0))
+          setChats(chatList)
+        })
+        .catch(() => {})
+    }, 8000)
+    return () => clearInterval(timer)
   }, [selectedInstance, loadChats])
 
   // ─── Load messages when chat selected + poll every 5s ────────────────────────
