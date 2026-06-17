@@ -36,11 +36,14 @@ export default function SettingsPage() {
   const [showHmac, setShowHmac] = useState(false)
   const [loadingWebhook, setLoadingWebhook] = useState(true)
   const [generatingWebhook, setGeneratingWebhook] = useState(false)
+  const [usage, setUsage] = useState<{ endpoint: string; status: number; detail: string; created_at: string }[]>([])
+  const [usageMonth, setUsageMonth] = useState(0)
 
   useEffect(() => {
     fetch("/api/user/profile").then(r => r.json()).then(d => { setDisplayName(d.full_name ?? ""); setEmail(d.email ?? "") }).catch(() => {})
     fetch("/api/user/api-key").then(r => r.json()).then(d => setApiKeyData(d)).finally(() => setLoadingApiKey(false))
     fetch("/api/user/webhook-token").then(r => r.json()).then(d => setWebhookData(d)).finally(() => setLoadingWebhook(false))
+    fetch("/api/user/usage").then(r => r.json()).then(d => { setUsage(d.calls ?? []); setUsageMonth(d.month_total ?? 0) }).catch(() => {})
   }, [])
 
   const handleSaveProfile = async () => {
@@ -169,6 +172,34 @@ export default function SettingsPage() {
         <p className="text-sm text-muted-foreground">Deleting your workspace is permanent and cannot be undone.</p>
         <Button variant="destructive" onClick={() => confirm("Are you absolutely sure?")}>Delete Workspace</Button>
       </div>
+      <Separator className="my-8" />
+
+      {/* API Usage */}
+      <section>
+        <div className="flex items-center gap-2 mb-1">
+          <Webhook className="w-4 h-4 text-primary" />
+          <h2 className="text-base font-semibold">API Usage</h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">Track the API calls made with your key. This month: <span className="font-medium text-foreground">{usageMonth}</span> calls.</p>
+        <div className="rounded-xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-card/60 text-muted-foreground"><tr className="text-left"><th className="p-3 font-medium">Endpoint</th><th className="p-3 font-medium">Detail</th><th className="p-3 font-medium">Status</th><th className="p-3 font-medium">Time</th></tr></thead>
+            <tbody>
+              {usage.length === 0 ? (
+                <tr><td colSpan={4} className="p-6 text-center text-muted-foreground text-xs">No API calls yet</td></tr>
+              ) : usage.map((c, i) => (
+                <tr key={i} className="border-t border-border/40">
+                  <td className="p-3 font-mono text-xs">{c.endpoint}</td>
+                  <td className="p-3 text-xs text-muted-foreground">{c.detail}</td>
+                  <td className="p-3"><span className={"text-xs " + (c.status === 200 ? "text-green-600" : "text-red-600")}>{c.status}</span></td>
+                  <td className="p-3 text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </div>
   )
 }
