@@ -81,6 +81,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ ok: true })
     }
 
+    // ── Reset password (admin sets a new password for the user) ──
+    case "reset_password": {
+      const newPass = body.password as string
+      if (!newPass || newPass.length < 6) return NextResponse.json({ error: "كلمة سر 6 أحرف على الأقل" }, { status: 400 })
+      const { error } = await db.auth.admin.updateUserById(targetUserId, { password: newPass })
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      // notify the user
+      await db.from("notifications").insert({
+        user_id: targetUserId, title: "تم تغيير كلمة المرور",
+        body: "قام المسؤول بتعيين كلمة مرور جديدة لحسابك بناءً على طلبك.", level: "warning",
+      })
+      await logAdminAction(gate.userId, "reset_password", "user", targetUserId, {})
+      return NextResponse.json({ ok: true })
+    }
+
     // ── Save admin notes ──
     case "set_notes": {
       await db.from("profiles").update({ notes: body.notes ?? null }).eq("id", targetUserId)
