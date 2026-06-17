@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X } from "lucide-react"
+import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download } from "lucide-react"
 
 interface AdminUser {
   id: string; email: string | null; full_name: string | null
@@ -18,6 +18,9 @@ export default function AdminUsers() {
   const [modal, setModal] = useState<{ type: string; user: AdminUser } | null>(null)
   const [input, setInput] = useState("")
   const [input2, setInput2] = useState("")
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [planFilter, setPlanFilter] = useState("all")
 
   const load = () => {
     setLoading(true)
@@ -38,13 +41,47 @@ export default function AdminUsers() {
     } finally { setBusy(null) }
   }
 
+  const filtered = users.filter((u) => {
+    const q = search.toLowerCase()
+    const matchSearch = !q || (u.email ?? "").toLowerCase().includes(q) || (u.full_name ?? "").toLowerCase().includes(q)
+    const matchStatus = statusFilter === "all" || u.status === statusFilter
+    const matchPlan = planFilter === "all" || u.plan === planFilter
+    return matchSearch && matchStatus && matchPlan
+  })
+
+  function exportCSV() {
+    const headers = ["email","full_name","role","status","plan","balance","instances_total","messages_sent","messages_received"]
+    const rows = filtered.map((u) => headers.map((h) => JSON.stringify((u as Record<string, unknown>)[h] ?? "")).join(","))
+    const csv = [headers.join(","), ...rows].join("\n")
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a"); a.href = url; a.download = "basma-users.csv"; a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">إدارة المستخدمين</h1>
-        <span className="text-sm text-muted-foreground">{users.length} مستخدم</span>
+        <span className="text-sm text-muted-foreground">{filtered.length} / {users.length} مستخدم</span>
+      </div>
+
+      {/* Search + filters + export */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input placeholder="بحث بالإيميل أو الاسم..." value={search} onChange={(e)=>setSearch(e.target.value)}
+            className="w-full pr-9 pl-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
+        </div>
+        <select value={statusFilter} onChange={(e)=>setStatusFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm">
+          <option value="all">كل الحالات</option><option value="active">نشط</option><option value="suspended">موقوف</option>
+        </select>
+        <select value={planFilter} onChange={(e)=>setPlanFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm">
+          <option value="all">كل الباقات</option><option value="free">مجاني</option><option value="starter">المبتدئ</option><option value="pro">الاحترافي</option><option value="enterprise">الشركات</option>
+        </select>
+        <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm hover:bg-muted/40"><Download className="w-4 h-4"/> تصدير CSV</button>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-border">
@@ -61,7 +98,7 @@ export default function AdminUsers() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {filtered.map((u) => (
               <tr key={u.id} className="border-t border-border/40 hover:bg-card/30">
                 <td className="p-3">
                   <div className="font-medium">{u.email ?? "—"}</div>
