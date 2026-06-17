@@ -6,34 +6,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import {
-  Eye, EyeOff, Copy, RefreshCw, Loader2, Check,
-  Key, Webhook, User, AlertTriangle,
-} from "lucide-react"
+import { Eye, EyeOff, Copy, RefreshCw, Loader2, Check, Key, Webhook, User, AlertTriangle } from "lucide-react"
 
-interface ApiKeyData {
-  key_prefix: string | null
-  is_active: boolean | null
-  last_used_at: string | null
-  created_at: string | null
-}
+interface ApiKeyData { key_prefix: string | null; is_active: boolean | null; last_used_at: string | null }
+interface WebhookTokenData { token: string | null; hmac_secret: string | null; is_active: boolean }
 
-interface WebhookTokenData {
-  token: string | null
-  webhook_url: string | null
-  hmac_secret: string | null
-  is_active: boolean
-}
+const WEBHOOK_URL = "https://www.basmaweb.com/api/evolution/webhook"
 
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false)
-  const copy = () => {
-    navigator.clipboard.writeText(value)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
   return (
-    <Button variant="outline" size="icon-sm" onClick={copy} aria-label="Copy">
+    <Button variant="outline" size="icon-sm" onClick={() => { navigator.clipboard.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 2000) }}>
       {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
     </Button>
   )
@@ -44,78 +27,42 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("")
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileSaved, setProfileSaved] = useState(false)
-
   const [apiKeyData, setApiKeyData] = useState<ApiKeyData | null>(null)
   const [newApiKey, setNewApiKey] = useState<string | null>(null)
   const [showApiKey, setShowApiKey] = useState(false)
   const [loadingApiKey, setLoadingApiKey] = useState(true)
   const [generatingApiKey, setGeneratingApiKey] = useState(false)
-
   const [webhookData, setWebhookData] = useState<WebhookTokenData | null>(null)
   const [showHmac, setShowHmac] = useState(false)
   const [loadingWebhook, setLoadingWebhook] = useState(true)
   const [generatingWebhook, setGeneratingWebhook] = useState(false)
 
-  // The correct webhook URL — always basmaweb.com
-  const EVOLUTION_WEBHOOK_URL = "https://www.basmaweb.com/api/evolution/webhook"
-
   useEffect(() => {
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((d) => { setDisplayName(d.full_name ?? ""); setEmail(d.email ?? "") })
-      .catch(() => {})
-
-    fetch("/api/user/api-key")
-      .then((r) => r.json())
-      .then((d) => setApiKeyData(d))
-      .finally(() => setLoadingApiKey(false))
-
-    fetch("/api/user/webhook-token")
-      .then((r) => r.json())
-      .then((d) => setWebhookData(d))
-      .finally(() => setLoadingWebhook(false))
+    fetch("/api/user/profile").then(r => r.json()).then(d => { setDisplayName(d.full_name ?? ""); setEmail(d.email ?? "") }).catch(() => {})
+    fetch("/api/user/api-key").then(r => r.json()).then(d => setApiKeyData(d)).finally(() => setLoadingApiKey(false))
+    fetch("/api/user/webhook-token").then(r => r.json()).then(d => setWebhookData(d)).finally(() => setLoadingWebhook(false))
   }, [])
 
   const handleSaveProfile = async () => {
     setSavingProfile(true)
-    await fetch("/api/user/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ full_name: displayName }),
-    })
-    setSavingProfile(false)
-    setProfileSaved(true)
-    setTimeout(() => setProfileSaved(false), 2000)
+    await fetch("/api/user/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ full_name: displayName }) })
+    setSavingProfile(false); setProfileSaved(true); setTimeout(() => setProfileSaved(false), 2000)
   }
 
   const handleGenerateApiKey = async () => {
     if (apiKeyData?.key_prefix && !confirm("This will invalidate your current API key. Continue?")) return
-    setGeneratingApiKey(true)
-    setNewApiKey(null)
+    setGeneratingApiKey(true); setNewApiKey(null)
     const res = await fetch("/api/user/api-key", { method: "POST" })
     const data = await res.json()
-    if (data.key) {
-      setNewApiKey(data.key)
-      setApiKeyData({ key_prefix: data.prefix, is_active: true, last_used_at: null, created_at: new Date().toISOString() })
-      setShowApiKey(true)
-    }
+    if (data.key) { setNewApiKey(data.key); setApiKeyData({ key_prefix: data.prefix, is_active: true, last_used_at: null }); setShowApiKey(true) }
     setGeneratingApiKey(false)
   }
 
-  const handleRevokeApiKey = async () => {
-    if (!confirm("Revoke your API key?")) return
-    await fetch("/api/user/api-key", { method: "DELETE" })
-    setApiKeyData((prev) => prev ? { ...prev, is_active: false } : null)
-    setNewApiKey(null)
-  }
-
   const handleGenerateWebhook = async () => {
-    if (webhookData?.token && !confirm("This will regenerate your HMAC secret. The webhook URL stays the same. Continue?")) return
     setGeneratingWebhook(true)
     const res = await fetch("/api/user/webhook-token", { method: "POST" })
     const data = await res.json()
-    setWebhookData(data)
-    setGeneratingWebhook(false)
+    setWebhookData(data); setGeneratingWebhook(false)
   }
 
   const keyExists = !!apiKeyData?.key_prefix
@@ -130,22 +77,13 @@ export default function SettingsPage() {
 
       {/* Profile */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          <User className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold text-foreground">Account</h2>
-        </div>
+        <div className="flex items-center gap-2"><User className="w-4 h-4 text-primary" /><h2 className="text-sm font-semibold">Account</h2></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="display-name">Display name</Label>
-            <Input id="display-name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} readOnly className="opacity-60 cursor-not-allowed" />
-          </div>
+          <div className="space-y-2"><Label>Display name</Label><Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Your name" /></div>
+          <div className="space-y-2"><Label>Email</Label><Input type="email" value={email} readOnly className="opacity-60 cursor-not-allowed" /></div>
         </div>
         <Button onClick={handleSaveProfile} disabled={savingProfile} className="gap-2">
-          {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : profileSaved ? <><Check className="w-4 h-4 text-green-500" /> Saved!</> : "Save Changes"}
+          {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</> : profileSaved ? <><Check className="w-4 h-4 text-green-500" />Saved!</> : "Save Changes"}
         </Button>
       </div>
 
@@ -154,49 +92,29 @@ export default function SettingsPage() {
       {/* API Key */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Key className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-foreground">API Key</h2>
-          </div>
+          <div className="flex items-center gap-2"><Key className="w-4 h-4 text-primary" /><h2 className="text-sm font-semibold">API Key</h2></div>
           {keyExists && !keyRevoked && <Badge variant="default" className="text-[10px]">Active</Badge>}
           {keyRevoked && <Badge variant="destructive" className="text-[10px]">Revoked</Badge>}
         </div>
         <p className="text-xs text-muted-foreground">Use this key to authenticate requests to the Basma Web API.</p>
-
-        {loadingApiKey ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Loading...</div>
-        ) : (
+        {loadingApiKey ? <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" />Loading...</div> : (
           <>
             {newApiKey && (
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs text-yellow-500 font-medium">
-                  <AlertTriangle className="w-4 h-4" /> Copy this key now — it will not be shown again
-                </div>
+                <div className="flex items-center gap-2 text-xs text-yellow-500 font-medium"><AlertTriangle className="w-4 h-4" />Copy this key now — it will not be shown again</div>
                 <div className="flex items-center gap-2">
                   <Input type={showApiKey ? "text" : "password"} value={newApiKey} readOnly className="flex-1 font-mono text-xs bg-background" />
-                  <Button variant="ghost" size="icon-sm" onClick={() => setShowApiKey((v) => !v)}>
-                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
+                  <Button variant="ghost" size="icon-sm" onClick={() => setShowApiKey(v => !v)}>{showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</Button>
                   <CopyButton value={newApiKey} />
                 </div>
               </div>
             )}
-            {!newApiKey && keyExists && (
-              <div className="space-y-2">
-                <Label>Current key</Label>
-                <div className="flex items-center gap-2">
-                  <Input value={apiKeyData?.key_prefix ?? ""} readOnly className="flex-1 font-mono text-xs opacity-70" />
-                </div>
-              </div>
-            )}
+            {!newApiKey && keyExists && <div className="space-y-2"><Label>Current key</Label><Input value={apiKeyData?.key_prefix ?? ""} readOnly className="flex-1 font-mono text-xs opacity-70" /></div>}
             {!newApiKey && !keyExists && <p className="text-xs text-muted-foreground">No API key generated yet.</p>}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2">
               <Button variant="outline" className="gap-2" onClick={handleGenerateApiKey} disabled={generatingApiKey}>
-                {generatingApiKey ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><RefreshCw className="w-4 h-4" /> {keyExists ? "Regenerate" : "Generate"} Key</>}
+                {generatingApiKey ? <><Loader2 className="w-4 h-4 animate-spin" />Generating...</> : <><RefreshCw className="w-4 h-4" />{keyExists ? "Regenerate" : "Generate"} Key</>}
               </Button>
-              {keyExists && !keyRevoked && (
-                <Button variant="outline" className="gap-2 text-destructive hover:text-destructive" onClick={handleRevokeApiKey}>Revoke Key</Button>
-              )}
             </div>
           </>
         )}
@@ -204,60 +122,48 @@ export default function SettingsPage() {
 
       <Separator />
 
-      {/* Webhook URL */}
+      {/* Webhook */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          <Webhook className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold text-foreground">Your Webhook URL</h2>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Set this URL in your Evolution API instance webhook settings. All WhatsApp events will be delivered here and forwarded to your configured destinations.
-        </p>
+        <div className="flex items-center gap-2"><Webhook className="w-4 h-4 text-primary" /><h2 className="text-sm font-semibold">Webhook URL</h2></div>
+        <p className="text-xs text-muted-foreground">Set this URL in your Evolution API instance webhook settings.</p>
 
-        {/* Always show the correct webhook URL */}
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Webhook URL (Evolution API)</Label>
             <div className="flex items-center gap-2">
-              <Input value={EVOLUTION_WEBHOOK_URL} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
-              <CopyButton value={EVOLUTION_WEBHOOK_URL} />
+              <Input value={WEBHOOK_URL} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
+              <CopyButton value={WEBHOOK_URL} />
             </div>
-            <p className="text-[10px] text-green-500">This is the URL to set in Evolution API instance webhook settings</p>
+            <p className="text-[10px] text-green-500">Set this in Evolution API instance webhook settings</p>
           </div>
 
-          {/* HMAC Secret */}
-          {loadingWebhook ? (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Loading...</div>
-          ) : webhookData?.hmac_secret ? (
+          {!loadingWebhook && webhookData?.hmac_secret && (
             <div className="space-y-2">
               <Label>HMAC Signing Secret</Label>
               <div className="flex items-center gap-2">
                 <Input type={showHmac ? "text" : "password"} value={webhookData.hmac_secret} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
-                <Button variant="ghost" size="icon-sm" onClick={() => setShowHmac((v) => !v)}>
-                  {showHmac ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
+                <Button variant="ghost" size="icon-sm" onClick={() => setShowHmac(v => !v)}>{showHmac ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</Button>
                 <CopyButton value={webhookData.hmac_secret} />
               </div>
             </div>
-          ) : null}
+          )}
 
           <div className="bg-muted/20 rounded-lg p-3 space-y-1 text-xs text-muted-foreground">
             <p className="font-medium text-foreground">How to configure in Evolution API:</p>
-            <p>1. Open your Evolution API dashboard</p>
-            <p>2. Go to your instance → Webhook settings</p>
-            <p>3. Set the URL above as the webhook endpoint</p>
-            <p>4. Enable: MESSAGES_UPSERT, CONNECTION_UPDATE, MESSAGES_UPDATE</p>
+            <p>1. Open Evolution API dashboard → your instance → Webhook</p>
+            <p>2. Set the URL above as the webhook endpoint</p>
+            <p>3. Enable: MESSAGES_UPSERT, CONNECTION_UPDATE, MESSAGES_UPDATE</p>
+            <p>4. Save and test</p>
           </div>
         </div>
 
         <Button variant="outline" className="gap-2" onClick={handleGenerateWebhook} disabled={generatingWebhook}>
-          {generatingWebhook ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><RefreshCw className="w-4 h-4" /> {webhookData?.token ? "Regenerate HMAC Secret" : "Generate Webhook Config"}</>}
+          {generatingWebhook ? <><Loader2 className="w-4 h-4 animate-spin" />Generating...</> : <><RefreshCw className="w-4 h-4" />{webhookData?.hmac_secret ? "Regenerate HMAC Secret" : "Generate Webhook Config"}</>}
         </Button>
       </div>
 
       <Separator />
 
-      {/* Danger Zone */}
       <div className="bg-card border border-destructive/30 rounded-xl p-6 space-y-5">
         <h2 className="text-sm font-semibold text-destructive">Danger Zone</h2>
         <p className="text-sm text-muted-foreground">Deleting your workspace is permanent and cannot be undone.</p>
