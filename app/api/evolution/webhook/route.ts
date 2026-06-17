@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           : new Date().toISOString()
 
         const msgContent = (msg.message as Record<string, unknown>) ?? {}
-        const { messageType, text } = parseMessageContent(msgContent)
+        const { messageType, text, media } = parseMessageContent(msgContent)
 
         const pushName = (msg.pushName as string) ?? null
 
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
             from_me: fromMe,
             remote_jid: remoteJid,
             message_type: messageType,
-            content: { text, raw: msgContent },
+            content: { text, media, raw: msgContent },
             status: fromMe ? "SENT" : "DELIVERED",
             timestamp: ts,
           },
@@ -198,25 +198,62 @@ export async function POST(request: NextRequest) {
 }
 
 // ─── Detect WhatsApp message type + extract a text/preview ──────────────────
-function parseMessageContent(m: Record<string, unknown>): { messageType: string; text: string | null } {
+interface ParsedMedia {
+  thumbnail?: string | null   // base64 jpeg thumbnail (data URL ready)
+  mimetype?: string | null
+  fileName?: string | null
+  mediaUrl?: string | null    // encrypted WhatsApp URL (needs Evolution to decrypt)
+  seconds?: number | null     // audio/video duration
+}
+function jpegThumbToDataUrl(t: unknown): string | null {
+  // Evolution sends jpegThumbnail as an object of byte values or a base64 string
+  if (!t) return null
+  if (typeof t === "string") return `data:image/jpeg;base64,${t}`
+  try {
+    const bytes = Object.values(t as Record<string, number>)
+    const b64 = Buffer.from(bytes).toString("base64")
+    return `data:image/jpeg;base64,${b64}`
+  } catch { return null }
+}
+function parseMessageContent(m: Record<string, unknown>): { messageType: string; text: string | null; media: ParsedMedia | null } {
   const get = (k: string) => m[k] as Record<string, unknown> | undefined
-  if (m.conversation) return { messageType: "TEXT", text: m.conversation as string }
-  if (get("extendedTextMessage")) return { messageType: "TEXT", text: (get("extendedTextMessage")!.text as string) ?? null }
-  if (get("imageMessage")) return { messageType: "IMAGE", text: (get("imageMessage")!.caption as string) ?? "[image]" }
-  if (get("videoMessage")) return { messageType: "VIDEO", text: (get("videoMessage")!.caption as string) ?? "[video]" }
-  if (get("audioMessage")) return { messageType: "AUDIO", text: "[audio]" }
-  if (get("documentMessage")) return { messageType: "DOCUMENT", text: (get("documentMessage")!.fileName as string) ?? "[document]" }
+  if (m.conversation) return { messageType: "TEXT", text: m.conversation as string, media: null }
+  if (get("extendedTextMessage")) return { messageType: "TEXT", text: (get("extendedTextMessage")!.text as string) ?? null, media: null }
+  if (get("imageMessage")) {
+    const im = get("imageMessage")!
+    return { messageType: "IMAGE", text: (im.caption as string) ?? "[image]",
+      media: { thumbnail: jpegThumbToDataUrl(im.jpegThumbnail), mimetype: (im.mimetype as string) ?? "image/jpeg", mediaUrl: (im.url as string) ?? null } }
+  }
+  if (get("videoMessage")) {
+    const vm = get("videoMessage")!
+    return { messageType: "VIDEO", text: (vm.caption as string) ?? "[video]",
+      media: { thumbnail: jpegThumbToDataUrl(vm.jpegThumbnail), mimetype: (vm.mimetype as string) ?? "video/mp4", mediaUrl: (vm.url as string) ?? null } }
+  }
+  if (get("audioMessage")) {
+    const am = get("audioMessage")!
+    return { messageType: "AUDIO", text: "[audio]",
+      media: { mimetype: (am.mimetype as string) ?? "audio/ogg", mediaUrl: (am.url as string) ?? null, seconds: (am.seconds as number) ?? null } }
+  }
+  if (get("documentMessage")) {
+    const dm = get("documentMessage")!
+    return { messageType: "DOCUMENT", text: (dm.fileName as string) ?? "[document]",
+      media: { mimetype: (dm.mimetype as string) ?? null, fileName: (dm.fileName as string) ?? null, mediaUrl: (dm.url as string) ?? null } }
+  }
   if (get("documentWithCaptionMessage")) {
     const inner = (get("documentWithCaptionMessage")!.message as Record<string, unknown>)?.documentMessage as Record<string, unknown> | undefined
-    return { messageType: "DOCUMENT", text: (inner?.fileName as string) ?? (inner?.caption as string) ?? "[document]" }
+    return { messageType: "DOCUMENT", text: (inner?.fileName as string) ?? (inner?.caption as string) ?? "[document]",
+      media: { mimetype: (inner?.mimetype as string) ?? null, fileName: (inner?.fileName as string) ?? null, mediaUrl: (inner?.url as string) ?? null } }
   }
-  if (get("stickerMessage")) return { messageType: "STICKER", text: "[sticker]" }
-  if (get("locationMessage")) return { messageType: "LOCATION", text: "[location]" }
-  if (get("contactMessage") || get("contactsArrayMessage")) return { messageType: "CONTACT", text: "[contact]" }
-  if (get("reactionMessage")) return { messageType: "REACTION", text: (get("reactionMessage")!.text as string) ?? "[reaction]" }
-  if (get("pollCreationMessage") || get("pollCreationMessageV3")) return { messageType: "POLL", text: "[poll]" }
-  if (get("ptvMessage")) return { messageType: "VIDEO", text: "[video note]" }
-  return { messageType: "UNKNOWN", text: null }
+  if (get("stickerMessage")) {
+    const sm = get("stickerMessage")!
+    return { messageType: "STICKER", text: "[sticker]", media: { mimetype: "image/webp", mediaUrl: (sm.url as string) ?? null } }
+  }
+  if (get("locationMessage")) return { messageType: "LOCATION", text: "[location]", media: null }
+  if (get("contactMessage") || get("contactsArrayMessage")) return { messageType: "CONTACT", text: "[contact]", media: null }
+  if (get("reactionMessage")) return { messageType: "REACTION", text: (get("reactionMessage")!.text as string) ?? "[reaction]", media: null }
+  if (get("pollCreationMessage") || get("pollCreationMessageV3")) return { messageType: "POLL", text: "[poll]", media: null }
+  if (get("ptvMessage")) return { messageType: "VIDEO", text: "[video note]", media: { thumbnail: jpegThumbToDataUrl(get("ptvMessage")!.jpegThumbnail) } }
+  return { messageType: "UNKNOWN", text: null, media: null }
 }
 
 async function deliverToDestination(
