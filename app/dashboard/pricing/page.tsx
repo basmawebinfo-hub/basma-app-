@@ -12,9 +12,15 @@ export default function PricingPage() {
 
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
 
+  const [requested, setRequested] = useState<string | null>(null)
   async function choose(planId: string, name: string) {
-    // For now: request the plan (admin activates after payment). Payment gateway later.
-    alert(`To activate "${name}", complete payment then it will be enabled on your account. (Payment gateway coming soon)`)
+    const r = await fetch("/api/plan-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan_id: planId }) })
+    if (r.ok) {
+      setRequested(name)
+      alert(`Your request for "${name}" was sent. Our team will contact you on WhatsApp to confirm payment and activate it.`)
+    } else {
+      alert("Something went wrong. Please try again.")
+    }
   }
 
   return (
