@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (profile?.status === "suspended") {
-    return NextResponse.json({ error: "حسابك موقوف" }, { status: 403 })
+    return NextResponse.json({ error: "Your account is suspended" }, { status: 403 })
   }
 
   const plan = await getUserPlan(user.id)
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   const maxInstances = plan.max_instances ?? 1
   if ((currentCount ?? 0) >= maxInstances) {
     return NextResponse.json(
-      { error: `وصلت للحد الأقصى من الأرقام في باقتك (${maxInstances}). قم بالترقية لإضافة المزيد.` },
+      { error: `You reached your plan limit (${maxInstances} numbers). Upgrade to add more.` },
       { status: 403 }
     )
   }
