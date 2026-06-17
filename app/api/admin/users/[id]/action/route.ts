@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin, adminService, logAdminAction } from "@/lib/admin"
 import { sendTelegram } from "@/lib/telegram"
+import { setUserPlan } from "@/lib/plan"
 
 // POST /api/admin/users/[id]/action  — perform an admin action on a user
 // Body: { action: "...", ...params }
@@ -44,16 +45,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ ok: true, balance: newBalance })
     }
 
-    // ── Change plan ──
+    // ── Change plan (writes to subscriptions) ──
     case "set_plan": {
-      const plan = body.plan as string
-      if (!["free","starter","pro","enterprise"].includes(plan))
-        return NextResponse.json({ error: "invalid plan" }, { status: 400 })
-      await db.from("profiles").update({
-        plan, plan_expires_at: body.expires_at ?? null, updated_at: new Date().toISOString(),
-      }).eq("id", targetUserId)
-      await logAdminAction(gate.userId, "set_plan", "user", targetUserId, { plan })
-      return NextResponse.json({ ok: true, plan })
+      const planId = body.plan_id as string
+      if (!planId) return NextResponse.json({ error: "plan_id required" }, { status: 400 })
+      const { data: pl } = await db.from("plans").select("id").eq("id", planId).single()
+      if (!pl) return NextResponse.json({ error: "invalid plan_id" }, { status: 400 })
+      await setUserPlan(targetUserId, planId, body.expires_at ?? undefined)
+      await logAdminAction(gate.userId, "set_plan", "user", targetUserId, { plan_id: planId })
+      return NextResponse.json({ ok: true, plan_id: planId })
     }
 
     // ── Update limits ──
