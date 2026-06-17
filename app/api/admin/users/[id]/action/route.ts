@@ -21,7 +21,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   switch (action) {
     // ── Suspend / Activate ──
     case "suspend":
-    case "activate": {
+    case "activate":
+    case "approve": {
       const status = action === "suspend" ? "suspended" : "active"
       await db.from("profiles").update({ status, updated_at: new Date().toISOString() }).eq("id", targetUserId)
       await logAdminAction(gate.userId, action, "user", targetUserId, { status })
