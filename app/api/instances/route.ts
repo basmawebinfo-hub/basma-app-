@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createInstance, deleteInstance, setInstanceWebhook } from "@/lib/evolution"
+import { getUserPlan } from "@/lib/plan"
 
 const WEBHOOK_EVENTS = [
   "MESSAGES_UPSERT",
@@ -40,10 +41,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "display_name is required" }, { status: 400 })
   }
 
-  // Enforce account status + per-plan instance limit
+  // Enforce account status + per-plan instance limit (from subscriptions)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("status, max_instances, plan")
+    .select("status")
     .eq("id", user.id)
     .single()
 
@@ -51,12 +52,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "حسابك موقوف" }, { status: 403 })
   }
 
+  const plan = await getUserPlan(user.id)
+
   const { count: currentCount } = await supabase
     .from("instances")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
 
-  const maxInstances = profile?.max_instances ?? 1
+  const maxInstances = plan.max_instances ?? 1
   if ((currentCount ?? 0) >= maxInstances) {
     return NextResponse.json(
       { error: `وصلت للحد الأقصى من الأرقام في باقتك (${maxInstances}). قم بالترقية لإضافة المزيد.` },
