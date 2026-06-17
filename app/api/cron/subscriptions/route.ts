@@ -69,5 +69,52 @@ export async function GET(req: NextRequest) {
     // TODO: send email reminder here once an email provider is configured
   }
 
-  return NextResponse.json({ ok: true, downgraded, reminded, ran_at: now })
+  // 3) Daily balance deduction (monthly price / 30) for users on a paid plan
+  let charged = 0, depleted = 0
+  const { data: paidProfiles } = await db
+    .from("profiles")
+    .select("id, balance, telegram_chat_id")
+  const { data: allSubs } = await db.from("subscriptions").select("user_id, plan_id, status")
+  const { data: allPlans } = await db.from("plans").select("id, price_monthly, name")
+  const planMap = new Map((allPlans ?? []).map((p: { id: string; price_monthly: number; name: string }) => [p.id, p]))
+  const subMap = new Map((allSubs ?? []).map((s: { user_id: string; plan_id: string; status: string }) => [s.user_id, s]))
+
+  for (const u of (paidProfiles ?? []) as { id: string; balance: number; telegram_chat_id: string | null }[]) {
+    const sub = subMap.get(u.id)
+    if (!sub || sub.status !== "active") continue
+    const plan = planMap.get(sub.plan_id)
+    if (!plan || !plan.price_monthly || plan.price_monthly <= 0) continue  // free/custom skip
+
+    const dailyCost = Number((plan.price_monthly / 30).toFixed(2))
+    const bal = Number(u.balance ?? 0)
+
+    if (bal >= dailyCost) {
+      const newBal = Number((bal - dailyCost).toFixed(2))
+      await db.from("profiles").update({ balance: newBal }).eq("id", u.id)
+      await db.from("credit_transactions").insert({
+        user_id: u.id, amount: -dailyCost, type: "debit",
+        reason: `Daily charge (${plan.name})`, balance_after: newBal,
+      })
+      charged++
+      // Low balance warning (< 3 days left)
+      if (newBal < dailyCost * 3) {
+        await db.from("notifications").insert({
+          user_id: u.id, title: "Low balance",
+          body: `Your balance is $${newBal}. Top up to keep your plan active.`, level: "warning",
+        })
+        if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, `<b>Low balance</b>\nYour balance is $${newBal}. Top up soon.`)
+      }
+    } else {
+      // Not enough balance -> suspend the subscription
+      await db.from("subscriptions").update({ status: "past_due" }).eq("user_id", u.id)
+      await db.from("notifications").insert({
+        user_id: u.id, title: "Plan paused — insufficient balance",
+        body: "Your balance ran out. Top up to reactivate your plan.", level: "critical",
+      })
+      if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, "<b>Plan paused</b>\nYour balance ran out. Top up to reactivate.")
+      depleted++
+    }
+  }
+
+  return NextResponse.json({ ok: true, downgraded, reminded, charged, depleted, ran_at: now })
 }
