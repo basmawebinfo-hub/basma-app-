@@ -1,12 +1,14 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Users, Server, MessageSquare, Wallet, Loader2 } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts"
 
 interface Stats {
   total_users: number; suspended_users: number
   total_instances: number; connected_instances: number
   total_messages: number; messages_today: number
   total_balance: number; webhook_success_rate: number
+  messages_week: { day: string; count: number }[]
 }
 
 export default function AdminOverview() {
@@ -41,6 +43,19 @@ export default function AdminOverview() {
             <div className="text-xs text-muted-foreground mt-1">{c.sub}</div>
           </div>
         ))}
+      </div>
+
+      {/* Messages — last 7 days */}
+      <div className="mt-6 rounded-xl border border-border bg-card/50 p-5">
+        <h2 className="text-sm font-semibold mb-4">الرسائل — آخر 7 أيام</h2>
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={stats.messages_week}>
+            <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+            <Tooltip />
+            <Bar dataKey="count" fill="#58a68d" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )
