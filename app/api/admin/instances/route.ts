@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin, adminService, logAdminAction } from "@/lib/admin"
+import { deleteInstance } from "@/lib/evolution"
 
 export async function GET() {
   const gate = await requireAdmin()
@@ -21,7 +22,17 @@ export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id")
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
   const db = adminService()
+
+  // Get the instance name first so we can also delete it from Evolution
+  const { data: inst } = await db.from("instances").select("instance_name").eq("id", id).single()
+
+  // Delete from Evolution server (best-effort — don't block if it's already gone)
+  if (inst?.instance_name) {
+    try { await deleteInstance(inst.instance_name) } catch { /* already gone on Evolution */ }
+  }
+
+  // Delete from our DB (cascades to messages/chats/contacts)
   await db.from("instances").delete().eq("id", id)
-  await logAdminAction(gate.userId, "delete_instance", "instance", id, {})
+  await logAdminAction(gate.userId, "delete_instance", "instance", id, { instance_name: inst?.instance_name })
   return NextResponse.json({ ok: true })
 }
