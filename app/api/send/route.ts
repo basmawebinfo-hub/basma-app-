@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { sendText, sendMedia, sendAudio } from "@/lib/evolution"
+import { getUserPlan } from "@/lib/plan"
 import crypto from "crypto"
 
 /**
@@ -70,8 +71,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Account suspended" }, { status: 403, headers: CORS })
   }
 
-  // Count outgoing messages this calendar month for this user's instances
-  const maxMessages = ownerProfile?.max_messages ?? 1000
+  // Count outgoing messages this calendar month (limit from real plan; 0 = unlimited)
+  const plan = await getUserPlan(keyRow.user_id)
+  const maxMessages = plan.max_messages_mo ?? 0
   if (maxMessages > 0) {
     const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
     const { data: ownInst } = await db.from("instances").select("id").eq("user_id", keyRow.user_id)
