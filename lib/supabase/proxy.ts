@@ -46,6 +46,41 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Protect all /admin routes — must be authenticated AND have role = 'admin'
+  if (pathname.startsWith("/admin")) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/login"
+      return NextResponse.redirect(url)
+    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .single()
+
+    if (!profile || profile.role !== "admin") {
+      // Not an admin — bounce to the normal dashboard
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard"
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Block suspended users from the whole dashboard
+  if (user && pathname.startsWith("/dashboard")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .single()
+    if (profile?.status === "suspended") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/suspended"
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Redirect authenticated users away from /login and /register
   if (user && (pathname === "/login" || pathname === "/register")) {
     const url = request.nextUrl.clone()
