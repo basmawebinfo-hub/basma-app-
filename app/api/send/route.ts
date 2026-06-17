@@ -59,6 +59,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid or revoked API key" }, { status: 401, headers: CORS })
   }
 
+  // ── Account status + monthly message limit checks ──
+  const { data: ownerProfile } = await db
+    .from("profiles")
+    .select("status, max_messages")
+    .eq("id", keyRow.user_id)
+    .single()
+
+  if (ownerProfile?.status === "suspended") {
+    return NextResponse.json({ error: "Account suspended" }, { status: 403, headers: CORS })
+  }
+
+  // Count outgoing messages this calendar month for this user's instances
+  const maxMessages = ownerProfile?.max_messages ?? 1000
+  if (maxMessages > 0) {
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+    const { data: ownInst } = await db.from("instances").select("id").eq("user_id", keyRow.user_id)
+    const instIds = (ownInst ?? []).map((i: { id: string }) => i.id)
+    if (instIds.length) {
+      const { count } = await db.from("messages")
+        .select("id", { count: "exact", head: true })
+        .in("instance_id", instIds)
+        .eq("from_me", true)
+        .gte("timestamp", monthStart.toISOString())
+      if ((count ?? 0) >= maxMessages) {
+        return NextResponse.json({ error: "Monthly message limit reached (" + maxMessages + ")" }, { status: 429, headers: CORS })
+      }
+    }
+  }
+
   // 3. Parse body
   let body: {
     to?: string
