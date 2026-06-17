@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireSuperAdmin, adminService, logAdminAction } from "@/lib/admin"
 
+// GET /api/admin/admins — list admins + all users (super admin only)
+export async function GET() {
+  const gate = await requireSuperAdmin()
+  if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status })
+  const db = adminService()
+  const { data: all } = await db.from("profiles")
+    .select("id, email, full_name, role, status, created_at")
+    .order("role", { ascending: false })
+  return NextResponse.json({ profiles: all ?? [] })
+}
+
 // POST /api/admin/admins — manage admin roles (SUPER ADMIN ONLY)
 // Body: { action: "promote"|"demote"|"create", user_id?, email?, password? }
 export async function POST(req: NextRequest) {
