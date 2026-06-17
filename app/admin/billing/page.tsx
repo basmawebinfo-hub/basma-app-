@@ -12,22 +12,22 @@ export default function AdminBilling() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold mb-4">أرصدة المستخدمين</h1>
+        <h1 className="text-2xl font-bold mb-4">User Balances</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {bal.map(b=>(
             <div key={b.id} className="rounded-xl border border-border bg-card/50 p-4">
               <div className="text-sm text-muted-foreground truncate">{b.email}</div>
               <div className="text-xl font-bold mt-1">{Number(b.balance).toFixed(2)}</div>
-              <div className="text-xs text-muted-foreground">باقة: {b.plan}</div>
+              <div className="text-xs text-muted-foreground">Plan: {b.plan}</div>
             </div>
           ))}
         </div>
       </div>
       <div>
-        <h2 className="text-lg font-semibold mb-3">آخر الحركات المالية</h2>
+        <h2 className="text-lg font-semibold mb-3">Recent Transactions</h2>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">المستخدم</th><th className="p-3">المبلغ</th><th className="p-3">النوع</th><th className="p-3">السبب</th><th className="p-3">التاريخ</th></tr></thead>
+            <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">User</th><th className="p-3">Amount</th><th className="p-3">Type</th><th className="p-3">Reason</th><th className="p-3">Date</th></tr></thead>
             <tbody>
               {tx.map(t=>(
                 <tr key={t.id} className="border-t border-border/40">
