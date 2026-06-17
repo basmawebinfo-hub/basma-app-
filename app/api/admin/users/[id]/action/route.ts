@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin, adminService, logAdminAction } from "@/lib/admin"
+import { sendTelegram } from "@/lib/telegram"
 
 // POST /api/admin/users/[id]/action  — perform an admin action on a user
 // Body: { action: "...", ...params }
@@ -72,6 +73,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         user_id: targetUserId, title: body.title, body: body.body ?? null,
         level: body.level ?? "info", created_by: gate.userId,
       })
+      // Also push to Telegram if the user linked it
+      if (profile.telegram_chat_id) {
+        await sendTelegram(profile.telegram_chat_id, `<b>${body.title}</b>\n${body.body ?? ""}`)
+      }
       await logAdminAction(gate.userId, "notify", "user", targetUserId, { title: body.title })
       return NextResponse.json({ ok: true })
     }
