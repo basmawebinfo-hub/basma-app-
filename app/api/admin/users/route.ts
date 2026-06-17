@@ -11,7 +11,7 @@ export async function GET() {
   // All profiles
   const { data: profiles } = await db
     .from("profiles")
-    .select("id, email, full_name, company, role, status, balance, plan, plan_expires_at, max_instances, max_messages, created_at")
+    .select("id, email, full_name, company, role, status, balance, plan, plan_expires_at, max_instances, max_messages, whatsapp, created_at")
     .order("created_at", { ascending: false })
 
   const users = profiles ?? []
