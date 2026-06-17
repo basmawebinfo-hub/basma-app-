@@ -56,6 +56,9 @@ export default function SettingsPage() {
   const [loadingWebhook, setLoadingWebhook] = useState(true)
   const [generatingWebhook, setGeneratingWebhook] = useState(false)
 
+  // The correct webhook URL — always basmaweb.com
+  const EVOLUTION_WEBHOOK_URL = "https://www.basmaweb.com/api/evolution/webhook"
+
   useEffect(() => {
     fetch("/api/user/profile")
       .then((r) => r.json())
@@ -100,14 +103,14 @@ export default function SettingsPage() {
   }
 
   const handleRevokeApiKey = async () => {
-    if (!confirm("Revoke your API key? All integrations using it will stop working.")) return
+    if (!confirm("Revoke your API key?")) return
     await fetch("/api/user/api-key", { method: "DELETE" })
     setApiKeyData((prev) => prev ? { ...prev, is_active: false } : null)
     setNewApiKey(null)
   }
 
   const handleGenerateWebhook = async () => {
-    if (webhookData?.token && !confirm("This will change your webhook URL. Continue?")) return
+    if (webhookData?.token && !confirm("This will regenerate your HMAC secret. The webhook URL stays the same. Continue?")) return
     setGeneratingWebhook(true)
     const res = await fetch("/api/user/webhook-token", { method: "POST" })
     const data = await res.json()
@@ -115,9 +118,7 @@ export default function SettingsPage() {
     setGeneratingWebhook(false)
   }
 
-  // Key exists = has a prefix
   const keyExists = !!apiKeyData?.key_prefix
-  // Key is revoked = exists but is_active is explicitly false
   const keyRevoked = keyExists && apiKeyData?.is_active === false
 
   return (
@@ -160,22 +161,16 @@ export default function SettingsPage() {
           {keyExists && !keyRevoked && <Badge variant="default" className="text-[10px]">Active</Badge>}
           {keyRevoked && <Badge variant="destructive" className="text-[10px]">Revoked</Badge>}
         </div>
-
-        <p className="text-xs text-muted-foreground">
-          Use this key to authenticate requests to the Basma Web API from your own applications.
-        </p>
+        <p className="text-xs text-muted-foreground">Use this key to authenticate requests to the Basma Web API.</p>
 
         {loadingApiKey ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" /> Loading...
-          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Loading...</div>
         ) : (
           <>
             {newApiKey && (
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-yellow-500 font-medium">
-                  <AlertTriangle className="w-4 h-4" />
-                  Copy this key now — it will not be shown again
+                  <AlertTriangle className="w-4 h-4" /> Copy this key now — it will not be shown again
                 </div>
                 <div className="flex items-center gap-2">
                   <Input type={showApiKey ? "text" : "password"} value={newApiKey} readOnly className="flex-1 font-mono text-xs bg-background" />
@@ -186,33 +181,21 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
-
             {!newApiKey && keyExists && (
               <div className="space-y-2">
                 <Label>Current key</Label>
                 <div className="flex items-center gap-2">
                   <Input value={apiKeyData?.key_prefix ?? ""} readOnly className="flex-1 font-mono text-xs opacity-70" />
-                  {apiKeyData?.last_used_at && (
-                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      Last used: {new Date(apiKeyData.last_used_at).toLocaleDateString()}
-                    </span>
-                  )}
                 </div>
               </div>
             )}
-
-            {!newApiKey && !keyExists && (
-              <p className="text-xs text-muted-foreground">No API key generated yet.</p>
-            )}
-
+            {!newApiKey && !keyExists && <p className="text-xs text-muted-foreground">No API key generated yet.</p>}
             <div className="flex gap-2 flex-wrap">
               <Button variant="outline" className="gap-2" onClick={handleGenerateApiKey} disabled={generatingApiKey}>
                 {generatingApiKey ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><RefreshCw className="w-4 h-4" /> {keyExists ? "Regenerate" : "Generate"} Key</>}
               </Button>
               {keyExists && !keyRevoked && (
-                <Button variant="outline" className="gap-2 text-destructive hover:text-destructive" onClick={handleRevokeApiKey}>
-                  Revoke Key
-                </Button>
+                <Button variant="outline" className="gap-2 text-destructive hover:text-destructive" onClick={handleRevokeApiKey}>Revoke Key</Button>
               )}
             </div>
           </>
@@ -221,7 +204,7 @@ export default function SettingsPage() {
 
       <Separator />
 
-      {/* Webhook Token */}
+      {/* Webhook URL */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-5">
         <div className="flex items-center gap-2">
           <Webhook className="w-4 h-4 text-primary" />
@@ -231,47 +214,45 @@ export default function SettingsPage() {
           Set this URL in your Evolution API instance webhook settings. All WhatsApp events will be delivered here and forwarded to your configured destinations.
         </p>
 
-        {loadingWebhook ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+        {/* Always show the correct webhook URL */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Webhook URL (Evolution API)</Label>
+            <div className="flex items-center gap-2">
+              <Input value={EVOLUTION_WEBHOOK_URL} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
+              <CopyButton value={EVOLUTION_WEBHOOK_URL} />
+            </div>
+            <p className="text-[10px] text-green-500">This is the URL to set in Evolution API instance webhook settings</p>
           </div>
-        ) : (
-          <>
-            {webhookData?.webhook_url ? (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Webhook URL</Label>
-                  <div className="flex items-center gap-2">
-                    <Input value={webhookData.webhook_url} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
-                    <CopyButton value={webhookData.webhook_url} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>HMAC Signing Secret</Label>
-                  <div className="flex items-center gap-2">
-                    <Input type={showHmac ? "text" : "password"} value={webhookData.hmac_secret ?? ""} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
-                    <Button variant="ghost" size="icon-sm" onClick={() => setShowHmac((v) => !v)}>
-                      {showHmac ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
-                    <CopyButton value={webhookData.hmac_secret ?? ""} />
-                  </div>
-                </div>
-                <div className="bg-muted/20 rounded-lg p-3 space-y-1 text-xs text-muted-foreground">
-                  <p className="font-medium text-foreground">How to configure in Evolution API:</p>
-                  <p>1. Open your Evolution API dashboard</p>
-                  <p>2. Go to your instance webhook settings</p>
-                  <p>3. Set the URL above as the webhook endpoint</p>
-                  <p>4. Enable the events you want to receive</p>
-                </div>
+
+          {/* HMAC Secret */}
+          {loadingWebhook ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Loading...</div>
+          ) : webhookData?.hmac_secret ? (
+            <div className="space-y-2">
+              <Label>HMAC Signing Secret</Label>
+              <div className="flex items-center gap-2">
+                <Input type={showHmac ? "text" : "password"} value={webhookData.hmac_secret} readOnly className="flex-1 font-mono text-xs bg-muted/30" />
+                <Button variant="ghost" size="icon-sm" onClick={() => setShowHmac((v) => !v)}>
+                  {showHmac ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </Button>
+                <CopyButton value={webhookData.hmac_secret} />
               </div>
-            ) : (
-              <p className="text-xs text-muted-foreground">No webhook URL generated yet.</p>
-            )}
-            <Button variant="outline" className="gap-2" onClick={handleGenerateWebhook} disabled={generatingWebhook}>
-              {generatingWebhook ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><RefreshCw className="w-4 h-4" /> {webhookData?.token ? "Regenerate" : "Generate"} Webhook URL</>}
-            </Button>
-          </>
-        )}
+            </div>
+          ) : null}
+
+          <div className="bg-muted/20 rounded-lg p-3 space-y-1 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">How to configure in Evolution API:</p>
+            <p>1. Open your Evolution API dashboard</p>
+            <p>2. Go to your instance → Webhook settings</p>
+            <p>3. Set the URL above as the webhook endpoint</p>
+            <p>4. Enable: MESSAGES_UPSERT, CONNECTION_UPDATE, MESSAGES_UPDATE</p>
+          </div>
+        </div>
+
+        <Button variant="outline" className="gap-2" onClick={handleGenerateWebhook} disabled={generatingWebhook}>
+          {generatingWebhook ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><RefreshCw className="w-4 h-4" /> {webhookData?.token ? "Regenerate HMAC Secret" : "Generate Webhook Config"}</>}
+        </Button>
       </div>
 
       <Separator />
