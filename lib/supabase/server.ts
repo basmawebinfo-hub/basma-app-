@@ -14,9 +14,12 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
+            cookiesToSet.forEach(({ name, value, options }) => {
+              const sessionOpts = { ...options }
+              delete (sessionOpts as { maxAge?: number }).maxAge
+              delete (sessionOpts as { expires?: Date }).expires
+              cookieStore.set(name, value, sessionOpts)
+            })
           } catch {}
         },
       },
