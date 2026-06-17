@@ -39,11 +39,11 @@ export async function GET(req: NextRequest) {
   for (const u of (expired ?? []) as { id: string; plan: string; telegram_chat_id: string | null }[]) {
     await db.from("profiles").update({ plan: "free", plan_expires_at: null }).eq("id", u.id)
     await db.from("notifications").insert({
-      user_id: u.id, title: "انتهى اشتراكك",
-      body: "انتهت صلاحية باقتك وتم تحويلك للباقة التجريبية. جدّد الآن لاستعادة كامل المميزات.",
+      user_id: u.id, title: "Subscription expired",
+      body: "Your plan has expired and you've been moved to the trial plan. Renew now to restore full features.",
       level: "critical",
     })
-    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, "<b>انتهى اشتراكك</b>\nتم تحويلك للباقة التجريبية. جدّد الآن.")
+    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, "<b>Subscription expired</b>\nتم تحويلك للباقة التجريبية. جدّد الآن.")
     downgraded++
   }
 
@@ -60,11 +60,11 @@ export async function GET(req: NextRequest) {
   for (const u of (soon ?? []) as { id: string; plan_expires_at: string; telegram_chat_id: string | null }[]) {
     const days = Math.ceil((new Date(u.plan_expires_at).getTime() - Date.now()) / 86400000)
     await db.from("notifications").insert({
-      user_id: u.id, title: "اشتراكك قارب على الانتهاء",
-      body: `باقي ${days} يوم على انتهاء باقتك. جدّد قبل الانتهاء لتجنّب توقف الخدمة.`,
+      user_id: u.id, title: "Subscription expiring soon",
+      body: `${days} days left until your plan expires. Renew before it ends to avoid service interruption.`,
       level: "warning",
     })
-    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, `<b>اشتراكك قارب على الانتهاء</b>\nباقي ${days} يوم. جدّد قبل توقف الخدمة.`)
+    if (u.telegram_chat_id) await sendTelegram(u.telegram_chat_id, `<b>Subscription expiring soon</b>\nباقي ${days} يوم. جدّد قبل توقف الخدمة.`)
     reminded++
     // TODO: send email reminder here once an email provider is configured
   }
