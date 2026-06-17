@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .single()
 
-    if (!profile || profile.role !== "admin") {
+    if (!profile || (profile.role !== "admin" && profile.role !== "super_admin")) {
       // Not an admin — bounce to the normal dashboard
       const url = request.nextUrl.clone()
       url.pathname = "/dashboard"
