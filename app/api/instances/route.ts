@@ -40,6 +40,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "display_name is required" }, { status: 400 })
   }
 
+  // Enforce account status + per-plan instance limit
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("status, max_instances, plan")
+    .eq("id", user.id)
+    .single()
+
+  if (profile?.status === "suspended") {
+    return NextResponse.json({ error: "حسابك موقوف" }, { status: 403 })
+  }
+
+  const { count: currentCount } = await supabase
+    .from("instances")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+
+  const maxInstances = profile?.max_instances ?? 1
+  if ((currentCount ?? 0) >= maxInstances) {
+    return NextResponse.json(
+      { error: `وصلت للحد الأقصى من الأرقام في باقتك (${maxInstances}). قم بالترقية لإضافة المزيد.` },
+      { status: 403 }
+    )
+  }
+
   const slug = display_name.toLowerCase().replace(/[^a-z0-9]/g, "_").slice(0, 20)
   const instance_name = `${user.id.slice(0, 8)}_${slug}_${Date.now()}`
 
