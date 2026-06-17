@@ -1,4 +1,3 @@
-// deploy: v2
 "use client"
 import { useEffect, useState } from "react"
 import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound, UserCheck, MinusCircle } from "lucide-react"
