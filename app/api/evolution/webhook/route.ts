@@ -10,6 +10,20 @@ function getServiceClient() {
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Security guard: if EVOLUTION_WEBHOOK_SECRET is set, require it ──
+    // Evolution must call the webhook with ?key=<secret> (or x-webhook-key header).
+    // This blocks anyone who doesn't know the secret from injecting fake events.
+    const requiredSecret = process.env.EVOLUTION_WEBHOOK_SECRET
+    if (requiredSecret) {
+      const provided =
+        request.nextUrl.searchParams.get("key") ??
+        request.headers.get("x-webhook-key") ??
+        ""
+      if (provided !== requiredSecret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+    }
+
     const body = await request.json()
     const supabase = getServiceClient()
 
