@@ -7,13 +7,26 @@ import { headers } from "next/headers"
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   })
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Route admins straight to the admin panel, everyone else to the dashboard
+  const uid = signInData.user?.id
+  if (uid) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", uid)
+      .single()
+    if (profile?.role === "admin") {
+      redirect("/admin")
+    }
   }
 
   redirect("/dashboard")
