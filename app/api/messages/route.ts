@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
   // Messages for a specific JID: from Supabase only
   const { data: dbMsgs } = await supabase
     .from("messages")
-    .select("id, message_id, from_me, remote_jid, content, status, timestamp")
+    .select("id, message_id, from_me, remote_jid, message_type, content, status, timestamp")
     .eq("instance_id", instance_id)
     .eq("remote_jid", jid)
     .order("timestamp", { ascending: true })
@@ -84,12 +84,16 @@ export async function GET(req: NextRequest) {
     message_id: string
     from_me: boolean
     remote_jid: string
-    content: { text?: string; raw?: Record<string, unknown> }
+    message_type?: string
+    content: { text?: string; media?: Record<string, unknown> | null; raw?: Record<string, unknown> }
     status: string
     timestamp: string
   }) => ({
     key: { id: m.message_id, remoteJid: m.remote_jid, fromMe: m.from_me },
     message: m.content?.raw ?? { conversation: m.content?.text ?? "" },
+    messageType: m.message_type ?? "TEXT",
+    text: m.content?.text ?? null,
+    media: m.content?.media ?? null,
     messageTimestamp: Math.floor(new Date(m.timestamp).getTime() / 1000),
     status: m.status,
   }))
