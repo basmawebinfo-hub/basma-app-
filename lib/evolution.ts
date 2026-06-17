@@ -112,6 +112,39 @@ export async function sendText(
   })
 }
 
+// Send an image / video / document via URL or base64
+export async function sendMedia(
+  instanceName: string,
+  to: string,
+  mediatype: "image" | "video" | "document",
+  media: string,            // URL or base64 string
+  caption?: string,
+  fileName?: string
+): Promise<unknown> {
+  return evoFetch(`/message/sendMedia/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({
+      number: to,
+      mediatype,
+      media,
+      ...(caption ? { caption } : {}),
+      ...(fileName ? { fileName } : {}),
+    }),
+  })
+}
+
+// Send a voice note (WhatsApp audio) via URL or base64
+export async function sendAudio(
+  instanceName: string,
+  to: string,
+  audio: string            // URL or base64 string
+): Promise<unknown> {
+  return evoFetch(`/message/sendWhatsAppAudio/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ number: to, audio }),
+  })
+}
+
 export async function fetchMessages(
   instanceName: string,
   remoteJid: string,
