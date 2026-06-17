@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LayoutDashboard, Users, Server, Wallet, ScrollText, ArrowLeft } from "lucide-react"
+import { LayoutDashboard, Users, Server, Wallet, ScrollText, ArrowLeft, ShieldCheck } from "lucide-react"
 
 const NAV = [
   { href: "/admin", label: "نظرة عامة", icon: LayoutDashboard },
@@ -7,6 +7,7 @@ const NAV = [
   { href: "/admin/instances", label: "الاتصالات", icon: Server },
   { href: "/admin/billing", label: "الرصيد والباقات", icon: Wallet },
   { href: "/admin/logs", label: "سجل النشاط", icon: ScrollText },
+  { href: "/admin/admins", label: "المشرفين", icon: ShieldCheck },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
