@@ -85,7 +85,7 @@ export default function AdminUsers() {
                 <td className="p-3"><div className="font-medium">{u.email ?? "—"}</div><div className="text-xs text-muted-foreground">{u.full_name} {u.role !== "user" && "• " + u.role}</div></td>
                 <td className="p-3"><span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : "bg-red-500/15 text-red-600")}>{u.status}</span></td>
                 <td className="p-3">{u.plan_name ?? "—"}</td>
-                <td className="p-3 font-medium">{Number(u.balance).toFixed(2)}</td>
+                <td className="p-3 font-medium">${Number(u.balance).toFixed(2)}</td>
                 <td className="p-3">{u.instances_connected}/{u.instances_total}</td>
                 <td className="p-3">{u.messages_sent} / {u.messages_received}</td>
                 <td className="p-3">
