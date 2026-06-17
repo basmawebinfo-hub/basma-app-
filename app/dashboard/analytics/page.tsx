@@ -18,25 +18,25 @@ export default function AnalyticsPage() {
   useEffect(() => { fetch("/api/analytics").then(r=>r.json()).then(setD).finally(()=>setLoading(false)) }, [])
 
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
-  if (!d) return <div className="p-6 text-destructive">تعذّر تحميل التحليلات</div>
+  if (!d) return <div className="p-6 text-destructive">تعذّر تحميل Analytics</div>
 
   const empty = d.totals.total === 0
   const cards = [
-    { label: "إجمالي الرسائل", value: d.totals.total, icon: MessageSquare },
-    { label: "صادرة", value: d.totals.sent, icon: Send },
-    { label: "واردة", value: d.totals.received, icon: Inbox },
+    { label: "Total Messages", value: d.totals.total, icon: MessageSquare },
+    { label: "Sent", value: d.totals.sent, icon: Send },
+    { label: "Received", value: d.totals.received, icon: Inbox },
   ]
 
   return (
-    <div className="p-6 space-y-6" dir="rtl">
+    <div className="p-6 space-y-6" >
       <div>
-        <h1 className="text-2xl font-bold">التحليلات</h1>
-        <p className="text-sm text-muted-foreground mt-1">حجم الرسائل والأنماط وأكثر جهات الاتصال (آخر 30 يوم)</p>
+        <h1 className="text-2xl font-bold">Analytics</h1>
+        <p className="text-sm text-muted-foreground mt-1">Message volume, patterns, and top contacts (last 30 days)</p>
       </div>
 
       {empty ? (
         <div className="rounded-xl border border-border bg-card/50 p-10 text-center text-muted-foreground">
-          لا توجد بيانات بعد. ابدأ باستقبال أو إرسال رسائل لتظهر التحليلات.
+          لا توجد بيانات بعد. ابدأ باستقبال أو إرسال رسائل لتظهر Analytics.
         </div>
       ) : (
         <>
@@ -51,13 +51,13 @@ export default function AnalyticsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-sm font-semibold mb-4">الرسائل — آخر 30 يوم</h2>
+              <h2 className="text-sm font-semibold mb-4">Messages — Last 30 days</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={d.line}><CartesianGrid strokeDasharray="3 3" opacity={0.1} /><XAxis dataKey="day" tick={{fontSize:10}} interval={4} /><YAxis tick={{fontSize:11}} /><Tooltip /><Line type="monotone" dataKey="messages" stroke="#58a68d" strokeWidth={2} dot={false} /></LineChart>
               </ResponsiveContainer>
             </div>
             <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-sm font-semibold mb-4">الرسائل حسب الساعة</h2>
+              <h2 className="text-sm font-semibold mb-4">Messages by Hour</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={d.byHour}><XAxis dataKey="hour" tick={{fontSize:9}} interval={2} /><YAxis tick={{fontSize:11}} /><Tooltip /><Bar dataKey="messages" fill="#58a68d" radius={[4,4,0,0]} /></BarChart>
               </ResponsiveContainer>
@@ -66,13 +66,13 @@ export default function AnalyticsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-sm font-semibold mb-4">أنواع الرسائل</h2>
+              <h2 className="text-sm font-semibold mb-4">Message Types</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart><Pie data={d.byType} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>{d.byType.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip /></PieChart>
               </ResponsiveContainer>
             </div>
             <div className="bg-card border border-border rounded-xl p-5">
-              <h2 className="text-sm font-semibold mb-4">أكثر جهات الاتصال</h2>
+              <h2 className="text-sm font-semibold mb-4">Top Contacts</h2>
               <div className="space-y-2 max-h-[240px] overflow-y-auto">
                 {d.topContacts.map((c, i) => (
                   <div key={i} className="flex items-center justify-between text-sm border-b border-border/30 pb-2">
