@@ -170,9 +170,10 @@ export default function RegisterPage() {
               <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-5">
                 <Check className="w-7 h-7 text-primary" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Check your email</h2>
+              <h2 className="text-xl font-bold text-foreground mb-2">Account under review</h2>
               <p className="text-sm text-muted-foreground">
-                We sent a confirmation link to your inbox. Click it to activate your account.
+                Thanks for signing up! Your account is being reviewed and your payment is being confirmed.
+                Our team will contact you on WhatsApp shortly to activate your account.
               </p>
               <Link
                 href="/login"
