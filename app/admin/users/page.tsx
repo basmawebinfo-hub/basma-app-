@@ -5,7 +5,7 @@ import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, 
 interface AdminUser {
   id: string; email: string | null; full_name: string | null
   role: string; status: string; balance: number; plan: string
-  plan_name?: string; plan_id?: string; sub_status?: string; days_left?: number | null; whatsapp?: string | null
+  plan_name?: string; plan_id?: string; sub_status?: string; days_left?: number | null; whatsapp?: string | null; requested_plan?: string | null
   max_instances: number; max_messages: number
   instances_total: number; instances_connected: number
   messages_sent: number; messages_received: number
@@ -88,7 +88,11 @@ export default function AdminUsers() {
                   {u.whatsapp && <a href={`https://wa.me/${(u.whatsapp||"").replace(/[^0-9]/g,"")}`} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline">{u.whatsapp}</a>}
                 </td>
                 <td className="p-3"><span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : u.status === "pending" ? "bg-amber-500/15 text-amber-600" : "bg-red-500/15 text-red-600")}>{u.status}</span></td>
-                <td className="p-3"><div>{u.plan_name ?? "—"}</div>{u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>}</td>
+                <td className="p-3">
+                  <div>{u.plan_name ?? "—"}</div>
+                  {u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>}
+                  {u.requested_plan && <div className="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-600 font-medium">wants: {u.requested_plan}</div>}
+                </td>
                 <td className="p-3 font-medium">${Number(u.balance).toFixed(2)}</td>
                 <td className="p-3">{u.instances_connected}/{u.instances_total}</td>
                 <td className="p-3">{u.messages_sent} / {u.messages_received}</td>
