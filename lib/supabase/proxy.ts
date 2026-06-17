@@ -84,6 +84,11 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/suspended"
       return NextResponse.redirect(url)
     }
+    if (profile?.status === "pending") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/pending"
+      return NextResponse.redirect(url)
+    }
     if (profile?.role === "admin" || profile?.role === "super_admin") {
       const url = request.nextUrl.clone()
       url.pathname = "/admin"
