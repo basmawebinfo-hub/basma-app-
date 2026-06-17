@@ -67,16 +67,21 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Block suspended users from the whole dashboard
+  // Dashboard guard: block suspended users + send admins to /admin (admins have no user dashboard)
   if (user && pathname.startsWith("/dashboard")) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("status")
+      .select("status, role")
       .eq("id", user.id)
       .single()
     if (profile?.status === "suspended") {
       const url = request.nextUrl.clone()
       url.pathname = "/suspended"
+      return NextResponse.redirect(url)
+    }
+    if (profile?.role === "admin" || profile?.role === "super_admin") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin"
       return NextResponse.redirect(url)
     }
   }
