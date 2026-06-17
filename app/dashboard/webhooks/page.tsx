@@ -39,21 +39,15 @@ interface DeliveryLog {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const EVENTS = [
+  // Core messaging events (most automations only need these)
   { key: "MESSAGE_RECEIVED", label: "New incoming message" },
-  { key: "MESSAGE_UPDATE", label: "Message status update" },
-  { key: "MESSAGE_DELETE", label: "Message deleted" },
   { key: "SEND_MESSAGE", label: "Outgoing message sent" },
+  { key: "MESSAGE_UPDATE", label: "Message status (delivered/read)" },
+  // Connection & contacts
   { key: "CONNECTION_UPDATE", label: "Connection status changed" },
-  { key: "QRCODE_UPDATED", label: "QR code refreshed" },
   { key: "CONTACTS_UPSERT", label: "New / updated contact" },
-  { key: "CONTACTS_UPDATE", label: "Contact updated" },
   { key: "CHATS_UPSERT", label: "New / updated chat" },
-  { key: "CHATS_UPDATE", label: "Chat updated" },
-  { key: "CHATS_DELETE", label: "Chat deleted" },
-  { key: "GROUPS_UPSERT", label: "New / updated group" },
-  { key: "GROUP_UPDATE", label: "Group info updated" },
-  { key: "GROUP_PARTICIPANTS_UPDATE", label: "Group members changed" },
-  { key: "PRESENCE_UPDATE", label: "Online presence update" },
+  // Calls
   { key: "CALL", label: "Incoming call" },
 ]
 
