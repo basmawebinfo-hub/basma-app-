@@ -13,8 +13,7 @@ import {
   X,
   LogOut,
   Megaphone,
-  Bot,
-} from "lucide-react"
+  Bot,, CreditCard, BookOpen} from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -29,6 +28,8 @@ const SIDEBAR_LINKS = [
   { icon: Webhook,         label: "Webhooks",     href: "/dashboard/webhooks" },
   { icon: BarChart2,       label: "Analytics",    href: "/dashboard/analytics" },
   { icon: Settings,        label: "Settings",     href: "/dashboard/settings" },
+  { icon: CreditCard,      label: "Pricing",      href: "/dashboard/pricing" },
+  { icon: BookOpen,        label: "API Docs",     href: "/dashboard/docs" },
 ]
 
 interface SidebarProps {
