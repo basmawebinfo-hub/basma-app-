@@ -67,11 +67,7 @@ export async function POST(request: NextRequest) {
           : new Date().toISOString()
 
         const msgContent = (msg.message as Record<string, unknown>) ?? {}
-        const text =
-          (msgContent.conversation as string) ??
-          ((msgContent.extendedTextMessage as Record<string, unknown>)?.text as string) ??
-          ((msgContent.imageMessage as Record<string, unknown>)?.caption as string) ??
-          null
+        const { messageType, text } = parseMessageContent(msgContent)
 
         const pushName = (msg.pushName as string) ?? null
 
@@ -100,7 +96,7 @@ export async function POST(request: NextRequest) {
             message_id: messageId,
             from_me: fromMe,
             remote_jid: remoteJid,
-            message_type: "TEXT",
+            message_type: messageType,
             content: { text, raw: msgContent },
             status: fromMe ? "SENT" : "DELIVERED",
             timestamp: ts,
@@ -185,6 +181,28 @@ export async function POST(request: NextRequest) {
     console.error("[basma] webhook error:", err)
     return NextResponse.json({ ok: true })
   }
+}
+
+// ─── Detect WhatsApp message type + extract a text/preview ──────────────────
+function parseMessageContent(m: Record<string, unknown>): { messageType: string; text: string | null } {
+  const get = (k: string) => m[k] as Record<string, unknown> | undefined
+  if (m.conversation) return { messageType: "TEXT", text: m.conversation as string }
+  if (get("extendedTextMessage")) return { messageType: "TEXT", text: (get("extendedTextMessage")!.text as string) ?? null }
+  if (get("imageMessage")) return { messageType: "IMAGE", text: (get("imageMessage")!.caption as string) ?? "[image]" }
+  if (get("videoMessage")) return { messageType: "VIDEO", text: (get("videoMessage")!.caption as string) ?? "[video]" }
+  if (get("audioMessage")) return { messageType: "AUDIO", text: "[audio]" }
+  if (get("documentMessage")) return { messageType: "DOCUMENT", text: (get("documentMessage")!.fileName as string) ?? "[document]" }
+  if (get("documentWithCaptionMessage")) {
+    const inner = (get("documentWithCaptionMessage")!.message as Record<string, unknown>)?.documentMessage as Record<string, unknown> | undefined
+    return { messageType: "DOCUMENT", text: (inner?.fileName as string) ?? (inner?.caption as string) ?? "[document]" }
+  }
+  if (get("stickerMessage")) return { messageType: "STICKER", text: "[sticker]" }
+  if (get("locationMessage")) return { messageType: "LOCATION", text: "[location]" }
+  if (get("contactMessage") || get("contactsArrayMessage")) return { messageType: "CONTACT", text: "[contact]" }
+  if (get("reactionMessage")) return { messageType: "REACTION", text: (get("reactionMessage")!.text as string) ?? "[reaction]" }
+  if (get("pollCreationMessage") || get("pollCreationMessageV3")) return { messageType: "POLL", text: "[poll]" }
+  if (get("ptvMessage")) return { messageType: "VIDEO", text: "[video note]" }
+  return { messageType: "UNKNOWN", text: null }
 }
 
 async function deliverToDestination(
