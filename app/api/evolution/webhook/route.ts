@@ -39,14 +39,13 @@ export async function POST(request: NextRequest) {
 
     // MESSAGES_UPSERT
     if (event === "messages.upsert" || event === "MESSAGES_UPSERT") {
-      // Get instance from DB
       const { data: instance } = await supabase
         .from("instances").select("id, user_id")
         .eq("instance_name", instanceName).single()
 
       if (!instance) return NextResponse.json({ ok: true })
 
-      // Parse messages array - Evolution API sends different formats
+      // Parse messages — Evolution API sends different formats
       let messages: Record<string, unknown>[] = []
       if (Array.isArray(data)) {
         messages = data
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
       }
 
       for (const msg of messages) {
-        const key = msg.key as Record<string, unknown> ?? {}
+        const key = (msg.key as Record<string, unknown>) ?? {}
         const remoteJid = (key.remoteJid as string) ?? ""
         if (!remoteJid || remoteJid.endsWith("@g.us")) continue
 
@@ -81,16 +80,14 @@ export async function POST(request: NextRequest) {
           .upsert(
             { instance_id: instance.id, remote_jid: remoteJid, push_name: pushName },
             { onConflict: "instance_id,remote_jid", ignoreDuplicates: false }
-          )
-          .select("id").single()
+          ).select("id").single()
 
         // Upsert chat
         const { data: chat } = await supabase.from("chats")
           .upsert(
             { instance_id: instance.id, remote_jid: remoteJid, last_message_at: ts, unread_count: fromMe ? 0 : 1 },
             { onConflict: "instance_id,remote_jid", ignoreDuplicates: false }
-          )
-          .select("id").single()
+          ).select("id").single()
 
         if (!chat || !messageId) continue
 
@@ -110,6 +107,21 @@ export async function POST(request: NextRequest) {
           },
           { onConflict: "instance_id,message_id", ignoreDuplicates: false }
         )
+      }
+
+      // Forward to user webhook configs (n8n, Zapier, etc.)
+      const { data: configs } = await supabase
+        .from("webhook_configs")
+        .select("*")
+        .eq("user_id", instance.user_id)
+        .eq("is_active", true)
+
+      if (configs?.length) {
+        for (const cfg of configs) {
+          if (cfg.destination_url && cfg.events?.includes("MESSAGES_UPSERT")) {
+            deliverToDestination(cfg.destination_url, body, cfg.secret).catch(() => {})
+          }
+        }
       }
     }
 
@@ -138,5 +150,23 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("[basma] webhook error:", err)
     return NextResponse.json({ ok: true })
+  }
+}
+
+async function deliverToDestination(url: string, payload: unknown, secret?: string) {
+  const maxAttempts = 3
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(secret ? { "X-Basma-Secret": secret } : {}),
+        },
+        body: JSON.stringify(payload),
+      })
+      if (res.ok) return
+    } catch {}
+    if (attempt < maxAttempts) await new Promise((r) => setTimeout(r, attempt * 2000))
   }
 }
