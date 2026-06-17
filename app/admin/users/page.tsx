@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard } from "lucide-react"
+import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound } from "lucide-react"
 
 interface AdminUser {
   id: string; email: string | null; full_name: string | null
@@ -134,6 +134,8 @@ export default function AdminUsers() {
                       className="p-1.5 rounded-md hover:bg-muted text-foreground"><Settings2 className="w-4 h-4" /></button>
                     <button title="تغيير الباقة" onClick={() => { setSelPlan(u.plan_id ?? ""); setModal({ type: "plan", user: u }) }}
                       className="p-1.5 rounded-md hover:bg-amber-500/15 text-amber-600"><CreditCard className="w-4 h-4" /></button>
+                    <button title="تغيير كلمة المرور" onClick={() => setModal({ type: "password", user: u })}
+                      className="p-1.5 rounded-md hover:bg-orange-500/15 text-orange-600"><KeyRound className="w-4 h-4" /></button>
                     <button title="حذف" onClick={() => { if (confirm("متأكد من حذف المستخدم نهائياً؟")) act(u.id, "delete") }}
                       className="p-1.5 rounded-md hover:bg-red-500/15 text-red-600"><Trash2 className="w-4 h-4" /></button>
                   </div>
@@ -152,6 +154,7 @@ export default function AdminUsers() {
               <h3 className="font-semibold">
                 {modal.type === "topup" && "شحن رصيد"}
                 {modal.type === "notify" && "إرسال إشعار"}
+                {modal.type === "password" && "تغيير كلمة المرور"}
                 {modal.type === "plan" && "تغيير الباقة"}
                 {modal.type === "limits" && "تعديل الحدود"}
               </h3>
@@ -177,6 +180,15 @@ export default function AdminUsers() {
                   className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" rows={3} />
                 <button onClick={() => act(modal.user.id, "notify", { title: input, body: input2 })}
                   className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">إرسال</button>
+              </>
+            )}
+            {modal.type === "password" && (
+              <>
+                <p className="text-xs text-muted-foreground mb-2">عيّن كلمة مرور جديدة للمستخدم (بعد التأكد من هويته).</p>
+                <input type="text" placeholder="كلمة المرور الجديدة" value={input} onChange={e=>setInput(e.target.value)}
+                  className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
+                <button onClick={() => act(modal.user.id, "reset_password", { password: input })} disabled={input.length<6}
+                  className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">تعيين كلمة المرور</button>
               </>
             )}
             {modal.type === "plan" && (
