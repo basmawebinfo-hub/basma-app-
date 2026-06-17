@@ -14,7 +14,7 @@ export function adminService() {
  * Returns { ok: true, userId } or { ok: false, status, error }.
  */
 export async function requireAdmin(): Promise<
-  { ok: true; userId: string } | { ok: false; status: number; error: string }
+  { ok: true; userId: string; role: string } | { ok: false; status: number; error: string }
 > {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -27,10 +27,22 @@ export async function requireAdmin(): Promise<
     .eq("id", user.id)
     .single()
 
-  if (!profile || profile.role !== "admin") {
+  if (!profile || (profile.role !== "admin" && profile.role !== "super_admin")) {
     return { ok: false, status: 403, error: "Forbidden — admin only" }
   }
-  return { ok: true, userId: user.id }
+  return { ok: true, userId: user.id, role: profile.role }
+}
+
+/** Verify the current user is a SUPER admin (owner-level). */
+export async function requireSuperAdmin(): Promise<
+  { ok: true; userId: string } | { ok: false; status: number; error: string }
+> {
+  const gate = await requireAdmin()
+  if (!gate.ok) return gate
+  if (gate.role !== "super_admin") {
+    return { ok: false, status: 403, error: "Forbidden — super admin only" }
+  }
+  return { ok: true, userId: gate.userId }
 }
 
 /** Write an entry to the admin audit log (best-effort). */
