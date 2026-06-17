@@ -24,7 +24,7 @@ export async function login(formData: FormData) {
       .select("role")
       .eq("id", uid)
       .single()
-    if (profile?.role === "admin") {
+    if (profile?.role === "admin" || profile?.role === "super_admin") {
       redirect("/admin")
     }
   }
