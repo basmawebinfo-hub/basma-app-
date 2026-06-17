@@ -10,10 +10,10 @@ export default function AdminLogs() {
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin"/></div>
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">سجل نشاط الأدمن</h1>
+      <h1 className="text-2xl font-bold mb-6">Admin Activity Log</h1>
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
-          <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">الأدمن</th><th className="p-3">الإجراء</th><th className="p-3">الهدف</th><th className="p-3">التوقيت</th></tr></thead>
+          <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">Admin</th><th className="p-3">الAction</th><th className="p-3">Target</th><th className="p-3">Time</th></tr></thead>
           <tbody>
             {logs.map(l=>(
               <tr key={l.id} className="border-t border-border/40">
@@ -23,7 +23,7 @@ export default function AdminLogs() {
                 <td className="p-3 text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
               </tr>
             ))}
-            {logs.length===0 && <tr><td colSpan={4} className="p-6 text-center text-muted-foreground text-sm">لا يوجد نشاط بعد</td></tr>}
+            {logs.length===0 && <tr><td colSpan={4} className="p-6 text-center text-muted-foreground text-sm">No activity yet</td></tr>}
           </tbody>
         </table>
       </div>
