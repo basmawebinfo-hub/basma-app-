@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
-import { sendText } from "@/lib/evolution"
+import { sendText, sendMedia, sendAudio } from "@/lib/evolution"
 import crypto from "crypto"
 
 /**
@@ -60,13 +60,30 @@ export async function POST(req: NextRequest) {
   }
 
   // 3. Parse body
-  let body: { to?: string; text?: string; instance_id?: string }
+  let body: {
+    to?: string
+    text?: string
+    instance_id?: string
+    type?: string        // "text" | "image" | "video" | "audio" | "document"
+    media?: string       // URL or base64 (for image/video/audio/document)
+    caption?: string
+    fileName?: string
+  }
   try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: CORS }) }
 
   const to = (body.to ?? "").trim()
+  const type = (body.type ?? "text").toLowerCase()
   const text = (body.text ?? "").trim()
-  if (!to || !text) {
-    return NextResponse.json({ error: "'to' and 'text' are required" }, { status: 400, headers: CORS })
+  const media = (body.media ?? "").trim()
+
+  if (!to) {
+    return NextResponse.json({ error: "'to' is required" }, { status: 400, headers: CORS })
+  }
+  if (type === "text" && !text) {
+    return NextResponse.json({ error: "'text' is required for text messages" }, { status: 400, headers: CORS })
+  }
+  if (type !== "text" && !media) {
+    return NextResponse.json({ error: "'media' (URL or base64) is required for " + type + " messages" }, { status: 400, headers: CORS })
   }
 
   // 4. Resolve the instance (must belong to this user)
@@ -91,9 +108,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Instance is not connected" }, { status: 400, headers: CORS })
   }
 
-  // 5. Send via Evolution
+  // 5. Send via Evolution (pick the right method based on type)
   try {
-    const result = await sendText(inst.instance_name, to, text)
+    let result: unknown
+    let storedType = "TEXT"
+    let storedText = text
+    if (type === "text") {
+      result = await sendText(inst.instance_name, to, text)
+    } else if (type === "audio") {
+      result = await sendAudio(inst.instance_name, to, media)
+      storedType = "AUDIO"; storedText = "[audio]"
+    } else if (type === "image" || type === "video" || type === "document") {
+      result = await sendMedia(
+        inst.instance_name, to,
+        type as "image" | "video" | "document",
+        media, body.caption, body.fileName
+      )
+      storedType = type.toUpperCase()
+      storedText = body.caption || (type === "document" ? (body.fileName || "[document]") : `[${type}]`)
+    } else {
+      return NextResponse.json({ error: "Unsupported type: " + type }, { status: 400, headers: CORS })
+    }
 
     // Persist the outgoing message so it shows in the inbox
     const remoteJid = to.includes("@") ? to : `${to.replace(/[^0-9]/g, "")}@s.whatsapp.net`
@@ -115,8 +150,8 @@ export async function POST(req: NextRequest) {
           message_id: r?.key?.id ?? `api_${Date.now()}`,
           from_me: true,
           remote_jid: remoteJid,
-          message_type: "TEXT",
-          content: { text },
+          message_type: storedType,
+          content: { text: storedText, media: type !== "text" ? { mediaUrl: media } : null },
           status: "SENT",
           timestamp: new Date().toISOString(),
         },
