@@ -240,6 +240,21 @@ export default function RegisterPage() {
                   />
                 </div>
 
+                {/* WhatsApp number */}
+                <div className="space-y-2">
+                  <label htmlFor="whatsapp" className="block text-xs font-medium text-muted-foreground">
+                    WhatsApp number (so we can contact you)
+                  </label>
+                  <input
+                    id="whatsapp"
+                    name="whatsapp"
+                    type="tel"
+                    required
+                    placeholder="+20 100 000 0000"
+                    className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+
                 {/* Password */}
                 <div className="space-y-2">
                   <label htmlFor="password" className="block text-xs font-medium text-muted-foreground">
