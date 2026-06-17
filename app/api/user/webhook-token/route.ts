@@ -16,12 +16,9 @@ export async function GET() {
 
   if (!data) return NextResponse.json({ token: null, webhook_url: null })
 
-  // Always use the app domain — never Supabase URL
-  const webhook_url = `https://www.basmaweb.com/api/evolution/webhook`
-
   return NextResponse.json({
     token: data.token,
-    webhook_url,
+    webhook_url: "https://www.basmaweb.com/api/evolution/webhook",
     hmac_secret: data.hmac_secret,
     is_active: data.is_active,
   })
@@ -49,7 +46,7 @@ export async function POST() {
 
   return NextResponse.json({
     token,
-    webhook_url: `https://www.basmaweb.com/api/evolution/webhook`,
+    webhook_url: "https://www.basmaweb.com/api/evolution/webhook",
     hmac_secret,
     message: "Set this URL in your Evolution API instance webhook settings.",
   })
