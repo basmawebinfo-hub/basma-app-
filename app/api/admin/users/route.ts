@@ -35,8 +35,8 @@ export async function GET() {
 
   // Plans + subscriptions (the real source of plan/limits)
   const { data: subs } = await db.from("subscriptions").select("user_id, plan_id, status, current_period_end")
-  const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo")
-  const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number }) => [p.id, p]))
+  const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo, price_monthly")
+  const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number; price_monthly?: number }) => [p.id, p]))
   const subByUser = new Map((subs ?? []).map((s: { user_id: string; plan_id: string; status: string; current_period_end: string|null }) => [s.user_id, s]))
 
   const instCount = new Map<string, number>()
@@ -49,9 +49,13 @@ export async function GET() {
   const enriched = users.map((u) => {
     const sub = subByUser.get(u.id)
     const plan = sub ? planById.get(sub.plan_id) : null
+    const monthly = Number((plan as { price_monthly?: number })?.price_monthly ?? 0)
+    const dailyCost = monthly > 0 ? monthly / 30 : 0
+    const daysLeft = dailyCost > 0 ? Math.floor(Number(u.balance ?? 0) / dailyCost) : null
     return {
       ...u,
       plan_name: plan?.name ?? "—",
+      days_left: daysLeft,
       plan_max_instances: plan?.max_instances ?? 1,
       plan_max_messages: plan?.max_messages_mo ?? 500,
       sub_status: sub?.status ?? "none",
