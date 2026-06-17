@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { LayoutDashboard, Users, Server, Wallet, ScrollText, ArrowLeft, ShieldCheck } from "lucide-react"
+import { LayoutDashboard, Users, Server, Wallet, ScrollText, ShieldCheck, LogOut } from "lucide-react"
+import { logout } from "@/app/actions/auth"
 
 const NAV = [
   { href: "/admin", label: "نظرة عامة", icon: LayoutDashboard },
@@ -28,9 +29,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
         <div className="p-3 border-t border-border">
-          <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-3.5 h-3.5" /> العودة للوحة المستخدم
-          </Link>
+          <form action={logout}>
+            <button type="submit" className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-500/10 rounded-lg">
+              <LogOut className="w-4 h-4" /> تسجيل خروج
+            </button>
+          </form>
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto">{children}</main>
