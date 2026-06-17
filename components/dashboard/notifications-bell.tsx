@@ -21,10 +21,10 @@ export function NotificationsBell() {
         {unread > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">{unread}</span>}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] max-h-96 overflow-y-auto rounded-xl border border-border bg-card shadow-xl z-50" dir="rtl">
-          <div className="p-3 border-b border-border text-sm font-semibold">الإشعارات</div>
+        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] max-h-96 overflow-y-auto rounded-xl border border-border bg-card shadow-xl z-50" >
+          <div className="p-3 border-b border-border text-sm font-semibold">Notifications</div>
           {items.length === 0 ? (
-            <div className="p-6 text-center text-xs text-muted-foreground">لا توجد إشعارات</div>
+            <div className="p-6 text-center text-xs text-muted-foreground">No notifications</div>
           ) : items.map(n => (
             <div key={n.id} className={"p-3 border-b border-border/40 " + (n.is_read ? "" : "bg-primary/5")}>
               <div className="flex items-center gap-2">
