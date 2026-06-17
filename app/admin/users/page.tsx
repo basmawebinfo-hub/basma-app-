@@ -1,11 +1,11 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound } from "lucide-react"
+import { Loader2, Ban, CheckCircle, Wallet, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound, UserCheck, MinusCircle } from "lucide-react"
 
 interface AdminUser {
   id: string; email: string | null; full_name: string | null
   role: string; status: string; balance: number; plan: string
-  plan_name?: string; plan_id?: string; sub_status?: string
+  plan_name?: string; plan_id?: string; sub_status?: string; days_left?: number | null
   max_instances: number; max_messages: number
   instances_total: number; instances_connected: number
   messages_sent: number; messages_received: number
@@ -68,7 +68,7 @@ export default function AdminUsers() {
           <input placeholder="Search by email or name..." value={search} onChange={(e)=>setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
         </div>
         <select value={statusFilter} onChange={(e)=>setStatusFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm">
-          <option value="all">All statuses</option><option value="active">Active</option><option value="suspended">Suspended</option>
+          <option value="all">All statuses</option><option value="pending">Pending</option><option value="active">Active</option><option value="suspended">Suspended</option>
         </select>
         <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm hover:bg-muted/40"><Download className="w-4 h-4"/> Export CSV</button>
       </div>
@@ -83,16 +83,18 @@ export default function AdminUsers() {
             {filtered.map((u) => (
               <tr key={u.id} className="border-t border-border/40 hover:bg-card/30">
                 <td className="p-3"><div className="font-medium">{u.email ?? "—"}</div><div className="text-xs text-muted-foreground">{u.full_name} {u.role !== "user" && "• " + u.role}</div></td>
-                <td className="p-3"><span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : "bg-red-500/15 text-red-600")}>{u.status}</span></td>
-                <td className="p-3">{u.plan_name ?? "—"}</td>
+                <td className="p-3"><span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : u.status === "pending" ? "bg-amber-500/15 text-amber-600" : "bg-red-500/15 text-red-600")}>{u.status}</span></td>
+                <td className="p-3"><div>{u.plan_name ?? "—"}</div>{u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>}</td>
                 <td className="p-3 font-medium">${Number(u.balance).toFixed(2)}</td>
                 <td className="p-3">{u.instances_connected}/{u.instances_total}</td>
                 <td className="p-3">{u.messages_sent} / {u.messages_received}</td>
                 <td className="p-3">
                   <div className="flex items-center gap-1.5">
-                    {u.status === "active" ? <button title="Suspend" disabled={busy===u.id} onClick={()=>act(u.id,"suspend")} className="p-1.5 rounded-md hover:bg-red-500/15 text-red-600"><Ban className="w-4 h-4"/></button>
+                    {u.status === "pending" ? <button title="Approve" disabled={busy===u.id} onClick={()=>act(u.id,"approve")} className="p-1.5 rounded-md hover:bg-green-500/15 text-green-600"><UserCheck className="w-4 h-4"/></button>
+                     : u.status === "active" ? <button title="Suspend" disabled={busy===u.id} onClick={()=>act(u.id,"suspend")} className="p-1.5 rounded-md hover:bg-red-500/15 text-red-600"><Ban className="w-4 h-4"/></button>
                      : <button title="Activate" disabled={busy===u.id} onClick={()=>act(u.id,"activate")} className="p-1.5 rounded-md hover:bg-green-500/15 text-green-600"><CheckCircle className="w-4 h-4"/></button>}
                     <button title="Top up" onClick={()=>setModal({type:"topup",user:u})} className="p-1.5 rounded-md hover:bg-primary/15 text-primary"><Wallet className="w-4 h-4"/></button>
+                    <button title="Deduct balance" onClick={()=>setModal({type:"debit",user:u})} className="p-1.5 rounded-md hover:bg-red-500/15 text-red-600"><MinusCircle className="w-4 h-4"/></button>
                     <button title="Notify" onClick={()=>setModal({type:"notify",user:u})} className="p-1.5 rounded-md hover:bg-blue-500/15 text-blue-600"><Bell className="w-4 h-4"/></button>
                     <button title="Limits" onClick={()=>setModal({type:"limits",user:u})} className="p-1.5 rounded-md hover:bg-muted text-foreground"><Settings2 className="w-4 h-4"/></button>
                     <button title="Change plan" onClick={()=>{setSelPlan(u.plan_id??"");setModal({type:"plan",user:u})}} className="p-1.5 rounded-md hover:bg-amber-500/15 text-amber-600"><CreditCard className="w-4 h-4"/></button>
@@ -111,12 +113,16 @@ export default function AdminUsers() {
           <div className="bg-card border border-border rounded-xl p-6 w-[400px]" onClick={(e)=>e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">
-                {modal.type==="topup"&&"Top up balance"}{modal.type==="notify"&&"Send notification"}
+                {modal.type==="topup"&&"Top up balance"}{modal.type==="debit"&&"Deduct balance"}{modal.type==="notify"&&"Send notification"}
                 {modal.type==="password"&&"Reset password"}{modal.type==="plan"&&"Change plan"}{modal.type==="limits"&&"Edit limits"}
               </h3>
               <button onClick={()=>setModal(null)}><X className="w-4 h-4"/></button>
             </div>
             <p className="text-xs text-muted-foreground mb-3">{modal.user.email}</p>
+            {modal.type==="debit"&&(<>
+              <input type="number" placeholder="Amount to deduct" value={input} onChange={e=>setInput(e.target.value)} className="w-full mb-2 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm"/>
+              <input placeholder="Reason (optional)" value={input2} onChange={e=>setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm"/>
+              <button onClick={()=>act(modal.user.id,"debit",{amount:Number(input),reason:input2})} className="w-full py-2 rounded-md bg-red-600 text-white text-sm font-medium">Deduct</button></>)}
             {modal.type==="topup"&&(<>
               <input type="number" placeholder="Amount" value={input} onChange={e=>setInput(e.target.value)} className="w-full mb-2 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm"/>
               <input placeholder="Reason (optional)" value={input2} onChange={e=>setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm"/>
