@@ -10,17 +10,17 @@ export default function AdminInstances() {
   const load = () => { setLoading(true); fetch("/api/admin/instances").then(r=>r.json()).then(d=>setRows(d.instances??[])).finally(()=>setLoading(false)) }
   useEffect(load, [])
   async function del(id: string) {
-    if (!confirm("حذف هذا الاتصال نهائياً؟")) return
+    if (!confirm("Delete this connection permanently?")) return
     await fetch(`/api/admin/instances?id=${id}`, { method: "DELETE" }); load()
   }
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">إدارة الاتصالات ({rows.length})</h1>
+      <h1 className="text-2xl font-bold mb-6">Connections ({rows.length})</h1>
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-card/60 text-muted-foreground"><tr className="text-right">
-            <th className="p-3">الاسم</th><th className="p-3">المالك</th><th className="p-3">الحالة</th><th className="p-3">تاريخ الإنشاء</th><th className="p-3">إجراء</th>
+            <th className="p-3">Name</th><th className="p-3">Owner</th><th className="p-3">Status</th><th className="p-3">Created</th><th className="p-3">Action</th>
           </tr></thead>
           <tbody>
             {rows.map(i=>(
