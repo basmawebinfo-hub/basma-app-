@@ -41,6 +41,7 @@ export async function register(formData: FormData) {
   const firstName = (formData.get("first_name") as string | null) ?? ""
   const lastName = (formData.get("last_name") as string | null) ?? ""
   const fullName = [firstName, lastName].filter(Boolean).join(" ")
+  const whatsapp = (formData.get("whatsapp") as string | null) ?? ""
 
   const { data, error } = await supabase.auth.signUp({
     email: formData.get("email") as string,
@@ -53,6 +54,7 @@ export async function register(formData: FormData) {
         full_name: fullName,
         first_name: firstName,
         last_name: lastName,
+        whatsapp: whatsapp,
       },
     },
   })
