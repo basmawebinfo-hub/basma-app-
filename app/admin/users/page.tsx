@@ -17,6 +17,8 @@ interface AdminUser {
   requested_plan: string | null
   days_left: number | null
   custom_max_instances?: number | null
+  effective_max_instances?: number
+  is_custom_limit?: boolean
   instances_total: number
   instances_connected: number
   messages_sent: number
@@ -120,7 +122,8 @@ export default function AdminUsers() {
                   <span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : u.status === "pending" ? "bg-amber-500/15 text-amber-600" : "bg-red-500/15 text-red-600")}>{u.status}</span>
                 </td>
                 <td className="p-3">
-                  <div>{u.plan_name ?? "—"}</div>
+                  <div>{u.is_custom_limit ? "Custom" : (u.plan_name ?? "—")}</div>
+                  <div className="text-xs text-muted-foreground">{u.effective_max_instances ?? "—"} numbers allowed</div>
                   {u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>}
                   {u.requested_plan && <div className="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-600 font-medium">wants: {u.requested_plan}</div>}
                 </td>
