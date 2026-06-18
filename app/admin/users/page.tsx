@@ -16,6 +16,7 @@ interface AdminUser {
   plan_id: string | null
   requested_plan: string | null
   days_left: number | null
+  custom_max_instances?: number | null
   instances_total: number
   instances_connected: number
   messages_sent: number
@@ -33,6 +34,7 @@ export default function AdminUsers() {
   const [input, setInput] = useState("")
   const [input2, setInput2] = useState("")
   const [selPlan, setSelPlan] = useState("")
+  const [input3, setInput3] = useState("")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
@@ -50,7 +52,7 @@ export default function AdminUsers() {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, ...payload }),
       })
       if (!r.ok) { const e = await r.json(); alert(e.error ?? "Failed") }
-      setModal(null); setInput(""); setInput2(""); setSelPlan(""); load()
+      setModal(null); setInput(""); setInput2(""); setInput3(""); setSelPlan(""); load()
     } finally { setBusy(null) }
   }
 
@@ -205,11 +207,12 @@ export default function AdminUsers() {
             )}
             {modal.type === "limits" && (
               <>
-                <label className="text-xs text-muted-foreground">Max connections</label>
-                <input type="number" defaultValue={modal.user.max_instances} value={input} onChange={(e) => setInput(e.target.value)} className="w-full mb-2 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
+                <label className="text-xs text-muted-foreground">Custom number of connections (overrides plan — use for &gt;25 / custom plans)</label>
+                <input type="number" placeholder={modal.user.custom_max_instances?.toString() ?? "e.g. 40"} value={input3} onChange={(e) => setInput3(e.target.value)} className="w-full mb-1 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
+                <p className="text-[10px] text-muted-foreground mb-3">Leave empty and Save to clear the override (use plan default). Current: {modal.user.custom_max_instances ?? "none"}</p>
                 <label className="text-xs text-muted-foreground">Max messages/month (0 = unlimited)</label>
-                <input type="number" defaultValue={modal.user.max_messages} value={input2} onChange={(e) => setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
-                <button onClick={() => act(modal.user.id, "set_limits", { max_instances: Number(input || modal.user.max_instances), max_messages: Number(input2 || modal.user.max_messages) })} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">Save</button>
+                <input type="number" placeholder={modal.user.max_messages?.toString()} value={input2} onChange={(e) => setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
+                <button onClick={() => act(modal.user.id, "set_limits", { custom_max_instances: input3 === "" ? "" : Number(input3), max_messages: input2 === "" ? modal.user.max_messages : Number(input2) })} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">Save</button>
               </>
             )}
           </div>
