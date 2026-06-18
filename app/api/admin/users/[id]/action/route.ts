@@ -59,9 +59,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // ── Update limits ──
     case "set_limits": {
-      const patch: Record<string, number> = {}
+      const patch: Record<string, number | null> = {}
       if (body.max_instances != null) patch.max_instances = Number(body.max_instances)
       if (body.max_messages != null) patch.max_messages = Number(body.max_messages)
+      // custom_max_instances overrides the plan limit (for >25 / custom plans). Empty = clear override.
+      if (body.custom_max_instances !== undefined) {
+        patch.custom_max_instances = body.custom_max_instances === "" || body.custom_max_instances === null ? null : Number(body.custom_max_instances)
+      }
       await db.from("profiles").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", targetUserId)
       await logAdminAction(gate.userId, "set_limits", "user", targetUserId, patch)
       return NextResponse.json({ ok: true, ...patch })
