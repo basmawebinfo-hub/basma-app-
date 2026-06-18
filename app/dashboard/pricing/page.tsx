@@ -8,30 +8,44 @@ export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [rate, setRate] = useState(50)
   const [loading, setLoading] = useState(true)
-  useEffect(() => { fetch("/api/pricing").then(r=>r.json()).then(d=>{setPlans(d.plans??[]);setRate(d.usd_to_egp??50)}).finally(()=>setLoading(false)) }, [])
+  const [requesting, setRequesting] = useState<string | null>(null)
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
+  useEffect(() => {
+    fetch("/api/pricing")
+      .then((r) => r.json())
+      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50) })
+      .finally(() => setLoading(false))
+  }, [])
 
-  const [requested, setRequested] = useState<string | null>(null)
   async function choose(planId: string, name: string) {
-    const r = await fetch("/api/plan-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan_id: planId }) })
-    if (r.ok) {
-      setRequested(name)
-      alert(`Your request for "${name}" was sent. Our team will contact you on WhatsApp to confirm payment and activate it.`)
-    } else {
-      alert("Something went wrong. Please try again.")
+    setRequesting(planId)
+    try {
+      const r = await fetch("/api/plan-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_id: planId }),
+      })
+      if (r.ok) {
+        alert("Your request for \"" + name + "\" was sent. Our team will contact you on WhatsApp to confirm payment and activate it.")
+      } else {
+        alert("Something went wrong. Please try again.")
+      }
+    } finally {
+      setRequesting(null)
     }
   }
+
+  if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin" /></div>
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">Plans & Pricing</h1>
         <p className="text-muted-foreground mt-2">Unlimited messages on all paid plans. Pay by number of WhatsApp connections.</p>
-        <p className="text-xs text-muted-foreground mt-1">Prices in USD. You pay the equivalent in EGP at today's rate (~{rate.toFixed(2)} EGP/USD).</p>
+        <p className="text-xs text-muted-foreground mt-1">Prices in USD. You pay the equivalent in EGP at today\'s rate (~{rate.toFixed(2)} EGP/USD).</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {plans.filter(p=>p.name!=="مخصص").map((p) => {
+        {plans.filter((p) => p.name !== "مخصص" && p.name !== "Custom").map((p) => {
           const egp = Math.round(p.price_monthly * rate)
           return (
             <div key={p.id} className="rounded-2xl border border-border bg-card/50 p-6 flex flex-col">
@@ -40,15 +54,19 @@ export default function PricingPage() {
                 <span className="text-3xl font-bold">${p.price_monthly}</span>
                 <span className="text-muted-foreground text-sm">/month</span>
               </div>
-              {p.price_monthly > 0 && <p className="text-xs text-muted-foreground mt-1">≈ {egp} EGP / month</p>}
+              {p.price_monthly > 0 && <p className="text-xs text-muted-foreground mt-1">~ {egp} EGP / month</p>}
               <ul className="mt-4 space-y-2 text-sm flex-1">
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_instances} WhatsApp number{p.max_instances>1?"s":""}</li>
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_messages_mo === 0 ? "Unlimited messages" : `${p.max_messages_mo} messages/mo`}</li>
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_instances} WhatsApp number{p.max_instances > 1 ? "s" : ""}</li>
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_messages_mo === 0 ? "Unlimited messages" : p.max_messages_mo + " messages/mo"}</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Webhooks & automation API</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Inbox & analytics</li>
               </ul>
-              <button onClick={()=>choose(p.id, p.name)} className="mt-5 w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium">
-                {p.price_monthly === 0 ? "Current / Trial" : "Choose plan"}
+              <button
+                onClick={() => choose(p.id, p.name)}
+                disabled={requesting === p.id}
+                className="mt-5 w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+              >
+                {p.price_monthly === 0 ? "Current / Trial" : requesting === p.id ? "Sending..." : "Choose plan"}
               </button>
             </div>
           )
