@@ -11,7 +11,7 @@ export async function GET() {
   // All profiles
   const { data: profiles } = await db
     .from("profiles")
-    .select("id, email, full_name, company, role, status, balance, plan, plan_expires_at, max_instances, max_messages, whatsapp, created_at")
+    .select("id, email, full_name, company, role, status, balance, plan, plan_expires_at, max_instances, max_messages, whatsapp, custom_max_instances, created_at")
     .order("created_at", { ascending: false })
 
   const users = profiles ?? []
@@ -60,10 +60,16 @@ export async function GET() {
     const daysLeft = dailyCost > 0 ? Math.floor(Number(u.balance ?? 0) / dailyCost) : null
     const reqPlanId = reqByUser.get(u.id)
     const reqPlan = reqPlanId ? planById.get(reqPlanId) : null
+    const planMax = (plan as { max_instances?: number })?.max_instances ?? 1
+    const customMax = (u as { custom_max_instances?: number | null }).custom_max_instances
+    const effectiveMax = customMax != null ? customMax : planMax
+    const isCustom = customMax != null
     return {
       ...u,
       plan_name: plan?.name ?? "—",
       requested_plan: reqPlan?.name ?? null,
+      effective_max_instances: effectiveMax,
+      is_custom_limit: isCustom,
       days_left: daysLeft,
       plan_max_instances: plan?.max_instances ?? 1,
       plan_max_messages: plan?.max_messages_mo ?? 500,
