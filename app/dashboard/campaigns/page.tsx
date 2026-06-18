@@ -1,4 +1,5 @@
 import { Megaphone } from "lucide-react"
+
 export default function CampaignsPage() {
   return (
     <div className="flex items-center justify-center min-h-[70vh] p-8">
