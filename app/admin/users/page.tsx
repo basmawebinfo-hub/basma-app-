@@ -197,12 +197,29 @@ export default function AdminUsers() {
             )}
             {modal.type === "plan" && (
               <>
-                <label className="text-xs text-muted-foreground">Select plan</label>
-                <select value={selPlan} onChange={(e) => setSelPlan(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm">
-                  <option value="">— select —</option>
-                  {plans.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.max_instances} numbers - ${p.price_monthly})</option>)}
-                </select>
-                <button onClick={() => act(modal.user.id, "set_plan", { plan_id: selPlan })} disabled={!selPlan} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">Activate plan</button>
+                <label className="text-xs text-muted-foreground mb-2 block">Choose a plan to activate</label>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto mb-3">
+                  {plans.map((p) => {
+                    const selected = selPlan === p.id
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setSelPlan(p.id)}
+                        className={"w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors " + (selected ? "border-primary bg-primary/10" : "border-border bg-muted/20 hover:bg-muted/40")}
+                      >
+                        <div>
+                          <div className="text-sm font-medium">{p.name}</div>
+                          <div className="text-xs text-muted-foreground">{p.max_instances} connection{p.max_instances > 1 ? "s" : ""}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold">${p.price_monthly}</div>
+                          <div className="text-[10px] text-muted-foreground">/month</div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+                <button onClick={() => act(modal.user.id, "set_plan", { plan_id: selPlan })} disabled={!selPlan} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">Activate plan</button>
               </>
             )}
             {modal.type === "limits" && (
