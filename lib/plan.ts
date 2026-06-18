@@ -25,6 +25,14 @@ export async function getUserPlan(userId: string): Promise<UserPlan> {
     .limit(1)
     .single()
 
+  // Custom override (admin-set number of connections, e.g. for >25 plans)
+  const { data: prof } = await db
+    .from("profiles")
+    .select("custom_max_instances")
+    .eq("id", userId)
+    .single()
+  const customMax = prof?.custom_max_instances ?? null
+
   // Default (no subscription) = trial-ish free limits
   if (!sub?.plan_id) {
     return { plan_id: null, plan_name: "—", max_instances: 1, max_messages_mo: 500, status: "none", current_period_end: null, messages_used: 0 }
@@ -39,7 +47,7 @@ export async function getUserPlan(userId: string): Promise<UserPlan> {
   return {
     plan_id: sub.plan_id,
     plan_name: plan?.name ?? "—",
-    max_instances: plan?.max_instances ?? 1,
+    max_instances: customMax != null ? customMax : (plan?.max_instances ?? 1),
     max_messages_mo: plan?.max_messages_mo ?? 0,
     status: sub.status ?? "active",
     current_period_end: sub.current_period_end ?? null,
