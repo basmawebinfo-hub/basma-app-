@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LayoutDashboard, Users, Server, Wallet, ScrollText, ShieldCheck, LogOut } from "lucide-react"
+import { LayoutDashboard, Users, Server, Wallet, ScrollText, ShieldCheck, LogOut, MessageCircle } from "lucide-react"
 import { logout } from "@/app/actions/auth"
 
 const NAV = [
@@ -7,6 +7,7 @@ const NAV = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/instances", label: "Connections", icon: Server },
   { href: "/admin/billing", label: "Billing", icon: Wallet },
+  { href: "/admin/support", label: "Support Chat", icon: MessageCircle },
   { href: "/admin/logs", label: "Activity Log", icon: ScrollText },
   { href: "/admin/admins", label: "Admins", icon: ShieldCheck },
 ]
