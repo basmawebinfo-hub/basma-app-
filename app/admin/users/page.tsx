@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Ban, CheckCircle, Wallet, MinusCircle, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound, UserCheck } from "lucide-react"
+import { Loader2, Search, Download } from "lucide-react"
 
 interface AdminUser {
   id: string
@@ -10,55 +10,28 @@ interface AdminUser {
   role: string
   status: string
   balance: number
-  max_instances: number
-  max_messages: number
   whatsapp: string | null
   plan_name: string | null
-  plan_id: string | null
   requested_plan: string | null
-  days_left: number | null
-  custom_max_instances?: number | null
-  effective_max_instances?: number
   is_custom_limit?: boolean
+  effective_max_instances?: number
+  days_left: number | null
   instances_total: number
   instances_connected: number
   messages_sent: number
   messages_received: number
 }
 
-interface Plan { id: string; name: string; max_instances: number; price_monthly: number }
-
 export default function AdminUsers() {
   const router = useRouter()
   const [users, setUsers] = useState<AdminUser[]>([])
-  const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
-  const [busy, setBusy] = useState<string | null>(null)
-  const [modal, setModal] = useState<{ type: string; user: AdminUser } | null>(null)
-  const [input, setInput] = useState("")
-  const [input2, setInput2] = useState("")
-  const [selPlan, setSelPlan] = useState("")
-  const [input3, setInput3] = useState("")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  const load = () => {
-    setLoading(true)
+  useEffect(() => {
     fetch("/api/admin/users").then((r) => r.json()).then((d) => setUsers(d.users ?? [])).finally(() => setLoading(false))
-  }
-  useEffect(load, [])
-  useEffect(() => { fetch("/api/admin/plans").then((r) => r.json()).then((d) => setPlans(d.plans ?? [])).catch(() => {}) }, [])
-
-  async function act(userId: string, action: string, payload: Record<string, unknown> = {}) {
-    setBusy(userId)
-    try {
-      const r = await fetch("/api/admin/users/" + userId + "/action", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, ...payload }),
-      })
-      if (!r.ok) { const e = await r.json(); alert(e.error ?? "Failed") }
-      setModal(null); setInput(""); setInput2(""); setInput3(""); setSelPlan(""); load()
-    } finally { setBusy(null) }
-  }
+  }, [])
 
   const filtered = users.filter((u) => {
     const q = search.toLowerCase()
@@ -98,6 +71,8 @@ export default function AdminUsers() {
         </select>
         <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm hover:bg-muted/40"><Download className="w-4 h-4" /> Export CSV</button>
       </div>
+
+      <p className="text-xs text-muted-foreground mb-3">Click on any user to open their full profile and manage them.</p>
 
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
