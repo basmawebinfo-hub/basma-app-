@@ -178,8 +178,11 @@ export default function UserDetailPage() {
                   )}
                   <button
                     onClick={async () => {
-                      await act("set_plan", { plan_id: selPlan })
-                      if (isCustom && customNums) { await act("set_limits", { custom_max_instances: Number(customNums) }) }
+                      await fetch("/api/admin/users/" + id + "/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "set_plan", plan_id: selPlan }) })
+                      if (isCustom && customNums) {
+                        await fetch("/api/admin/users/" + id + "/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "set_limits", custom_max_instances: Number(customNums) }) })
+                      }
+                      setModal(null); setCustomNums(""); setSelPlan(""); load()
                     }}
                     disabled={!selPlan || (isCustom && !customNums)}
                     className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
