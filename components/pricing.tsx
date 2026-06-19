@@ -1,103 +1,50 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-const plans = [
-  {
-    name: "Trial",
-    price: "Free",
-    period: "",
-    description: "Try the platform",
-    features: [
-      "1 WhatsApp number",
-      "500 messages",
-      "Webhooks & API",
-      "Inbox & analytics",
-    ],
-    cta: "Start Free Trial",
-    featured: false,
-  },
-  {
-    name: "3 Numbers",
-    price: "$20",
-    period: "/mo",
-    description: "For small teams",
-    features: [
-      "3 WhatsApp numbers",
-      "Unlimited messages",
-      "Webhooks & automation API",
-      "Full analytics",
-      "Inbox",
-    ],
-    cta: "Choose Plan",
-    featured: false,
-  },
-  {
-    name: "8 Numbers",
-    price: "$50",
-    period: "/mo",
-    description: "For growing businesses",
-    features: [
-      "8 WhatsApp numbers",
-      "Unlimited messages",
-      "Webhooks & automation API",
-      "Full analytics",
-      "Priority support",
-      "HMAC signing",
-    ],
-    cta: "Choose Plan",
-    featured: true,
-  },
-  {
-    name: "13 Numbers",
-    price: "$100",
-    period: "/mo",
-    description: "For larger teams",
-    features: [
-      "13 WhatsApp numbers",
-      "Unlimited messages",
-      "Webhooks & automation API",
-      "Full analytics",
-      "Priority support",
-    ],
-    cta: "Choose Plan",
-    featured: false,
-  },
-  {
-    name: "25 Numbers",
-    price: "$200",
-    period: "/mo",
-    description: "For large organizations",
-    features: [
-      "25 WhatsApp numbers",
-      "Unlimited messages",
-      "Webhooks & automation API",
-      "Dedicated support",
-    ],
-    cta: "Choose Plan",
-    featured: false,
-  },
-  {
-    name: "Custom",
-    price: "Custom",
-    period: "",
-    description: "More than 25 numbers",
-    features: [
-      "Unlimited numbers",
-      "Guaranteed SLA",
-      "Dedicated support",
-      "Custom pricing",
-    ],
-    cta: "Contact Us",
-    featured: false,
-  },
-]
+interface ApiPlan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number }
 
 export function Pricing() {
   const shouldReduceMotion = useReducedMotion()
+  const [plans, setPlans] = useState<ApiPlan[]>([])
+  const [rate, setRate] = useState(50)
+
+  useEffect(() => {
+    fetch("/api/pricing")
+      .then((r) => r.json())
+      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50) })
+      .catch(() => {})
+  }, [])
+
+  // Build display cards from real plans (skip the custom plan; it has its own CTA)
+  const display = plans
+    .filter((p) => p.name !== "مخصص" && p.name.toLowerCase() !== "custom")
+    .map((p, i, arr) => {
+      const isFree = p.price_monthly === 0
+      const featured = arr.length > 2 ? i === 2 : i === arr.length - 1
+      const features = [
+        `${p.max_instances} WhatsApp number${p.max_instances > 1 ? "s" : ""}`,
+        p.max_messages_mo === 0 ? "Unlimited messages" : `${p.max_messages_mo} messages`,
+        "Webhooks & automation API",
+        "Full analytics",
+        "Inbox",
+      ]
+      if (featured) { features.push("Priority support"); features.push("HMAC signing") }
+      return {
+        id: p.id,
+        name: p.name,
+        price: isFree ? "Free" : `$${p.price_monthly}`,
+        period: isFree ? "" : "/mo",
+        egp: isFree ? "" : `~ ${Math.round(p.price_monthly * rate)} EGP/mo`,
+        description: isFree ? "Try the platform" : `${p.max_instances} connections`,
+        features,
+        cta: isFree ? "Start Free Trial" : "Choose Plan",
+        featured,
+      }
+    })
 
   return (
     <section id="pricing" className="relative py-16 sm:py-24 lg:py-32">
@@ -112,35 +59,32 @@ export function Pricing() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
             <span className="text-gradient-lime">Simple</span> pricing
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free.</p>
+          <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free. Prices in USD (paid in EGP at today's rate).</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {plans.map((plan, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {display.map((plan, index) => (
             <motion.div
-              key={plan.name}
+              key={plan.id}
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative p-6 sm:p-8 rounded-2xl border ${
-                plan.featured ? "bg-card border-primary/50" : "bg-card/50 border-border"
-              }`}
+              className={`relative p-6 sm:p-8 rounded-2xl border ${plan.featured ? "bg-card border-primary/50" : "bg-card/50 border-border"}`}
             >
               {plan.featured && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">
-                    Most Popular
-                  </span>
+                  <span className="px-3 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">Most Popular</span>
                 </div>
               )}
 
               <div className="mb-4 sm:mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{plan.name}</h3>
-                <div className="flex items-baseline gap-1 mb-2">
+                <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl sm:text-4xl font-bold text-foreground">{plan.price}</span>
                   <span className="text-muted-foreground text-xs sm:text-sm">{plan.period}</span>
                 </div>
+                {plan.egp && <p className="text-[11px] text-muted-foreground mb-1">{plan.egp}</p>}
                 <p className="text-xs sm:text-sm text-muted-foreground">{plan.description}</p>
               </div>
 
@@ -153,14 +97,18 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Button variant={plan.featured ? "default" : "outline"} size="lg" rounded="full" className="w-full gap-2" asChild>
-                <Link href="/register">
-                  {plan.cta}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
+              <Link
+                href="/register"
+                className={`flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-colors ${plan.featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
+              >
+                {plan.cta} <ArrowRight className="w-4 h-4" />
+              </Link>
             </motion.div>
           ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground">Need more than 25 numbers? <Link href="/register" className="text-primary hover:underline">Contact us for a custom plan</Link></p>
         </div>
       </div>
     </section>
