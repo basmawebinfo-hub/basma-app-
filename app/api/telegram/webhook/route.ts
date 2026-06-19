@@ -20,7 +20,13 @@ export async function POST(req: NextRequest) {
   const db = createServiceClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   if (!code) {
-    await sendTelegram(chatId, "Welcome to BASMA bot. To link your account, send the link code shown in your account settings (starts with BSM-).")
+    // Not a link code -> treat as a support message from the customer
+    // Find the linked user (if any) by chat_id
+    const { data: linkedUser } = await db.from("profiles").select("id, full_name").eq("telegram_chat_id", chatId).single()
+    await db.from("support_messages").insert({
+      user_id: linkedUser?.id ?? null, chat_id: chatId, direction: "in", body: text, read_by_admin: false,
+    })
+    await sendTelegram(chatId, "تم استلام رسالتك ✅ سيتواصل معك فريق الدعم في أقرب وقت.")
     return NextResponse.json({ ok: true })
   }
 
