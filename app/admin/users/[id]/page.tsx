@@ -24,6 +24,7 @@ export default function UserDetailPage() {
   const [input2, setInput2] = useState("")
   const [plans, setPlans] = useState<{ id: string; name: string; max_instances: number; price_monthly: number }[]>([])
   const [selPlan, setSelPlan] = useState("")
+  const [customNums, setCustomNums] = useState("")
 
   function load() {
     if (!id) return
@@ -151,21 +152,43 @@ export default function UserDetailPage() {
               <textarea placeholder="Message" value={input2} onChange={(e) => setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" rows={3} />
               <button onClick={() => act("notify", { title: input, body: input2 })} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">Send</button>
             </>)}
-            {modal === "plan" && (<>
-              <label className="text-xs text-muted-foreground mb-2 block">Choose a plan to activate</label>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto mb-3">
-                {plans.map((pl) => {
-                  const selected = selPlan === pl.id
-                  return (
-                    <button key={pl.id} onClick={() => setSelPlan(pl.id)} className={"w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors " + (selected ? "border-primary bg-primary/10" : "border-border bg-muted/20 hover:bg-muted/40")}>
-                      <div><div className="text-sm font-medium">{pl.name}</div><div className="text-xs text-muted-foreground">{pl.max_instances} connection{pl.max_instances > 1 ? "s" : ""}</div></div>
-                      <div className="text-right"><div className="text-sm font-bold">${pl.price_monthly}</div><div className="text-[10px] text-muted-foreground">/month</div></div>
-                    </button>
-                  )
-                })}
-              </div>
-              <button onClick={() => act("set_plan", { plan_id: selPlan })} disabled={!selPlan} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">Activate plan</button>
-            </>)}
+            {modal === "plan" && (() => {
+              const selectedPlan = plans.find((pl) => pl.id === selPlan)
+              const isCustom = selectedPlan && (selectedPlan.name === "مخصص" || selectedPlan.name.toLowerCase() === "custom")
+              return (
+                <>
+                  <label className="text-xs text-muted-foreground mb-2 block">Choose a plan to activate</label>
+                  <div className="space-y-2 max-h-[260px] overflow-y-auto mb-3">
+                    {plans.map((pl) => {
+                      const selected = selPlan === pl.id
+                      const customPlan = pl.name === "مخصص" || pl.name.toLowerCase() === "custom"
+                      return (
+                        <button key={pl.id} onClick={() => setSelPlan(pl.id)} className={"w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors " + (selected ? "border-primary bg-primary/10" : "border-border bg-muted/20 hover:bg-muted/40")}>
+                          <div><div className="text-sm font-medium">{pl.name}</div><div className="text-xs text-muted-foreground">{customPlan ? "Set custom number of connections" : pl.max_instances + " connection" + (pl.max_instances > 1 ? "s" : "")}</div></div>
+                          <div className="text-right"><div className="text-sm font-bold">${pl.price_monthly}</div><div className="text-[10px] text-muted-foreground">/month</div></div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {isCustom && (
+                    <div className="mb-3">
+                      <label className="text-xs text-muted-foreground mb-1 block">Number of connections for this customer</label>
+                      <input type="number" min="1" placeholder="e.g. 40" value={customNums} onChange={(e) => setCustomNums(e.target.value)} className="w-full px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
+                    </div>
+                  )}
+                  <button
+                    onClick={async () => {
+                      await act("set_plan", { plan_id: selPlan })
+                      if (isCustom && customNums) { await act("set_limits", { custom_max_instances: Number(customNums) }) }
+                    }}
+                    disabled={!selPlan || (isCustom && !customNums)}
+                    className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+                  >
+                    Activate plan
+                  </button>
+                </>
+              )
+            })()}
             {modal === "password" && (<>
               <input type="text" placeholder="New password" value={input} onChange={(e) => setInput(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
               <button onClick={() => act("reset_password", { password: input })} disabled={input.length < 6} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">Set password</button>
