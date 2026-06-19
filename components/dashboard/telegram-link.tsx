@@ -36,12 +36,24 @@ export function TelegramLink() {
       <p className="text-sm text-muted-foreground mb-4">Link your Telegram to receive alerts (subscription reminders, admin messages).</p>
 
       {status?.linked ? (
-        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 flex items-center gap-3">
-          <Check className="w-5 h-5 text-green-600" />
-          <div>
-            <div className="text-sm font-medium">Telegram connected</div>
-            <div className="text-xs text-muted-foreground">You will receive alerts on Telegram.</div>
+        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <Check className="w-5 h-5 text-green-600" />
+            <div>
+              <div className="text-sm font-medium">Telegram connected</div>
+              <div className="text-xs text-muted-foreground">You receive all alerts on Telegram.</div>
+            </div>
           </div>
+          <button
+            onClick={async () => {
+              if (!confirm("تنبيه: إلغاء ربط تليجرام سيوقف استخدامك للمنصة حتى تربطه مجدداً. هل أنت متأكد؟")) return
+              await fetch("/api/telegram/link", { method: "DELETE" })
+              window.location.href = "/dashboard/link-telegram"
+            }}
+            className="text-xs text-red-600 hover:underline"
+          >
+            Unlink Telegram
+          </button>
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-card/40 p-4">
