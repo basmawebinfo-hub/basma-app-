@@ -8,8 +8,8 @@ export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const { data } = await supabase.from("profiles").select("telegram_chat_id, telegram_linked_at").eq("id", user.id).single()
-  return NextResponse.json({ linked: !!data?.telegram_chat_id, linked_at: data?.telegram_linked_at ?? null })
+  const { data } = await supabase.from("profiles").select("telegram_chat_id, telegram_linked_at, telegram_link_expires_at").eq("id", user.id).single()
+  return NextResponse.json({ linked: !!data?.telegram_chat_id, linked_at: data?.telegram_linked_at ?? null, code_expires_at: data?.telegram_link_expires_at ?? null })
 }
 
 // POST /api/telegram/link — generate a fresh link code
@@ -19,14 +19,16 @@ export async function POST() {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const code = "BSM-" + crypto.randomBytes(3).toString("hex").toUpperCase()
+  const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString()  // valid 2 minutes
   const svc = createServiceClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-  await svc.from("profiles").update({ telegram_link_code: code }).eq("id", user.id)
+  await svc.from("profiles").update({ telegram_link_code: code, telegram_link_expires_at: expiresAt }).eq("id", user.id)
 
   const botUser = process.env.TELEGRAM_BOT_USERNAME ?? ""
   return NextResponse.json({
     code,
+    expires_at: expiresAt,
     bot_link: botUser ? `https://t.me/${botUser}?start=${code}` : null,
-    instructions: "Open the Telegram bot and send this code to link your account.",
+    instructions: "Open the Telegram bot and send this code within 2 minutes to link your account.",
   })
 }
 
