@@ -29,3 +29,13 @@ export async function POST() {
     instructions: "Open the Telegram bot and send this code to link your account.",
   })
 }
+
+// DELETE /api/telegram/link — unlink telegram (user will be forced to re-link)
+export async function DELETE() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const svc = createServiceClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  await svc.from("profiles").update({ telegram_chat_id: null, telegram_linked_at: null, telegram_link_code: null }).eq("id", user.id)
+  return NextResponse.json({ ok: true })
+}
