@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Loader2, Ban, CheckCircle, Wallet, MinusCircle, Bell, Trash2, Settings2, X, Search, Download, CreditCard, KeyRound, UserCheck } from "lucide-react"
 
 interface AdminUser {
@@ -28,6 +29,7 @@ interface AdminUser {
 interface Plan { id: string; name: string; max_instances: number; price_monthly: number }
 
 export default function AdminUsers() {
+  const router = useRouter()
   const [users, setUsers] = useState<AdminUser[]>([])
   const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
@@ -114,9 +116,14 @@ export default function AdminUsers() {
             {filtered.map((u) => (
               <tr key={u.id} className="border-t border-border/40 hover:bg-card/30">
                 <td className="p-3">
-                  <div className="font-medium">{u.email ?? "—"}</div>
-                  <div className="text-xs text-muted-foreground">{u.full_name} {u.role !== "user" && "• " + u.role}</div>
-                  {u.whatsapp && <a href={"https://wa.me/" + (u.whatsapp || "").replace(/[^0-9]/g, "")} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline">{u.whatsapp}</a>}
+                  <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/admin/users/" + u.id)}>
+                    <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">{(u.full_name || u.email || "?").slice(0,2).toUpperCase()}</div>
+                    <div>
+                      <div className="font-medium hover:text-primary transition-colors">{u.email ?? "—"}</div>
+                      <div className="text-xs text-muted-foreground">{u.full_name} {u.role !== "user" && "• " + u.role}</div>
+                      {u.whatsapp && <a href={"https://wa.me/" + (u.whatsapp || "").replace(/[^0-9]/g, "")} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-xs text-green-600 hover:underline">{u.whatsapp}</a>}
+                    </div>
+                  </div>
                 </td>
                 <td className="p-3">
                   <span className={"px-2 py-0.5 rounded-full text-xs " + (u.status === "active" ? "bg-green-500/15 text-green-600" : u.status === "pending" ? "bg-amber-500/15 text-amber-600" : "bg-red-500/15 text-red-600")}>{u.status}</span>
