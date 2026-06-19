@@ -95,6 +95,10 @@ export async function GET(req: NextRequest) {
         user_id: u.id, amount: -dailyCost, type: "debit",
         reason: `Daily charge (${plan.name})`, balance_after: newBal,
       })
+      // Daily deduction message (Arabic) to Telegram
+      if (u.telegram_chat_id) {
+        await sendTelegram(u.telegram_chat_id, `<b>الخصم اليومي</b>\nتم خصم $${dailyCost.toFixed(2)} من رصيدك (باقة ${plan.name}).\nرصيدك الحالي: $${newBal.toFixed(2)}`)
+      }
       charged++
       // Low balance warning (< 3 days left)
       if (newBal < dailyCost * 3) {
