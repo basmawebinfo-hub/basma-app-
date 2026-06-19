@@ -30,15 +30,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  // Find the user with this link code (need name + balance for the welcome message)
-  const { data: profile } = await db.from("profiles").select("id, email, full_name, balance").eq("telegram_link_code", code).single()
+  // Find the user with this link code (need name + balance + expiry for security)
+  const { data: profile } = await db.from("profiles").select("id, email, full_name, balance, telegram_link_expires_at").eq("telegram_link_code", code).single()
   if (!profile) {
     await sendTelegram(chatId, "كود غير صحيح أو منتهي. أنشئ كوداً جديداً من إعدادات حسابك في المنصة.")
     return NextResponse.json({ ok: true })
   }
 
+  // SECURITY 1: code must not be expired (valid 2 minutes)
+  if (!profile.telegram_link_expires_at || new Date(profile.telegram_link_expires_at) < new Date()) {
+    await db.from("profiles").update({ telegram_link_code: null, telegram_link_expires_at: null }).eq("id", profile.id)
+    await sendTelegram(chatId, "انتهت صلاحية الكود ⏱️ من فضلك أنشئ كوداً جديداً من المنصة (صالح لدقيقتين فقط).")
+    return NextResponse.json({ ok: true })
+  }
+
+  // SECURITY 2: this telegram chat must not already be linked to a different account
+  const { data: existingLink } = await db.from("profiles").select("id, email").eq("telegram_chat_id", chatId).maybeSingle()
+  if (existingLink && existingLink.id !== profile.id) {
+    await sendTelegram(chatId, "حساب تليجرام هذا مرتبط بالفعل بحساب آخر. لا يمكن ربطه بحسابين. تواصل مع الدعم إذا احتجت مساعدة.")
+    return NextResponse.json({ ok: true })
+  }
+
+  // SECURITY 3: clear old support messages of this chat (so a new owner can't read old chats)
+  await db.from("support_messages").delete().eq("chat_id", chatId)
+
   await db.from("profiles").update({
-    telegram_chat_id: chatId, telegram_linked_at: new Date().toISOString(), telegram_link_code: null,
+    telegram_chat_id: chatId, telegram_linked_at: new Date().toISOString(), telegram_link_code: null, telegram_link_expires_at: null,
   }).eq("id", profile.id)
 
   // Resolve current plan for the welcome message
