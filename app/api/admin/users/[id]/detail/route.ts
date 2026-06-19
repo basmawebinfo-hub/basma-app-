@@ -3,11 +3,11 @@ import { requireAdmin, adminService } from "@/lib/admin"
 import { getUserPlan } from "@/lib/plan"
 
 // GET /api/admin/users/[id]/detail — full profile of one user
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const gate = await requireAdmin()
   if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status })
   const db = adminService()
-  const uid = params.id
+  const { id: uid } = await params
 
   const { data: profile } = await db.from("profiles")
     .select("id, email, full_name, company, role, status, balance, plan, whatsapp, telegram_chat_id, telegram_linked_at, custom_max_instances, created_at")
