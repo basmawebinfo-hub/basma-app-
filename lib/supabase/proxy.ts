@@ -76,7 +76,7 @@ export async function updateSession(request: NextRequest) {
   if (user && pathname.startsWith("/dashboard")) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("status, role")
+      .select("status, role, telegram_chat_id")
       .eq("id", user.id)
       .single()
     if (profile?.status === "suspended") {
@@ -92,6 +92,14 @@ export async function updateSession(request: NextRequest) {
     if (profile?.role === "admin" || profile?.role === "super_admin") {
       const url = request.nextUrl.clone()
       url.pathname = "/admin"
+      return NextResponse.redirect(url)
+    }
+    // Mandatory Telegram link: regular active users must link Telegram first
+    const isRegularUser = profile?.role === "user" || !profile?.role
+    const allowedWithoutTg = pathname.startsWith("/dashboard/link-telegram")
+    if (isRegularUser && !profile?.telegram_chat_id && !allowedWithoutTg) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard/link-telegram"
       return NextResponse.redirect(url)
     }
   }
