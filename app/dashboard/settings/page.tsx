@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Eye, EyeOff, Copy, RefreshCw, Loader2, Check, Key, Webhook, User, AlertTriangle } from "lucide-react"
+import { TelegramLink } from "@/components/dashboard/telegram-link"
 
 interface ApiKeyData { key_prefix: string | null; is_active: boolean | null; last_used_at: string | null }
 interface WebhookTokenData { token: string | null; hmac_secret: string | null; is_active: boolean }
@@ -199,6 +200,9 @@ export default function SettingsPage() {
           </table>
         </div>
       </section>
+
+      <Separator className="my-8" />
+      <TelegramLink />
 
     </div>
   )
