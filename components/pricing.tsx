@@ -20,31 +20,48 @@ export function Pricing() {
   }, [])
 
   // Build display cards from real plans (skip the custom plan; it has its own CTA)
-  const display = plans
-    .filter((p) => p.name !== "مخصص" && p.name.toLowerCase() !== "custom")
-    .map((p, i, arr) => {
-      const isFree = p.price_monthly === 0
-      const featured = arr.length > 2 ? i === 2 : i === arr.length - 1
-      const features = [
-        `${p.max_instances} WhatsApp number${p.max_instances > 1 ? "s" : ""}`,
-        p.max_messages_mo === 0 ? "Unlimited messages" : `${p.max_messages_mo} messages`,
-        "Webhooks & automation API",
-        "Full analytics",
-        "Inbox",
-      ]
-      if (featured) { features.push("Priority support"); features.push("HMAC signing") }
-      return {
-        id: p.id,
-        name: p.name,
-        price: isFree ? "Free" : `$${p.price_monthly}`,
-        period: isFree ? "" : "/mo",
-        egp: isFree ? "" : `~ ${Math.round(p.price_monthly * rate)} EGP/mo`,
-        description: isFree ? "Try the platform" : `${p.max_instances} connections`,
-        features,
-        cta: isFree ? "Start Free Trial" : "Choose Plan",
-        featured,
-      }
+  const regular = plans.filter((p) => p.name !== "مخصص" && p.name.toLowerCase() !== "custom")
+  const customPlan = plans.find((p) => p.name === "مخصص" || p.name.toLowerCase() === "custom")
+
+  const display = regular.map((p, i, arr) => {
+    const isFree = p.price_monthly === 0
+    const featured = arr.length > 2 ? i === 2 : i === arr.length - 1
+    const features = [
+      `${p.max_instances} WhatsApp number${p.max_instances > 1 ? "s" : ""}`,
+      p.max_messages_mo === 0 ? "Unlimited messages" : `${p.max_messages_mo} messages`,
+      "Webhooks & automation API",
+      "Full analytics",
+      "Inbox",
+    ]
+    if (featured) { features.push("Priority support"); features.push("HMAC signing") }
+    return {
+      id: p.id,
+      name: p.name,
+      price: isFree ? "Free" : `$${p.price_monthly}`,
+      period: isFree ? "" : "/mo",
+      egp: isFree ? "" : `~ ${Math.round(p.price_monthly * rate)} EGP/mo`,
+      description: isFree ? "Try the platform" : `${p.max_instances} connections`,
+      features,
+      cta: isFree ? "Start Free Trial" : "Choose Plan",
+      featured: !!featured,
+      isCustom: false,
+    }
+  })
+
+  if (customPlan) {
+    display.push({
+      id: customPlan.id,
+      name: "Custom",
+      price: "Custom",
+      period: "",
+      egp: "",
+      description: "For more than 25 numbers",
+      features: ["Unlimited numbers", "Unlimited messages", "Priority support", "Dedicated onboarding", "Custom pricing"],
+      cta: "Contact Us",
+      featured: false,
+      isCustom: true,
     })
+  }
 
   return (
     <section id="pricing" className="relative py-16 sm:py-24 lg:py-32">
@@ -107,9 +124,7 @@ export function Pricing() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">Need more than 25 numbers? <Link href="/register" className="text-primary hover:underline">Contact us for a custom plan</Link></p>
-        </div>
+
       </div>
     </section>
   )
