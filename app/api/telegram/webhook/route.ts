@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  // Find the user with this link code
-  const { data: profile } = await db.from("profiles").select("id, email").eq("telegram_link_code", code).single()
+  // Find the user with this link code (need name + balance for the welcome message)
+  const { data: profile } = await db.from("profiles").select("id, email, full_name, balance").eq("telegram_link_code", code).single()
   if (!profile) {
-    await sendTelegram(chatId, "Invalid or expired code. Generate a new one from your account settings.")
+    await sendTelegram(chatId, "كود غير صحيح أو منتهي. أنشئ كوداً جديداً من إعدادات حسابك في المنصة.")
     return NextResponse.json({ ok: true })
   }
 
@@ -35,6 +35,36 @@ export async function POST(req: NextRequest) {
     telegram_chat_id: chatId, telegram_linked_at: new Date().toISOString(), telegram_link_code: null,
   }).eq("id", profile.id)
 
-  await sendTelegram(chatId, `Your account is linked successfully.\nYou'll now receive BASMA alerts here.`)
+  // Resolve current plan for the welcome message
+  const { data: sub } = await db.from("subscriptions").select("plan_id, current_period_end").eq("user_id", profile.id).order("created_at", { ascending: false }).limit(1).single()
+  let planName = "تجريبي"
+  if (sub?.plan_id) {
+    const { data: pl } = await db.from("plans").select("name").eq("id", sub.plan_id).single()
+    if (pl?.name) planName = pl.name
+  }
+
+  const name = profile.full_name || profile.email || "عميلنا العزيز"
+  const balance = Number(profile.balance ?? 0).toFixed(2)
+
+  const welcome = [
+    `مرحباً ${name}! 👋`,
+    ``,
+    `تم ربط حسابك في <b>BASMA</b> بتليجرام بنجاح ✅`,
+    `سيصلك هنا كل ما يخص اشتراكك وحسابك.`,
+    ``,
+    `💰 رصيدك الحالي: <b>$${balance}</b>`,
+    `📦 باقتك: <b>${planName}</b>`,
+    ``,
+    `<b>ماذا يفعل هذا البوت؟</b>`,
+    `• يرسل لك إشعار عند إيداع رصيد في حسابك`,
+    `• يرسل لك الخصم اليومي ورصيدك المتبقي`,
+    `• ينبّهك قبل انتهاء اشتراكك بوقت كافٍ`,
+    `• ينبّهك عند انخفاض رصيدك`,
+    `• يوصّل لك رسائل وتنبيهات الإدارة`,
+    ``,
+    `شكراً لاستخدامك BASMA 🌟`,
+  ].join("\n")
+
+  await sendTelegram(chatId, welcome)
   return NextResponse.json({ ok: true })
 }
