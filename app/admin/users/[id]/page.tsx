@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Loader2, ArrowLeft, Ban, CheckCircle, Wallet, MinusCircle, Bell, KeyRound, Trash2, Server, MessageSquare, Check, X } from "lucide-react"
+import { Loader2, ArrowLeft, Ban, CheckCircle, Wallet, MinusCircle, Bell, KeyRound, Trash2, Server, MessageSquare, Check, X, CreditCard } from "lucide-react"
 
 interface Detail {
   profile: { id: string; email: string | null; full_name: string | null; company: string | null; role: string; status: string; balance: number; plan_name: string; whatsapp: string | null; telegram_linked: boolean; telegram_linked_at: string | null; effective_max_instances: number; created_at: string }
@@ -22,6 +22,8 @@ export default function UserDetailPage() {
   const [modal, setModal] = useState<string | null>(null)
   const [input, setInput] = useState("")
   const [input2, setInput2] = useState("")
+  const [plans, setPlans] = useState<{ id: string; name: string; max_instances: number; price_monthly: number }[]>([])
+  const [selPlan, setSelPlan] = useState("")
 
   function load() {
     if (!id) return
@@ -33,6 +35,7 @@ export default function UserDetailPage() {
       .finally(() => setLoading(false))
   }
   useEffect(() => { load() }, [id])
+  useEffect(() => { fetch("/api/admin/plans").then((r) => r.json()).then((d) => setPlans(d.plans ?? [])).catch(() => {}) }, [])
 
   async function act(action: string, payload: Record<string, unknown> = {}) {
     const r = await fetch("/api/admin/users/" + id + "/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, ...payload }) })
@@ -83,6 +86,7 @@ export default function UserDetailPage() {
             <button title="Top up" onClick={() => setModal("topup")} className="p-2 rounded-md hover:bg-primary/15 text-primary"><Wallet className="w-4 h-4" /></button>
             <button title="Deduct" onClick={() => setModal("debit")} className="p-2 rounded-md hover:bg-red-500/15 text-red-600"><MinusCircle className="w-4 h-4" /></button>
             <button title="Notify" onClick={() => setModal("notify")} className="p-2 rounded-md hover:bg-blue-500/15 text-blue-600"><Bell className="w-4 h-4" /></button>
+            <button title="Change plan" onClick={() => setModal("plan")} className="p-2 rounded-md hover:bg-amber-500/15 text-amber-600"><CreditCard className="w-4 h-4" /></button>
             <button title="Reset password" onClick={() => setModal("password")} className="p-2 rounded-md hover:bg-orange-500/15 text-orange-600"><KeyRound className="w-4 h-4" /></button>
             <button title="Delete" onClick={() => { if (confirm("Delete this user permanently?")) act("delete") }} className="p-2 rounded-md hover:bg-red-500/15 text-red-600"><Trash2 className="w-4 h-4" /></button>
           </div>
@@ -146,6 +150,21 @@ export default function UserDetailPage() {
               <input placeholder="Title" value={input} onChange={(e) => setInput(e.target.value)} className="w-full mb-2 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
               <textarea placeholder="Message" value={input2} onChange={(e) => setInput2(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" rows={3} />
               <button onClick={() => act("notify", { title: input, body: input2 })} className="w-full py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">Send</button>
+            </>)}
+            {modal === "plan" && (<>
+              <label className="text-xs text-muted-foreground mb-2 block">Choose a plan to activate</label>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto mb-3">
+                {plans.map((pl) => {
+                  const selected = selPlan === pl.id
+                  return (
+                    <button key={pl.id} onClick={() => setSelPlan(pl.id)} className={"w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors " + (selected ? "border-primary bg-primary/10" : "border-border bg-muted/20 hover:bg-muted/40")}>
+                      <div><div className="text-sm font-medium">{pl.name}</div><div className="text-xs text-muted-foreground">{pl.max_instances} connection{pl.max_instances > 1 ? "s" : ""}</div></div>
+                      <div className="text-right"><div className="text-sm font-bold">${pl.price_monthly}</div><div className="text-[10px] text-muted-foreground">/month</div></div>
+                    </button>
+                  )
+                })}
+              </div>
+              <button onClick={() => act("set_plan", { plan_id: selPlan })} disabled={!selPlan} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">Activate plan</button>
             </>)}
             {modal === "password" && (<>
               <input type="text" placeholder="New password" value={input} onChange={(e) => setInput(e.target.value)} className="w-full mb-3 px-3 py-2 rounded-md bg-muted/30 border border-border text-sm" />
