@@ -42,6 +42,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         type: action === "topup" ? "topup" : "debit",
         reason: body.reason ?? null, balance_after: newBalance, created_by: gate.userId,
       })
+      // Notify the user (in-app + Telegram in Arabic)
+      const isTopup = action === "topup"
+      const title = isTopup ? "تم إيداع رصيد" : "تم خصم رصيد"
+      const noteBody = isTopup
+        ? `تم إضافة $${amount.toFixed(2)} إلى حسابك.\nرصيدك الحالي: $${newBalance.toFixed(2)}`
+        : `تم خصم $${amount.toFixed(2)} من حسابك.\nرصيدك الحالي: $${newBalance.toFixed(2)}`
+      await db.from("notifications").insert({ user_id: targetUserId, title, body: noteBody, level: "info", created_by: gate.userId })
+      if (profile.telegram_chat_id) {
+        await sendTelegram(profile.telegram_chat_id, `<b>${title}</b>\n${noteBody}`)
+      }
       await logAdminAction(gate.userId, action, "user", targetUserId, { amount: delta, newBalance })
       return NextResponse.json({ ok: true, balance: newBalance })
     }
