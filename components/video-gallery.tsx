@@ -315,21 +315,9 @@ function MultiChannelIllustration() {
 }
 
 const demos = [
-  {
-    title: "{t("vg.c3.title")}",
-    description: "{t("vg.c3.desc")}",
-    Illustration: LiveChatIllustration,
-  },
-  {
-    title: "{t("vg.c2.title")}",
-    description: "{t("vg.c2.desc")}",
-    Illustration: TicketResolutionIllustration,
-  },
-  {
-    title: "200+ Integrations",
-    description: "{t("vg.c1.desc")}",
-    Illustration: MultiChannelIllustration,
-  },
+  { titleKey: "vg.c3.title", descKey: "vg.c3.desc", Illustration: LiveChatIllustration },
+  { titleKey: "vg.c2.title", descKey: "vg.c2.desc", Illustration: TicketResolutionIllustration },
+  { titleKey: "vg.c1.title", descKey: "vg.c1.desc", Illustration: MultiChannelIllustration },
 ]
 
 export function VideoGallery() {
@@ -356,7 +344,7 @@ export function VideoGallery() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {demos.map((demo, index) => (
             <motion.div
-              key={demo.title}
+              key={demo.titleKey}
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -367,8 +355,8 @@ export function VideoGallery() {
                 <demo.Illustration />
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-foreground mb-1">{demo.title}</h3>
-                <p className="text-sm text-muted-foreground">{demo.description}</p>
+                <h3 className="font-semibold text-foreground mb-1">{t(demo.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground">{t(demo.descKey)}</p>
               </div>
             </motion.div>
           ))}
