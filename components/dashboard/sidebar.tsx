@@ -2,20 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  MessageSquare,
-  Plug,
-  Webhook,
-  BarChart2,
-  Settings,
-  Menu,
-  X,
-  LogOut,
-  Megaphone,
-  Bot,
-  CreditCard,
-  BookOpen} from "lucide-react"
+import { LayoutDashboard, MessageSquare, Plug, Webhook, BarChart2, Settings, Menu, X, Megaphone, Bot, CreditCard, BookOpen } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
