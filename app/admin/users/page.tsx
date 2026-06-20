@@ -20,6 +20,9 @@ interface AdminUser {
   instances_connected: number
   messages_sent: number
   messages_received: number
+  avatar_url?: string | null
+  is_trial?: boolean
+  trial_day?: number | null
 }
 
 export default function AdminUsers() {
@@ -91,7 +94,7 @@ export default function AdminUsers() {
               <tr key={u.id} onClick={() => router.push("/admin/users/" + u.id)} className="border-t border-border/40 hover:bg-card/30 cursor-pointer">
                 <td className="p-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">{(u.full_name || u.email || "?").slice(0, 2).toUpperCase()}</div>
+                    <div className="w-9 h-9 rounded-full overflow-hidden bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">{u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full object-cover" /> : (u.full_name || u.email || "?").slice(0, 2).toUpperCase()}</div>
                     <div>
                       <div className="font-medium">{u.email ?? "—"}</div>
                       <div className="text-xs text-muted-foreground">{u.full_name} {u.role !== "user" && "• " + u.role}</div>
@@ -105,7 +108,7 @@ export default function AdminUsers() {
                 <td className="p-3">
                   <div>{u.is_custom_limit ? "Custom" : (u.plan_name ?? "—")}</div>
                   <div className="text-xs text-muted-foreground">{u.effective_max_instances ?? "—"} numbers allowed</div>
-                  {u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>}
+                  {u.is_trial && u.trial_day ? <div className="text-xs text-primary">Trial - Day {u.trial_day}</div> : (u.days_left !== null && u.days_left !== undefined && <div className={"text-xs " + ((u.days_left ?? 0) <= 5 ? "text-red-500" : "text-muted-foreground")}>{u.days_left} days left</div>)}
                   {u.requested_plan && <div className="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-600 font-medium">wants: {u.requested_plan}</div>}
                 </td>
                 <td className="p-3 font-medium">${Number(u.balance).toFixed(2)}</td>
