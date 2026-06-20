@@ -2,46 +2,47 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import { Webhook, MessageSquare, BarChart3, Plug, Zap, ShieldCheck, Clock, Globe } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 const useCases = [
   {
     category: "n8n",
-    question: "How can we forward every WhatsApp message into an n8n workflow automatically?",
+    questionKey: "uc.q1",
     icon: Zap,
   },
   {
     category: "Zapier",
-    question: "Want to trigger Zapier zaps the moment a customer sends a WhatsApp message?",
+    questionKey: "uc.q2",
     icon: Webhook,
   },
   {
     category: "Make",
-    question: "Need to pass WhatsApp events directly into Make scenarios with zero code?",
+    questionKey: "uc.q3",
     icon: Plug,
   },
   {
     category: "Inbox",
-    question: "How do we manage thousands of WhatsApp conversations in one unified place?",
+    questionKey: "uc.q4",
     icon: MessageSquare,
   },
   {
     category: "Analytics",
-    question: "Want live data on message volume, response rates, and peak hours?",
+    questionKey: "uc.q5",
     icon: BarChart3,
   },
   {
     category: "24/7 Events",
-    question: "Need every event — messages, calls, status updates — delivered around the clock?",
+    questionKey: "uc.q6",
     icon: Clock,
   },
   {
     category: "Security",
-    question: "Looking for HMAC-signed webhook payloads with automatic retry on failure?",
+    questionKey: "uc.q7",
     icon: ShieldCheck,
   },
   {
     category: "Global",
-    question: "Want to support customers across any country on WhatsApp at scale?",
+    questionKey: "uc.q8",
     icon: Globe,
   },
 ]
@@ -51,6 +52,7 @@ const allUseCases = [...useCases, ...useCases]
 
 export function UseCases() {
   const shouldReduceMotion = useReducedMotion()
+  const { t } = useI18n()
 
   return (
     <section id="features" className="relative py-12 sm:py-20 overflow-hidden">
@@ -72,7 +74,7 @@ export function UseCases() {
           transition={{ duration: 0.5 }}
           className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
         >
-          What will you connect?
+          {t("uc.title")}
         </motion.h2>
         <motion.p
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -81,7 +83,7 @@ export function UseCases() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto"
         >
-          From simple inboxes to complex automations, Basma Web handles it all
+          {t("uc.subtitle")}
         </motion.p>
       </div>
 
@@ -128,6 +130,7 @@ export function UseCases() {
 }
 
 function UseCaseCard({ useCase }: { useCase: (typeof useCases)[0] }) {
+  const { t } = useI18n()
   const Icon = useCase.icon
 
   return (
@@ -143,7 +146,7 @@ function UseCaseCard({ useCase }: { useCase: (typeof useCases)[0] }) {
         <span className="text-xs font-semibold text-primary uppercase tracking-wider">{useCase.category}</span>
       </div>
       <p className="relative text-xs sm:text-sm text-foreground leading-relaxed group-hover:text-foreground/90">
-        {useCase.question}
+        {t(useCase.questionKey)}
       </p>
     </div>
   )
