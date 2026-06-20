@@ -198,8 +198,9 @@ export function Navbar() {
 
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-3">
+            <LangToggle />
             <Button variant="ghost" size="sm" rounded="full" asChild>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard">{t("nav.login")}</Link>
             </Button>
             <Button size="sm" rounded="full" className="gap-1.5" asChild>
               <Link href="#pricing">
