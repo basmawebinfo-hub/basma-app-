@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Megaphone, Wifi, WifiOff, QrCode, RefreshCw } from "lucide-react"
+import { TelegramLink } from "@/components/dashboard/telegram-link"
 
 interface Instance {
   id: string
@@ -13,7 +14,7 @@ interface Instance {
   created_at: string
 }
 
-type View = "channels" | "whatsapp"
+type View = "channels" | "whatsapp" | "telegram"
 type Step = 1 | 2 | 3
 
 export default function ConnectPage() {
@@ -92,7 +93,7 @@ export default function ConnectPage() {
   if (view === "channels") {
     const channels = [
       { key: "whatsapp", name: "WhatsApp", desc: "Connect your WhatsApp numbers for messaging & automation", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
-      { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Manage in settings", onClick: () => router.push("/dashboard/settings") },
+      { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Link your Telegram", onClick: () => setView("telegram") },
       { key: "campaigns", name: "Broadcast Channels", desc: "Bulk campaigns across your channels", icon: Megaphone, color: "text-amber-500", bg: "bg-amber-500/10", active: false, status: "Coming soon", onClick: () => {} },
     ]
     return (
@@ -110,6 +111,16 @@ export default function ConnectPage() {
             </button>
           ))}
         </div>
+      </div>
+    )
+  }
+
+  // ===== TELEGRAM MANAGEMENT =====
+  if (view === "telegram") {
+    return (
+      <div className="p-8 max-w-2xl mx-auto">
+        <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> Back to channels</button>
+        <TelegramLink />
       </div>
     )
   }
