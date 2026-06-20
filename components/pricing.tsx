@@ -65,7 +65,7 @@ export function Pricing() {
 
   return (
     <section id="pricing" className="relative py-16 sm:py-24 lg:py-32">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ export function Pricing() {
           <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free. Prices in USD (paid in EGP at today's rate).</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-4">
           {display.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -87,16 +87,16 @@ export function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative p-4 rounded-2xl border ${plan.featured ? "bg-card border-primary/50" : "bg-card/50 border-border"}`}
+              className={`relative flex flex-col p-5 rounded-2xl border transition-all ${plan.featured ? "bg-card border-2 border-primary ring-2 ring-primary/20 shadow-lg" : "bg-card/50 border border-border"}`}
             >
               {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">Most Popular</span>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap">
+                  <span className="px-3 py-1 text-[11px] font-semibold bg-primary text-primary-foreground rounded-full shadow">Most Popular</span>
                 </div>
               )}
 
-              <div className="mb-4 sm:mb-6">
-                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{plan.name}</h3>
+              <div className="mb-4 mt-1">
+                <h3 className="text-base font-semibold text-foreground mb-2">{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-2xl sm:text-3xl font-bold text-foreground">{plan.price}</span>
                   <span className="text-muted-foreground text-xs sm:text-sm">{plan.period}</span>
