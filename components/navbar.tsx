@@ -28,11 +28,11 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
 const navLinks = [
-  { href: "#platform", label: "Platform" },
-  { href: "#inbox", label: "Inbox" },
-  { href: "#webhooks", label: "Webhooks" },
-  { href: "#integrations", label: "Integrations" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "#how-it-works", key: "nav.howItWorks" },
+  { href: "#use-cases", key: "nav.useCases" },
+  { href: "#pricing", key: "nav.pricing" },
+  { href: "#faq", key: "nav.faq" },
+  { href: "#footer", key: "nav.contact" },
 ]
 
 const platformItems = [
@@ -194,7 +194,7 @@ export function Navbar() {
                 href={link.href}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {link.label}
+                {t(link.key)}
               </Link>
             ))}
           </div>
