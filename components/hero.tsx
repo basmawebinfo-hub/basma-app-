@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Command, CornerDownLeft } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useEffect } from "react"
+import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
 
 const examplePrompts = [
@@ -23,6 +24,7 @@ const trustedLogos = [
 ]
 
 export function Hero() {
+  const { t } = useI18n()
   const shouldReduceMotion = useReducedMotion()
   const [prompt, setPrompt] = useState("")
   const [isFocused, setIsFocused] = useState(false)
@@ -89,7 +91,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            أول منصة عربية لأتمتة واتساب · The first Arabic WhatsApp platform
+            {t("hero.badge")}
           </motion.div>
 
           <motion.h1
@@ -98,9 +100,9 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-display text-balance mb-6 leading-[1.1]"
           >
-            <span className="text-gradient-lime">Connect WhatsApp</span>
+            <span className="text-gradient-lime">{t("hero.title1")}</span>
             <br />
-            <span className="text-foreground">to any tool.</span>
+            <span className="text-foreground">{t("hero.title2")}</span>
           </motion.h1>
 
           <motion.p
@@ -109,7 +111,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 text-pretty leading-relaxed px-2"
           >
-            Receive messages, trigger any event, and forward data to n8n, Zapier, or any Webhook endpoint.
+            {t("hero.desc")}
           </motion.p>
 
           <motion.div
