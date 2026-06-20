@@ -16,6 +16,22 @@ export async function GET() {
 
   const plan = await getUserPlan(user.id)
 
+  // Trial day counter (Day 1, Day 2, ...) based on subscription start
+  let trialDay: number | null = null
+  let isTrial = false
+  {
+    const { data: sub } = await supabase.from("subscriptions").select("plan_id, created_at, current_period_end").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single()
+    if (sub) {
+      const { data: planRow } = await supabase.from("plans").select("price_monthly, name").eq("id", sub.plan_id).single()
+      isTrial = Number(planRow?.price_monthly ?? 0) === 0
+      if (isTrial && sub.created_at) {
+        const start = new Date(sub.created_at)
+        const days = Math.floor((Date.now() - start.getTime()) / 86400000) + 1  // Day 1 on first day
+        trialDay = days
+      }
+    }
+  }
+
   // Daily cost + days left based on the plan price (monthly / 30)
   let monthlyPrice = 0
   if (plan.plan_id) {
@@ -42,6 +58,8 @@ export async function GET() {
     monthly_price: monthlyPrice,
     daily_cost: dailyCost,
     days_left: daysLeft,
+    is_trial: isTrial,
+    trial_day: trialDay,
     transactions: tx ?? [],
   })
 }
