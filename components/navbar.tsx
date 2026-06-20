@@ -97,7 +97,7 @@ export function Navbar() {
       <nav className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8 py-4" aria-label="Main navigation">
         <div className="flex h-14 items-center justify-between bg-background/60 backdrop-blur-xl border border-border/50 rounded-full px-4 sm:px-6">
           <Link href="/" className="flex items-center" aria-label="Basma Web home">
-            <img src="/basma-logo.png" alt="BASMA" className="h-8 sm:h-9 w-auto" />
+            <img src="/basma-logo.png" alt="BASMA" className="h-9 sm:h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation - hidden below lg */}
@@ -200,17 +200,18 @@ export function Navbar() {
           </div>
 
           {/* Desktop Buttons - hidden below lg */}
-          <div className="hidden lg:flex items-center gap-3">
-            <LangToggle />
+          <div className="hidden lg:flex items-center gap-2.5">
             <Button variant="ghost" size="sm" rounded="full" asChild>
               <Link href="/dashboard">{t("nav.login")}</Link>
             </Button>
             <Button size="sm" rounded="full" className="gap-1.5" asChild>
               <Link href="#pricing">
-                Get Started Free
+                {t("nav.getStarted")}
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
             </Button>
+            <div className="w-px h-5 bg-border/60 mx-1" />
+            <LangToggle />
           </div>
 
           {/* Mobile Menu Button - visible below lg */}
