@@ -57,7 +57,6 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
     <div className="p-3 border-t border-border">
       <Link
         href="/dashboard/settings"
-        onClick={onClick}
         className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group"
       >
         <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
