@@ -16,6 +16,10 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "hero.title": { ar: "منصة واتساب الذكية لأعمالك", en: "The smart WhatsApp platform for your business" },
   "hero.subtitle": { ar: "استقبل وأرسل رسائل واتساب، تابع عملاءك، وأتمت ردودك — واربطها بـ n8n وMake.", en: "Send and receive WhatsApp messages, track customers, and automate your replies — connect with n8n and Make." },
   "hero.cta": { ar: "ابدأ مجاناً", en: "Start Free" },
+  "hero.title1": { ar: "اربط واتساب", en: "Connect WhatsApp" },
+  "hero.title2": { ar: "بأي أداة.", en: "to any tool." },
+  "hero.desc": { ar: "استقبل الرسائل، شغّل أي حدث، وحوّل البيانات إلى n8n أو Zapier أو أي Webhook.", en: "Receive messages, trigger any event, and forward data to n8n, Zapier, or any Webhook endpoint." },
+
   // Pricing
   "pricing.title": { ar: "أسعار بسيطة", en: "Simple pricing" },
   "pricing.subtitle": { ar: "بدون رسوم خفية. ألغِ في أي وقت. ابدأ مجاناً.", en: "No hidden fees. Cancel anytime. Start for free." },
