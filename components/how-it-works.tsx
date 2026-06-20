@@ -2,30 +2,20 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import { QrCode, Webhook, Zap } from "lucide-react"
-
-const steps = [
-  {
-    icon: QrCode,
-    title: "Scan & Connect",
-    description: "Open the dashboard, scan the QR code with WhatsApp, and your number is live in under 30 seconds.",
-  },
-  {
-    icon: Webhook,
-    title: "Configure Webhooks",
-    description: "Choose which events to forward — messages, status updates, calls — and set your destination URLs.",
-  },
-  {
-    icon: Zap,
-    title: "Automate Everything",
-    description: "Every WhatsApp event triggers your n8n, Zapier, or custom workflow automatically, in real time.",
-  },
-]
+import { useI18n } from "@/lib/i18n"
 
 export function HowItWorks() {
   const shouldReduceMotion = useReducedMotion()
+  const { t } = useI18n()
+
+  const steps = [
+    { icon: QrCode, titleKey: "how.s1.title", descKey: "how.s1.desc" },
+    { icon: Webhook, titleKey: "how.s2.title", descKey: "how.s2.desc" },
+    { icon: Zap, titleKey: "how.s3.title", descKey: "how.s3.desc" },
+  ]
 
   return (
-    <section id="webhooks" className="relative py-24 lg:py-32 border-t border-border">
+    <section id="how-it-works" className="relative py-24 lg:py-32 border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
@@ -34,15 +24,15 @@ export function HowItWorks() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
-            How it <span className="text-gradient-lime">works</span>
+            {t("how.title1")} <span className="text-gradient-lime">{t("how.title2")}</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">From zero to live WhatsApp webhooks in three simple steps</p>
+          <p className="text-muted-foreground max-w-xl mx-auto">{t("how.subtitle")}</p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">
           {steps.map((step, index) => (
             <motion.div
-              key={step.title}
+              key={step.titleKey}
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -57,8 +47,8 @@ export function HowItWorks() {
                   {index + 1}
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{t(step.titleKey)}</h3>
+              <p className="text-sm text-muted-foreground">{t(step.descKey)}</p>
             </motion.div>
           ))}
         </div>
