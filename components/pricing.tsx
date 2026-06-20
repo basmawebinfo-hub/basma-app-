@@ -79,7 +79,7 @@ export function Pricing() {
           <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free. Prices in USD (paid in EGP at today's rate).</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           {display.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -87,7 +87,7 @@ export function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative p-6 sm:p-8 rounded-2xl border ${plan.featured ? "bg-card border-primary/50" : "bg-card/50 border-border"}`}
+              className={`relative p-4 rounded-2xl border ${plan.featured ? "bg-card border-primary/50" : "bg-card/50 border-border"}`}
             >
               {plan.featured && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -98,7 +98,7 @@ export function Pricing() {
               <div className="mb-4 sm:mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-3xl sm:text-4xl font-bold text-foreground">{plan.price}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground">{plan.price}</span>
                   <span className="text-muted-foreground text-xs sm:text-sm">{plan.period}</span>
                 </div>
                 {plan.egp && <p className="text-[11px] text-muted-foreground mb-1">{plan.egp}</p>}
