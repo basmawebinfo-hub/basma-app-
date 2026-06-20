@@ -19,9 +19,8 @@ import {
   Webhook,
   BarChart3,
   Plug,
-  Zap,
-  Lock,
   Settings,
+  ,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
