@@ -102,69 +102,7 @@ export function Navbar() {
 
           {/* Desktop Navigation - hidden below lg */}
           <div className="hidden lg:flex items-center gap-8">
-            {/* Platform Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors outline-none">
-                Platform
-                <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-[480px] max-w-[calc(100vw-2rem)] bg-card/95 backdrop-blur-xl border-border p-4"
-              >
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Free Tools Column */}
-                  <div>
-                    <DropdownMenuLabel className="flex items-center gap-2 text-primary font-semibold mb-2">
-                      Free Tools
-                    </DropdownMenuLabel>
-                    {toolsMenu.free.map((cat) => (
-                      <div key={cat.category} className="mb-3">
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 px-2">
-                          {cat.category}
-                        </div>
-                        {cat.items.map((item) => (
-                          <DropdownMenuItem key={item.href} asChild className="group">
-                            <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
-                              <item.icon
-                                className="w-4 h-4 text-primary group-data-[highlighted]:text-black transition-colors"
-                                aria-hidden="true"
-                              />
-                              {item.label}
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Paid Tools Column */}
-                  <div>
-                    <DropdownMenuLabel className="flex items-center gap-2 text-primary font-semibold mb-2">
-                      <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-                      Pro Tools
-                    </DropdownMenuLabel>
-                    {toolsMenu.paid.map((cat) => (
-                      <div key={cat.category} className="mb-3">
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 px-2">
-                          {cat.category}
-                        </div>
-                        {cat.items.map((item) => (
-                          <DropdownMenuItem key={item.href} asChild className="group">
-                            <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
-                              <item.icon
-                                className="w-4 h-4 text-primary group-data-[highlighted]:text-black transition-colors"
-                                aria-hidden="true"
-                              />
-                              {item.label}
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Platform dropdown removed for clean landing nav */}
 
             {/* Dashboard Dropdown */}
             <DropdownMenu>
