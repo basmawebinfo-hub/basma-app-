@@ -1,17 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import {
-  Check, RefreshCw, QrCode, ArrowRight, Trash2,
-  Wifi, WifiOff, Loader2, Plus
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-
-type Step = 1 | 2 | 3
+import { useRouter } from "next/navigation"
+import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Megaphone, Wifi, WifiOff, QrCode, RefreshCw } from "lucide-react"
 
 interface Instance {
   id: string
@@ -22,342 +13,183 @@ interface Instance {
   created_at: string
 }
 
-const statusColor: Record<Instance["status"], string> = {
-  CONNECTED: "text-green-500",
-  CONNECTING: "text-yellow-500",
-  QR_READY: "text-blue-400",
-  DISCONNECTED: "text-muted-foreground",
-}
-
-const statusBadge: Record<Instance["status"], "default" | "secondary" | "destructive" | "outline"> = {
-  CONNECTED: "default",
-  CONNECTING: "secondary",
-  QR_READY: "secondary",
-  DISCONNECTED: "outline",
-}
-
-const steps = [
-  { number: 1, label: "Name" },
-  { number: 2, label: "Scan QR" },
-  { number: 3, label: "Connected" },
-]
+type View = "channels" | "whatsapp"
+type Step = 1 | 2 | 3
 
 export default function ConnectPage() {
+  const router = useRouter()
+  const [view, setView] = useState<View>("channels")
   const [instances, setInstances] = useState<Instance[]>([])
   const [loadingInstances, setLoadingInstances] = useState(true)
 
-  // New connection wizard state
   const [step, setStep] = useState<Step>(1)
   const [displayName, setDisplayName] = useState("")
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState("")
+  const [showWizard, setShowWizard] = useState(false)
 
-  // QR state
   const [newInstance, setNewInstance] = useState<Instance | null>(null)
   const [qrBase64, setQrBase64] = useState<string | null>(null)
   const [qrLoading, setQrLoading] = useState(false)
   const [qrError, setQrError] = useState("")
-  const [countdown, setCountdown] = useState(30)
-  const [polling, setPolling] = useState(false)
 
-  // ─── Load existing instances ────────────────────────────────────────────────
   const loadInstances = useCallback(async () => {
     const res = await fetch("/api/instances")
-    if (res.ok) {
-      const data = await res.json()
-      setInstances(data)
-    }
+    if (res.ok) { const data = await res.json(); setInstances(data) }
     setLoadingInstances(false)
   }, [])
-
   useEffect(() => { loadInstances() }, [loadInstances])
 
-  // ─── Poll for connection status after QR shown ──────────────────────────────
+  // Poll for connection after QR
   useEffect(() => {
     if (step !== 2 || !newInstance) return
-    setPolling(true)
-
     const interval = setInterval(async () => {
-      const res = await fetch(`/api/instances/${newInstance.id}/status`)
+      const res = await fetch("/api/instances/" + newInstance.id + "/status")
       if (!res.ok) return
       const { status } = await res.json()
       if (status === "CONNECTED") {
         clearInterval(interval)
-        setPolling(false)
-        setInstances((prev) =>
-          prev.map((i) => (i.id === newInstance.id ? { ...i, status: "CONNECTED" } : i))
-        )
-        setNewInstance((prev) => prev ? { ...prev, status: "CONNECTED" } : prev)
-        setStep(3)
+        setInstances((prev) => prev.map((i) => (i.id === newInstance.id ? { ...i, status: "CONNECTED" } : i)))
+        setStep(3); loadInstances()
       }
     }, 3000)
+    return () => clearInterval(interval)
+  }, [step, newInstance, loadInstances])
 
-    return () => { clearInterval(interval); setPolling(false) }
-  }, [step, newInstance])
-
-  // ─── Countdown timer ────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (step !== 2) return
-    setCountdown(30)
-    const t = setInterval(() => {
-      setCountdown((p) => {
-        if (p <= 1) { clearInterval(t); return 0 }
-        return p - 1
-      })
-    }, 1000)
-    return () => clearInterval(t)
-  }, [step, qrBase64])
-
-  // ─── Fetch QR code ───────────────────────────────────────────────────────────
   const fetchQR = useCallback(async (inst: Instance) => {
-    setQrLoading(true)
-    setQrError("")
-    setQrBase64(null)
+    setQrLoading(true); setQrError(""); setQrBase64(null)
     try {
-      const res = await fetch(`/api/instances/${inst.id}/qr`)
+      const res = await fetch("/api/instances/" + inst.id + "/qr")
       if (!res.ok) throw new Error("Failed to get QR code")
       const data = await res.json()
-      const base64 = data.base64 ?? data.code ?? null
-      setQrBase64(base64)
-    } catch (e: unknown) {
-      setQrError((e as Error).message)
-    } finally {
-      setQrLoading(false)
-    }
+      setQrBase64(data.base64 ?? data.code ?? null)
+    } catch (e: unknown) { setQrError((e as Error).message) } finally { setQrLoading(false) }
   }, [])
 
-  // ─── Step 1: Create instance ─────────────────────────────────────────────────
   const handleCreate = async () => {
-    setCreating(true)
-    setCreateError("")
+    setCreating(true); setCreateError("")
     try {
-      const res = await fetch("/api/instances", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ display_name: displayName }),
-      })
+      const res = await fetch("/api/instances", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ display_name: displayName }) })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Failed to create connection")
       const inst: Instance = data
-      setNewInstance(inst)
-      setInstances((prev) => [inst, ...prev])
-      await fetchQR(inst)
-      setStep(2)
-    } catch (e: unknown) {
-      setCreateError((e as Error).message)
-    } finally {
-      setCreating(false)
-    }
+      setNewInstance(inst); setInstances((prev) => [inst, ...prev])
+      await fetchQR(inst); setStep(2)
+    } catch (e: unknown) { setCreateError((e as Error).message) } finally { setCreating(false) }
   }
 
-  // ─── Delete instance ─────────────────────────────────────────────────────────
   const handleDelete = async (id: string) => {
-    await fetch(`/api/instances?id=${id}`, { method: "DELETE" })
+    if (!confirm("Delete this WhatsApp connection?")) return
+    await fetch("/api/instances?id=" + id, { method: "DELETE" })
     setInstances((prev) => prev.filter((i) => i.id !== id))
   }
 
-  // ─── Reset wizard ─────────────────────────────────────────────────────────────
-  const resetWizard = () => {
-    setStep(1)
-    setDisplayName("")
-    setNewInstance(null)
-    setQrBase64(null)
-    setQrError("")
-    setCreateError("")
+  function resetWizard() { setShowWizard(false); setStep(1); setDisplayName(""); setNewInstance(null); setQrBase64(null); setQrError(""); setCreateError("") }
+
+  const connectedCount = instances.filter((i) => i.status === "CONNECTED").length
+
+  // ===== CHANNELS OVERVIEW =====
+  if (view === "channels") {
+    const channels = [
+      { key: "whatsapp", name: "WhatsApp", desc: "Connect your WhatsApp numbers for messaging & automation", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
+      { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Manage in settings", onClick: () => router.push("/dashboard/settings") },
+      { key: "campaigns", name: "Broadcast Channels", desc: "Bulk campaigns across your channels", icon: Megaphone, color: "text-amber-500", bg: "bg-amber-500/10", active: false, status: "Coming soon", onClick: () => {} },
+    ]
+    return (
+      <div className="p-8 max-w-5xl mx-auto">
+        <h1 className="text-2xl font-bold mb-1">Connections</h1>
+        <p className="text-sm text-muted-foreground mb-6">Connect and manage all your channels in one place.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {channels.map((c) => (
+            <button key={c.key} onClick={c.onClick} disabled={!c.active}
+              className={"text-left rounded-2xl border p-5 transition-colors " + (c.active ? "border-border bg-card/50 hover:border-primary/50 cursor-pointer" : "border-border bg-card/30 opacity-60 cursor-not-allowed")}>
+              <div className={"w-12 h-12 rounded-xl flex items-center justify-center mb-4 " + c.bg}><c.icon className={"w-6 h-6 " + c.color} /></div>
+              <h3 className="font-semibold mb-1">{c.name}</h3>
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{c.desc}</p>
+              <span className={"text-xs font-medium " + (c.active ? "text-primary" : "text-muted-foreground")}>{c.status}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
   }
 
+  // ===== WHATSAPP MANAGEMENT =====
   return (
-    <div className="p-6 space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Connect WhatsApp</h1>
-        <p className="text-sm text-muted-foreground mt-1">Link a WhatsApp number in under 30 seconds</p>
+    <div className="p-8 max-w-3xl mx-auto">
+      <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> Back to channels</button>
+
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><MessageSquare className="w-6 h-6 text-green-500" /> WhatsApp Numbers</h1>
+          <p className="text-sm text-muted-foreground mt-1">{connectedCount} of {instances.length} connected</p>
+        </div>
+        {!showWizard && <button onClick={() => setShowWizard(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"><Plus className="w-4 h-4" /> Add number</button>}
       </div>
 
-      {/* ─── Existing instances ─────────────────────────────────────────────── */}
-      {!loadingInstances && instances.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Your Connections</h2>
-          <div className="space-y-2">
-            {instances.map((inst) => (
-              <div
-                key={inst.id}
-                className="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={cn("w-2 h-2 rounded-full", {
-                    "bg-green-500": inst.status === "CONNECTED",
-                    "bg-yellow-400": inst.status === "CONNECTING" || inst.status === "QR_READY",
-                    "bg-zinc-500": inst.status === "DISCONNECTED",
-                  })} />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{inst.display_name}</p>
-                    <p className="text-xs text-muted-foreground font-mono">{inst.instance_name}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant={statusBadge[inst.status]} className="text-[10px] uppercase">
-                    {inst.status}
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Delete connection"
-                    onClick={() => handleDelete(inst.id)}
-                  >
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+      {/* Wizard */}
+      {showWizard && (
+        <div className="rounded-2xl border border-border bg-card/50 p-6 mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className={"w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold " + (step >= n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>{step > n ? <Check className="w-4 h-4" /> : n}</div>
+              ))}
+            </div>
+            <button onClick={resetWizard} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
           </div>
+
+          {step === 1 && (
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Name this number (e.g. Sales, Support)</label>
+              <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Sales Line" className="w-full px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
+              {createError && <p className="text-xs text-red-500">{createError}</p>}
+              <button onClick={handleCreate} disabled={creating || !displayName.trim()} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">{creating ? "Creating..." : "Next: Get QR Code"}</button>
+            </div>
+          )}
+          {step === 2 && (
+            <div className="text-center space-y-3">
+              <p className="text-sm text-muted-foreground">Open WhatsApp on your phone -&gt; Linked Devices -&gt; Scan this code</p>
+              <div className="flex items-center justify-center min-h-[220px]">
+                {qrLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : qrError ? <p className="text-red-500 text-sm">{qrError}</p> : qrBase64 ? <img src={qrBase64.startsWith("data:") ? qrBase64 : "data:image/png;base64," + qrBase64} alt="QR" className="w-56 h-56 rounded-lg bg-white p-2" /> : <QrCode className="w-12 h-12 text-muted-foreground" />}
+              </div>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Waiting for scan...</div>
+              {newInstance && <button onClick={() => fetchQR(newInstance)} className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto"><RefreshCw className="w-3 h-3" /> Refresh QR</button>}
+            </div>
+          )}
+          {step === 3 && (
+            <div className="text-center space-y-3 py-4">
+              <div className="w-14 h-14 rounded-full bg-green-500/15 flex items-center justify-center mx-auto"><Check className="w-7 h-7 text-green-500" /></div>
+              <h3 className="font-semibold">Connected successfully!</h3>
+              <button onClick={resetWizard} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Done</button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ─── Wizard ──────────────────────────────────────────────────────────── */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-0">
-          {steps.map((s, i) => (
-            <div key={s.number} className="flex items-center flex-1">
-              <div className="flex flex-col items-center gap-1.5">
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors",
-                  step > s.number
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : step === s.number
-                    ? "border-primary text-primary bg-primary/10"
-                    : "border-border text-muted-foreground"
-                )}>
-                  {step > s.number ? <Check className="w-4 h-4" /> : s.number}
+      {/* Numbers list */}
+      {loadingInstances ? (
+        <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin" /></div>
+      ) : instances.length === 0 && !showWizard ? (
+        <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground text-sm">No WhatsApp numbers yet. Click "Add number" to connect one.</div>
+      ) : (
+        <div className="space-y-2">
+          {instances.map((inst) => (
+            <div key={inst.id} className="flex items-center justify-between rounded-xl border border-border bg-card/40 p-4">
+              <div className="flex items-center gap-3">
+                <div className={"w-10 h-10 rounded-full flex items-center justify-center " + (inst.status === "CONNECTED" ? "bg-green-500/15" : "bg-muted/40")}>
+                  {inst.status === "CONNECTED" ? <Wifi className="w-5 h-5 text-green-500" /> : <WifiOff className="w-5 h-5 text-muted-foreground" />}
                 </div>
-                <span className="text-[10px] text-muted-foreground text-center whitespace-nowrap">
-                  {s.label}
-                </span>
+                <div>
+                  <div className="font-medium text-sm">{inst.display_name}</div>
+                  <div className="text-xs text-muted-foreground">{inst.phone || "Not linked"} • <span className={inst.status === "CONNECTED" ? "text-green-500" : "text-muted-foreground"}>{inst.status}</span></div>
+                </div>
               </div>
-              {i < steps.length - 1 && (
-                <div className={cn(
-                  "flex-1 h-0.5 mt-[-14px] mx-1 transition-colors",
-                  step > s.number ? "bg-primary" : "bg-border"
-                )} />
-              )}
+              <button onClick={() => handleDelete(inst.id)} className="p-2 rounded-md hover:bg-red-500/15 text-red-600"><Trash2 className="w-4 h-4" /></button>
             </div>
           ))}
         </div>
-
-        {/* Step 1 */}
-        {step === 1 && (
-          <div className="bg-card border border-border rounded-xl p-6 space-y-5">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">Name your connection</h2>
-              <p className="text-sm text-muted-foreground mt-1">Give this WhatsApp number a recognizable name.</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="conn-name">Connection name</Label>
-              <Input
-                id="conn-name"
-                placeholder="e.g. Customer Support, Sales Line"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && displayName.trim() && !creating && handleCreate()}
-              />
-            </div>
-            {createError && (
-              <p className="text-xs text-destructive">{createError}</p>
-            )}
-            <Button
-              className="w-full gap-2"
-              onClick={handleCreate}
-              disabled={!displayName.trim() || creating}
-            >
-              {creating ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Creating...</>
-              ) : (
-                <><Plus className="w-4 h-4" /> Create Connection</>
-              )}
-            </Button>
-          </div>
-        )}
-
-        {/* Step 2: QR Code */}
-        {step === 2 && newInstance && (
-          <div className="bg-card border border-border rounded-xl p-6 space-y-5 text-center">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">Scan QR Code</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Open WhatsApp &rarr; Linked Devices &rarr; Link a Device
-              </p>
-            </div>
-
-            <div className="mx-auto w-64 h-64 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-3 bg-muted/20 overflow-hidden">
-              {qrLoading ? (
-                <><Loader2 className="w-10 h-10 animate-spin text-muted-foreground/40" /><span className="text-xs text-muted-foreground">Loading QR...</span></>
-              ) : qrError ? (
-                <><QrCode className="w-12 h-12 text-destructive/40" /><span className="text-xs text-destructive text-center px-4">{qrError}</span></>
-              ) : qrBase64 ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={qrBase64.startsWith("data:") ? qrBase64 : `data:image/png;base64,${qrBase64}`} alt="WhatsApp QR Code" className="w-56 h-56 object-contain" />
-              ) : (
-                <><QrCode className="w-16 h-16 text-muted-foreground/40" /><span className="text-xs text-muted-foreground">No QR yet</span></>
-              )}
-            </div>
-
-            {!qrLoading && (
-              <div className="flex flex-col items-center gap-1">
-                {countdown > 0 ? (
-                  <span className="text-[10px] text-muted-foreground">Expires in {countdown}s</span>
-                ) : (
-                  <span className="text-[10px] text-destructive">QR code expired</span>
-                )}
-                <button
-                  onClick={() => fetchQR(newInstance)}
-                  className="flex items-center gap-1.5 text-xs text-primary hover:underline"
-                >
-                  <RefreshCw className="w-3 h-3" /> Refresh QR
-                </button>
-              </div>
-            )}
-
-            {polling && (
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Waiting for connection...
-              </div>
-            )}
-
-            <Button variant="outline" className="w-full" onClick={resetWizard}>
-              Cancel
-            </Button>
-          </div>
-        )}
-
-        {/* Step 3: Connected */}
-        {step === 3 && newInstance && (
-          <div className="bg-card border border-border rounded-xl p-6 space-y-5 text-center">
-            <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
-              <Check className="w-10 h-10 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-foreground">Connection successful!</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                <span className="font-medium text-foreground">{newInstance.display_name}</span> is now connected.
-              </p>
-            </div>
-            <div className="bg-muted/30 rounded-lg p-3 text-left space-y-1.5 text-xs text-muted-foreground">
-              <div className="flex justify-between">
-                <span>Instance name</span>
-                <span className="font-mono text-foreground truncate max-w-[180px]">{newInstance.instance_name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Status</span>
-                <span className="text-green-500 font-medium">Connected</span>
-              </div>
-            </div>
-            <Button className="w-full gap-2" variant="outline" onClick={resetWizard}>
-              <Plus className="w-4 h-4" />
-              Add Another Connection
-            </Button>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }
