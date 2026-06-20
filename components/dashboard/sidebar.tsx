@@ -84,10 +84,12 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
             BASMA
           </span>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
+        <nav className="px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
           <NavLinks />
         </nav>
-        <SidebarFooter />
+        <div className="mt-auto">
+          <SidebarFooter />
+        </div>
       </aside>
 
       {/* Mobile overlay */}
