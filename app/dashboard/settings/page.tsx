@@ -1,6 +1,8 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
-import { Eye, EyeOff, Copy, Check, Loader2, Key, Webhook, User, RefreshCw, Camera, Activity } from "lucide-react"
+import { Eye, EyeOff, Copy, Check, Loader2, Key, Webhook, User, RefreshCw, Camera, Activity, LogOut, ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { logout } from "@/app/actions/auth"
 
 const WEBHOOK_URL = "https://www.basmaweb.com/api/evolution/webhook"
 
@@ -158,6 +160,21 @@ export default function SettingsPage() {
           </table>
         </div>
       </section>
+      {/* Account */}
+      <section className="rounded-2xl border border-border bg-card/50 p-6">
+        <div className="flex items-center gap-2 mb-4"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">Account</h2></div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/40">
+            <ArrowLeft className="w-4 h-4" /> Back to landing page
+          </Link>
+          <form action={logout} className="flex-1">
+            <button type="submit" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/30 text-sm font-medium text-red-600 hover:bg-red-500/10">
+              <LogOut className="w-4 h-4" /> Sign out
+            </button>
+          </form>
+        </div>
+      </section>
+
     </div>
   )
 }
