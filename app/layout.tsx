@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono, PT_Mono, Cairo } from "next/font/google"
+import { Geist, Geist_Mono, PT_Mono, Cairo, Rubik } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n"
@@ -9,6 +9,7 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _ptMono = PT_Mono({ weight: "400", subsets: ["latin"], variable: "--font-pt-mono" })
 const _cairo = Cairo({ subsets: ["arabic", "latin"], variable: "--font-cairo" })
+const _rubik = Rubik({ subsets: ["arabic", "latin"], variable: "--font-rubik" })
 
 const SITE = "https://www.basmaweb.com"
 
@@ -66,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`dark ${_ptMono.variable} ${_cairo.variable}`}>
+    <html lang="ar" dir="rtl" className={`dark ${_ptMono.variable} ${_cairo.variable} ${_rubik.variable}`}>
       <head>
         <script
           type="application/ld+json"
