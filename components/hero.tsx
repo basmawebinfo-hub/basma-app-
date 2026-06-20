@@ -176,9 +176,9 @@ export function Hero() {
             className="mb-6"
           >
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-              <span className="text-gradient-lime">200+</span> integrations supported
+              <span className="text-gradient-lime">200+</span> {t("hero.intg")}
             </p>
-            <p className="text-muted-foreground text-xs sm:text-sm">connect to n8n, Zapier, Make, and any webhook endpoint</p>
+            <p className="text-muted-foreground text-xs sm:text-sm">{t("hero.intgDesc")}</p>
           </motion.div>
 
           <motion.div
@@ -189,13 +189,13 @@ export function Hero() {
           >
             <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
               <Link href="/register">
-                Get Started Free
+                {t("hero.getStarted")}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
             <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto" asChild>
               <Link href="/login">
-                Sign in
+                {t("hero.signin")}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
@@ -211,7 +211,7 @@ export function Hero() {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-xs sm:text-sm text-muted-foreground/60 mb-4 sm:mb-6 text-center">
-            Integrates with your favorite tools
+            {t("hero.integrates")}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-12 gap-y-3 sm:gap-y-4">
             {trustedLogos.map((logo) => (
