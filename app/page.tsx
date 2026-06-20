@@ -4,7 +4,6 @@ import { VideoGallery } from "@/components/video-gallery"
 import { HowItWorks } from "@/components/how-it-works"
 import { UseCases } from "@/components/use-cases"
 import { Stats } from "@/components/stats"
-import { Testimonials } from "@/components/testimonials"
 import { Pricing } from "@/components/pricing"
 import { FAQ } from "@/components/faq"
 import { FinalCTA } from "@/components/final-cta"
@@ -29,7 +28,6 @@ export default function Home() {
       <HowItWorks />
       <UseCases />
       <Stats />
-      <Testimonials />
       <Pricing />
       <FAQ />
       <FinalCTA />
