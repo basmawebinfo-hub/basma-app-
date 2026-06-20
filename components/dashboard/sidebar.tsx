@@ -87,9 +87,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
         <nav className="px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
           <NavLinks />
         </nav>
-        <div className="mt-auto">
-          <SidebarFooter />
-        </div>
+        <SidebarFooter />
       </aside>
 
       {/* Mobile overlay */}
