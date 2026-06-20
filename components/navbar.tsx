@@ -83,7 +83,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
               >
                 {t(link.key)}
               </Link>
@@ -92,11 +92,8 @@ export function Navbar() {
 
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-2.5">
-            <Button variant="ghost" size="sm" rounded="full" asChild>
-              <Link href="/dashboard">{t("nav.login")}</Link>
-            </Button>
-            <Button size="sm" rounded="full" className="gap-1.5" asChild>
-              <Link href="#pricing">
+            <Button size="sm" rounded="full" className="gap-1.5 whitespace-nowrap" asChild>
+              <Link href="/dashboard">
                 {t("nav.getStarted")}
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
