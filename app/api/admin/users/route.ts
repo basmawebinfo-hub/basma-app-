@@ -34,7 +34,7 @@ export async function GET() {
   }
 
   // Plans + subscriptions (the real source of plan/limits)
-  const { data: subs } = await db.from("subscriptions").select("user_id, plan_id, status, current_period_end")
+  const { data: subs } = await db.from("subscriptions").select("user_id, plan_id, status, current_period_end, created_at")
   const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo, price_monthly")
   // pending plan requests
   const { data: reqs } = await db.from("plan_requests").select("user_id, plan_id, created_at").eq("status", "pending").order("created_at", { ascending: false })
@@ -71,6 +71,9 @@ export async function GET() {
       effective_max_instances: effectiveMax,
       is_custom_limit: isCustom,
       days_left: daysLeft,
+      avatar_url: (u as { avatar_url?: string }).avatar_url ?? null,
+      is_trial: monthly === 0,
+      trial_day: (monthly === 0 && sub && (sub as { created_at?: string }).created_at) ? Math.floor((Date.now() - new Date((sub as { created_at: string }).created_at).getTime()) / 86400000) + 1 : null,
       plan_max_instances: plan?.max_instances ?? 1,
       plan_max_messages: plan?.max_messages_mo ?? 500,
       sub_status: sub?.status ?? "none",
