@@ -9,7 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import {
   Menu,
@@ -42,40 +41,6 @@ const platformItems = [
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
-
-const toolsMenu = {
-  free: [
-    {
-      category: "Messaging",
-      items: [
-        { href: "#inbox", label: "Unified Inbox", icon: MessageSquare },
-        { href: "#integrations", label: "Integrations", icon: Plug },
-      ],
-    },
-    {
-      category: "Analytics",
-      items: [
-        { href: "#platform", label: "Analytics Dashboard", icon: BarChart3 },
-      ],
-    },
-  ],
-  paid: [
-    {
-      category: "Automation",
-      items: [
-        { href: "#webhooks", label: "Webhook Engine", icon: Webhook },
-        { href: "#webhooks", label: "Auto-Retry", icon: Zap },
-      ],
-    },
-    {
-      category: "Enterprise",
-      items: [
-        { href: "#pricing", label: "HMAC Signing", icon: Lock },
-        { href: "#pricing", label: "Guaranteed SLA", icon: Settings },
-      ],
-    },
-  ],
-}
 
 export function Navbar() {
   const { t } = useI18n()
