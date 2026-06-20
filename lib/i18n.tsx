@@ -11,6 +11,12 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "nav.docs": { ar: "التوثيق", en: "Docs" },
   "nav.login": { ar: "تسجيل الدخول", en: "Log in" },
   "nav.getStarted": { ar: "ابدأ مجاناً", en: "Get Started" },
+  "nav.features": { ar: "المميزات", en: "Features" },
+  "nav.howItWorks": { ar: "كيف يعمل", en: "How it works" },
+  "nav.useCases": { ar: "حالات الاستخدام", en: "Use cases" },
+  "nav.faq": { ar: "الأسئلة الشائعة", en: "FAQ" },
+  "nav.contact": { ar: "تواصل معنا", en: "Contact" },
+
   // Hero
   "hero.badge": { ar: "أول منصة عربية لأتمتة واتساب", en: "The first Arabic WhatsApp platform" },
   "hero.title": { ar: "منصة واتساب الذكية لأعمالك", en: "The smart WhatsApp platform for your business" },
