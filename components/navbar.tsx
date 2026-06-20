@@ -24,6 +24,7 @@ import {
   Settings,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useI18n } from "@/lib/i18n"
 
 const navLinks = [
   { href: "#platform", label: "Platform" },
@@ -76,6 +77,7 @@ const toolsMenu = {
 }
 
 export function Navbar() {
+  const { t } = useI18n()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
