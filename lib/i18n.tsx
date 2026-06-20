@@ -32,6 +32,26 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "pricing.choose": { ar: "اختر الباقة", en: "Choose plan" },
   "pricing.trial": { ar: "ابدأ التجربة المجانية", en: "Start Free Trial" },
   "pricing.contact": { ar: "تواصل معنا", en: "Contact Us" },
+  // How it works
+  "how.title1": { ar: "كيف", en: "How it" },
+  "how.title2": { ar: "يعمل", en: "works" },
+  "how.subtitle": { ar: "من الصفر إلى واتساب آلي بالكامل في ثلاث خطوات بسيطة", en: "From zero to live WhatsApp automation in three simple steps" },
+  "how.s1.title": { ar: "امسح واربط", en: "Scan & Connect" },
+  "how.s1.desc": { ar: "افتح اللوحة، امسح كود QR من واتساب، ورقمك يشتغل في أقل من 30 ثانية.", en: "Open the dashboard, scan the QR code with WhatsApp, and your number is live in under 30 seconds." },
+  "how.s2.title": { ar: "اضبط الـ Webhooks", en: "Configure Webhooks" },
+  "how.s2.desc": { ar: "اختر الأحداث التي تريد تمريرها — الرسائل، تحديثات الحالة — وحدد روابط الوجهة.", en: "Choose which events to forward — messages, status updates — and set your destination URLs." },
+  "how.s3.title": { ar: "أتمت كل شيء", en: "Automate Everything" },
+  "how.s3.desc": { ar: "كل حدث في واتساب يشغّل سير عملك في n8n أو Zapier تلقائياً وفي الوقت الفعلي.", en: "Every WhatsApp event triggers your n8n, Zapier, or custom workflow automatically, in real time." },
+  // Final CTA
+  "cta.title1": { ar: "ابدأ أتمتة أعمالك", en: "Start connecting WhatsApp" },
+  "cta.title2": { ar: "على واتساب اليوم.", en: "to your business today." },
+  "cta.subtitle": { ar: "انضم إلى مئات الأعمال التي تدير عملاءها مع بصمة.", en: "Join hundreds of businesses managing their customers with Basma." },
+  "cta.join": { ar: "انضم لقائمة الانتظار", en: "Join Waitlist" },
+  "cta.dashboard": { ar: "اذهب للوحة", en: "View Dashboard" },
+  // Stats
+  "stats.s1": { ar: "تكامل مدعوم", en: "integrations supported" },
+  "stats.s2": { ar: "وقت تشغيل المنصة", en: "platform uptime" },
+  "stats.s3": { ar: "زمن تسليم الـ Webhook", en: "webhook delivery latency" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
