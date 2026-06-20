@@ -92,6 +92,27 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "faq.a4": { ar: "نعم. تختار الباقة حسب عدد الأرقام التي تحتاجها، وكل رقم له صندوق وارد وإعدادات webhook وتحليلات خاصة به.", en: "Yes. Choose a plan by the number of connections you need; each number has its own inbox, webhook config, and analytics." },
   "faq.q5": { ar: "كيف يتم تأمين تسليم الـ webhook؟", en: "How are webhook deliveries secured?" },
   "faq.a5": { ar: "تدعم الباقات المدفوعة توقيع الطلبات بـ HMAC-SHA256. كل تسليم يتضمّن توقيعاً ليتحقق منه الخادم، والتسليمات الفاشلة تُعاد تلقائياً.", en: "Paid plans support HMAC-SHA256 request signing. Each delivery includes a signature header, and failed deliveries are retried automatically." },
+  // Testimonials
+  "test.title1": { ar: "موثوق من", en: "Loved by" },
+  "test.title2": { ar: "الشركات", en: "businesses" },
+  "test.subtitle": { ar: "انضم إلى مئات الأعمال التي تستخدم بصمة بالفعل", en: "Join hundreds of businesses already using Basma" },
+  "test.q1": { ar: "بصمة تربط واتساب مباشرة بـ n8n. كل رسالة عميل تشغّل أتمتة فوراً — بدون كود ولا تعقيد.", en: "Basma connects our WhatsApp directly to n8n. Every customer message triggers an automation instantly — no code, no hassle." },
+  "test.q2": { ar: "انتقلنا من متابعة واتساب يدوياً طوال اليوم إلى توجيه كل رسالة للفريق المناسب تلقائياً. نقلة نوعية.", en: "We went from manually checking WhatsApp all day to routing every message to the right team automatically. Game changer." },
+  "test.q3": { ar: "الإعداد استغرق أقل من 30 ثانية. مسحنا الكود، ربطنا الرقم، وبدأت الـ webhooks تعمل مع Zapier فوراً.", en: "Setup took under 30 seconds. Scanned the QR, linked our number, and webhooks started firing into Zapier immediately." },
+  "test.r1": { ar: "مديرة العمليات، TechFlow", en: "Head of Operations, TechFlow" },
+  "test.r2": { ar: "مدير نجاح العملاء، Studio Nine", en: "Customer Success Director, Studio Nine" },
+  "test.r3": { ar: "نائبة رئيس العمليات، Launchpad", en: "VP of Operations, Launchpad" },
+  // Video gallery
+  "vg.title1": { ar: "شاهد", en: "See" },
+  "vg.title2": { ar: "بصمة", en: "Basma" },
+  "vg.title3": { ar: "أثناء العمل", en: "in action" },
+  "vg.subtitle": { ar: "كل ما تحتاجه لإدارة واتساب على نطاق واسع", en: "Everything you need to manage WhatsApp at scale" },
+  "vg.c1.title": { ar: "+200 تكامل", en: "200+ Integrations" },
+  "vg.c1.desc": { ar: "اربط أي أداة بـ webhook واحد", en: "Connect to any tool with a single webhook" },
+  "vg.c2.title": { ar: "محرّك Webhook", en: "Webhook Engine" },
+  "vg.c2.desc": { ar: "مرّر كل حدث إلى n8n أو Zapier أو أي رابط", en: "Forward every event to n8n, Zapier, or any endpoint" },
+  "vg.c3.title": { ar: "صندوق وارد موحّد", en: "Unified Inbox" },
+  "vg.c3.desc": { ar: "كل محادثات واتساب في مكان واحد", en: "All your WhatsApp conversations in one place" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
