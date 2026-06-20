@@ -52,6 +52,21 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "stats.s1": { ar: "تكامل مدعوم", en: "integrations supported" },
   "stats.s2": { ar: "وقت تشغيل المنصة", en: "platform uptime" },
   "stats.s3": { ar: "زمن تسليم الـ Webhook", en: "webhook delivery latency" },
+  // Footer
+  "footer.tagline": { ar: "أول منصة عربية لأتمتة واتساب وإدارة أعمالك بذكاء.", en: "The first Arabic platform to automate WhatsApp and grow your business." },
+  "footer.product": { ar: "المنتج", en: "Product" },
+  "footer.company": { ar: "الشركة", en: "Company" },
+  "footer.legal": { ar: "قانوني", en: "Legal" },
+  "footer.features": { ar: "المميزات", en: "Features" },
+  "footer.pricing": { ar: "الأسعار", en: "Pricing" },
+  "footer.useCases": { ar: "حالات الاستخدام", en: "Use cases" },
+  "footer.about": { ar: "عن بصمة", en: "About" },
+  "footer.contact": { ar: "تواصل معنا", en: "Contact" },
+  "footer.faq": { ar: "الأسئلة الشائعة", en: "FAQ" },
+  "footer.privacy": { ar: "الخصوصية", en: "Privacy" },
+  "footer.terms": { ar: "الشروط", en: "Terms" },
+  "footer.docs": { ar: "التوثيق", en: "Docs" },
+  "footer.rights": { ar: "جميع الحقوق محفوظة.", en: "All rights reserved." },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
