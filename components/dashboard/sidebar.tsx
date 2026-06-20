@@ -19,7 +19,6 @@ import {
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { logout } from "@/app/actions/auth"
 
 const SIDEBAR_LINKS = [
   { icon: LayoutDashboard, label: "Overview",     href: "/dashboard" },
