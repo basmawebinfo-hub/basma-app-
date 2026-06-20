@@ -68,22 +68,21 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
   )
 
   const SidebarFooter = () => (
-    <div className="p-4 border-t border-border space-y-1">
-      {userEmail && (
-        <p className="px-3 py-1 text-[11px] text-muted-foreground truncate">{userEmail}</p>
-      )}
-      <Link href="/" className="block text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1">
-        &larr; Back to landing page
+    <div className="p-3 border-t border-border">
+      <Link
+        href="/dashboard/settings"
+        onClick={onClick}
+        className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group"
+      >
+        <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+          {(userEmail ?? "?").slice(0, 2).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium truncate text-sidebar-foreground">{userEmail ?? "Account"}</p>
+          <p className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">View settings</p>
+        </div>
+        <Settings className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
       </Link>
-      <form action={logout}>
-        <button
-          type="submit"
-          className="flex items-center gap-2 text-xs text-black/40 dark:text-white/40 hover:text-black/70 dark:hover:text-white/70 transition-colors px-3 py-2 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.04] w-full"
-        >
-          <LogOut size={14} aria-hidden="true" />
-          Sign out
-        </button>
-      </form>
     </div>
   )
 
