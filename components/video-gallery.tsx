@@ -1,6 +1,7 @@
 "use client"
 
 import { motion, useReducedMotion } from "framer-motion"
+import { useI18n } from "@/lib/i18n"
 
 function LiveChatIllustration() {
   return (
@@ -315,23 +316,24 @@ function MultiChannelIllustration() {
 
 const demos = [
   {
-    title: "Unified Inbox",
-    description: "All your WhatsApp conversations in one place",
+    title: "{t("vg.c3.title")}",
+    description: "{t("vg.c3.desc")}",
     Illustration: LiveChatIllustration,
   },
   {
-    title: "Webhook Engine",
-    description: "Forward every event to n8n, Zapier, or any endpoint",
+    title: "{t("vg.c2.title")}",
+    description: "{t("vg.c2.desc")}",
     Illustration: TicketResolutionIllustration,
   },
   {
     title: "200+ Integrations",
-    description: "Connect to any tool with a single webhook",
+    description: "{t("vg.c1.desc")}",
     Illustration: MultiChannelIllustration,
   },
 ]
 
 export function VideoGallery() {
+  const { t } = useI18n()
   const shouldReduceMotion = useReducedMotion()
 
   return (
@@ -347,7 +349,7 @@ export function VideoGallery() {
             See <span className="text-gradient-lime">Basma Web</span> in action
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-            Everything you need to manage WhatsApp at scale
+            {t("vg.subtitle")}
           </p>
         </motion.div>
 
