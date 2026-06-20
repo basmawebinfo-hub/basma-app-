@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
 import { NotificationsBell } from "@/components/dashboard/notifications-bell"
 import { BalanceChip } from "@/components/dashboard/balance-chip"
+import { UserAvatar } from "@/components/dashboard/user-avatar"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -26,6 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="h-14 border-b border-border flex items-center justify-end gap-3 px-4 shrink-0">
           <BalanceChip />
           <NotificationsBell />
+          <UserAvatar />
         </div>
         <main className="flex-1 overflow-auto">
           {children}
