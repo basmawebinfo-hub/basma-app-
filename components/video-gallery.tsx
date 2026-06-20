@@ -346,7 +346,7 @@ export function VideoGallery() {
           className="text-center mb-10 sm:mb-16"
         >
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4" id="platform">
-            See <span className="text-gradient-lime">Basma Web</span> in action
+            {t("vg.title1")} <span className="text-gradient-lime">{t("vg.title2")}</span> {t("vg.title3")}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             {t("vg.subtitle")}
