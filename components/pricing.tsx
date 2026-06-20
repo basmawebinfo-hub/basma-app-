@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
 
 interface ApiPlan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number }
 
 export function Pricing() {
   const shouldReduceMotion = useReducedMotion()
+  const { t } = useI18n()
   const [plans, setPlans] = useState<ApiPlan[]>([])
   const [rate, setRate] = useState(50)
 
@@ -74,9 +76,9 @@ export function Pricing() {
           className="text-center mb-10 sm:mb-16"
         >
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
-            <span className="text-gradient-lime">Simple</span> pricing
+            <span className="text-gradient-lime">{t("pricing.title")}</span>
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">No hidden fees. Cancel anytime. Start for free. Prices in USD (paid in EGP at today's rate).</p>
+          <p className="text-sm sm:text-base text-muted-foreground">{t("pricing.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-4">
