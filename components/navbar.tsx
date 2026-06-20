@@ -57,26 +57,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-8">
             {/* Platform dropdown removed for clean landing nav */}
 
-            {/* Dashboard Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors outline-none">
-                Dashboard
-                <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border">
-                {platformItems.map((item) => (
-                  <DropdownMenuItem key={item.href} asChild className="group">
-                    <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
-                      <item.icon
-                        className="w-4 h-4 text-primary group-data-[highlighted]:text-black transition-colors"
-                        aria-hidden="true"
-                      />
-                      {item.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Dashboard dropdown removed */}
 
             {/* Nav Links */}
             {navLinks.map((link) => (
