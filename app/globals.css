@@ -44,7 +44,7 @@
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
+  --font-sans: var(--font-rubik), var(--font-cairo), "Geist", "Geist Fallback";
   --font-serif: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
   /* Updated to PT Mono font for logo */
