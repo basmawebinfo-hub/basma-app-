@@ -113,6 +113,11 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "vg.c2.desc": { ar: "مرّر كل حدث إلى n8n أو Zapier أو أي رابط", en: "Forward every event to n8n, Zapier, or any endpoint" },
   "vg.c3.title": { ar: "صندوق وارد موحّد", en: "Unified Inbox" },
   "vg.c3.desc": { ar: "كل محادثات واتساب في مكان واحد", en: "All your WhatsApp conversations in one place" },
+  "hero.intg": { ar: "تكامل مدعوم", en: "integrations supported" },
+  "hero.intgDesc": { ar: "اتصل بـ n8n وZapier وMake وأي Webhook", en: "connect to n8n, Zapier, Make, and any webhook endpoint" },
+  "hero.getStarted": { ar: "ابدأ مجاناً", en: "Get Started Free" },
+  "hero.signin": { ar: "تسجيل الدخول", en: "Sign in" },
+  "hero.integrates": { ar: "يتكامل مع أدواتك المفضّلة", en: "Integrates with your favorite tools" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
