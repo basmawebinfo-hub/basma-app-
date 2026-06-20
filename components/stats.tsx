@@ -1,15 +1,17 @@
 "use client"
 
 import { motion, useReducedMotion } from "framer-motion"
-
-const stats = [
-  { value: "200+", label: "integrations supported" },
-  { value: "99.9%", label: "platform uptime" },
-  { value: "<200ms", label: "webhook delivery latency" },
-]
+import { useI18n } from "@/lib/i18n"
 
 export function Stats() {
   const shouldReduceMotion = useReducedMotion()
+  const { t } = useI18n()
+
+  const stats = [
+    { value: "200+", key: "stats.s1" },
+    { value: "99.9%", key: "stats.s2" },
+    { value: "<200ms", key: "stats.s3" },
+  ]
 
   return (
     <section className="relative py-24 lg:py-32">
@@ -25,7 +27,7 @@ export function Stats() {
               className="text-center"
             >
               <p className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gradient-lime mb-3">{stat.value}</p>
-              <p className="text-sm text-muted-foreground max-w-[200px] mx-auto">{stat.label}</p>
+              <p className="text-sm text-muted-foreground max-w-[200px] mx-auto">{t(stat.key)}</p>
             </motion.div>
           ))}
         </div>
