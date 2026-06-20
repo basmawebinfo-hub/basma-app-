@@ -10,18 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Menu,
-  X,
-  ArrowRight,
-  ChevronDown,
-  MessageSquare,
-  Webhook,
-  BarChart3,
-  Plug,
-  Settings,
-  ,
-} from "lucide-react"
+import { Menu, X, ArrowRight, ChevronDown, MessageSquare, Webhook, BarChart3, Plug, Settings } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
