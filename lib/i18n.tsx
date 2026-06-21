@@ -464,6 +464,16 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "am.name": { ar: "الاسم", en: "Name" },
   "am.email": { ar: "البريد الإلكتروني", en: "Email" },
   "am.password": { ar: "كلمة المرور", en: "Password" },
+  // WhatsApp safety tips
+  "safety.title": { ar: "نصائح حماية رقمك من الحظر", en: "Protect your number from bans" },
+  "safety.t1": { ar: "أرقام جديدة: ابدأ بكمية قليلة (20-50 رسالة/يوم) وزِد تدريجياً.", en: "New numbers: start small (20-50 msgs/day) and ramp up gradually." },
+  "safety.t2": { ar: "ابعت لأرقام تعرفك أو محادثة سابقة — تجنّب الأرقام العشوائية.", en: "Message people who know you or had a prior chat — avoid cold/random numbers." },
+  "safety.t3": { ar: "نوّع نص رسائلك (لا ترسل نفس النص حرفياً للجميع).", en: "Vary your message text (don't send the exact same text to everyone)." },
+  "safety.t4": { ar: "تجنّب الروابط الكثيرة والكلمات المشبوهة (مجاني، اربح، إلخ).", en: "Avoid too many links and spammy words (free, win, etc.)." },
+  "safety.t5": { ar: "المنصة تطبّق تلقائياً: تأخير عشوائي + مؤشر كتابة + حد يومي آمن.", en: "The platform auto-applies: random delays + typing indicator + safe daily limits." },
+  "safety.dailyLimit": { ar: "حدك اليومي الآمن الآن", en: "Your safe daily limit now" },
+  "safety.ageDays": { ar: "عمر الرقم (أيام)", en: "Number age (days)" },
+  "safety.sentToday": { ar: "أُرسلت اليوم", en: "Sent today" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
