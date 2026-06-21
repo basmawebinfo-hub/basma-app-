@@ -25,7 +25,7 @@ interface SidebarProps {
   userEmail?: string | null
 }
 
-export function DashboardSidebar({ userEmail }: SidebarProps) {
+export function DashboardSidebar(_props: SidebarProps) {
   const { t } = useI18n()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
