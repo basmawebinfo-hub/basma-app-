@@ -235,7 +235,7 @@ export default function WebhooksPage() {
       {/* ─── Create form ──────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-xl p-6 space-y-6">
         <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Plus className="w-4 h-4" /> New Webhook Config
+          <Plus className="w-4 h-4" /> {t("wh.newConfig")}
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
