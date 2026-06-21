@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, Download } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 interface AdminUser {
   id: string
@@ -26,6 +27,7 @@ interface AdminUser {
 }
 
 export default function AdminUsers() {
+  const { t } = useI18n()
   const router = useRouter()
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,20 +59,20 @@ export default function AdminUsers() {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">User Management</h1>
+        <h1 className="text-2xl font-bold">{t("au.title")}</h1>
         <span className="text-sm text-muted-foreground">{filtered.length} / {users.length} users</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input placeholder="Search by email or name..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
+          <input placeholder=t("au.search") value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm">
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="active">Active</option>
-          <option value="suspended">Suspended</option>
+          <option value="all">{t("au.allStatuses")}</option>
+          <option value="pending">{t("au.pending")}</option>
+          <option value="active">{t("au.active")}</option>
+          <option value="suspended">{t("au.suspended")}</option>
         </select>
         <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm hover:bg-muted/40"><Download className="w-4 h-4" /> Export CSV</button>
       </div>
@@ -81,12 +83,12 @@ export default function AdminUsers() {
         <table className="w-full text-sm">
           <thead className="bg-card/60 text-muted-foreground">
             <tr className="text-left">
-              <th className="p-3 font-medium">User</th>
-              <th className="p-3 font-medium">Status</th>
-              <th className="p-3 font-medium">Plan</th>
-              <th className="p-3 font-medium">Balance</th>
-              <th className="p-3 font-medium">Conn.</th>
-              <th className="p-3 font-medium">Msgs (out/in)</th>
+              <th className="p-3 font-medium">{t("au.colUser")}</th>
+              <th className="p-3 font-medium">{t("au.colStatus")}</th>
+              <th className="p-3 font-medium">{t("au.colPlan")}</th>
+              <th className="p-3 font-medium">{t("au.colBalance")}</th>
+              <th className="p-3 font-medium">{t("au.colConn")}</th>
+              <th className="p-3 font-medium">{t("au.colMsgs")}</th>
             </tr>
           </thead>
           <tbody>
