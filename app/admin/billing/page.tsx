@@ -1,18 +1,20 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 interface Tx { id: string; email: string; amount: number; type: string; reason: string|null; balance_after: number; created_at: string }
 interface Bal { id: string; email: string; balance: number; plan: string }
 
 export default function AdminBilling() {
+  const { t } = useI18n()
   const [tx, setTx] = useState<Tx[]>([]); const [bal, setBal] = useState<Bal[]>([]); const [loading, setLoading] = useState(true)
   useEffect(()=>{ fetch("/api/admin/billing").then(r=>r.json()).then(d=>{setTx(d.transactions??[]);setBal(d.balances??[])}).finally(()=>setLoading(false)) },[])
   if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin"/></div>
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold mb-4">User Balances</h1>
+        <h1 className="text-2xl font-bold mb-4">{t("ab.balances")}</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {bal.map(b=>(
             <div key={b.id} className="rounded-xl border border-border bg-card/50 p-4">
@@ -24,10 +26,10 @@ export default function AdminBilling() {
         </div>
       </div>
       <div>
-        <h2 className="text-lg font-semibold mb-3">Recent Transactions</h2>
+        <h2 className="text-lg font-semibold mb-3">{t("ab.recentTx")}</h2>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">User</th><th className="p-3">Amount</th><th className="p-3">Type</th><th className="p-3">Reason</th><th className="p-3">Date</th></tr></thead>
+            <thead className="bg-card/60 text-muted-foreground"><tr className="text-right"><th className="p-3">{t("ab.user")}</th><th className="p-3">{t("ab.amount")}</th><th className="p-3">{t("ab.type")}</th><th className="p-3">{t("ab.reason")}</th><th className="p-3">{t("ab.date")}</th></tr></thead>
             <tbody>
               {tx.map(t=>(
                 <tr key={t.id} className="border-t border-border/40">
