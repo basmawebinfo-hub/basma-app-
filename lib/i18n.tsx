@@ -138,6 +138,12 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "auth.b2": { ar: "عميل جديد من الموقع 🎯", en: "New lead from web 🎯" },
   "auth.b3": { ar: "تم استلام الدفعة 💳", en: "Payment received 💳" },
   "auth.b4": { ar: "تم إرسال Webhook ⚡", en: "Webhook sent ⚡" },
+  "forgot.title": { ar: "إعادة تعيين كلمة المرور", en: "Reset your password" },
+  "forgot.subtitle": { ar: "أدخل بريدك وسنرسل لك رابط إعادة التعيين.", en: "Enter your email and we'll send you a reset link." },
+  "forgot.send": { ar: "إرسال رابط التعيين", en: "Send reset link" },
+  "forgot.sending": { ar: "جارٍ الإرسال...", en: "Sending..." },
+  "forgot.sent": { ar: "تم! تفقّد بريدك الإلكتروني لرابط إعادة التعيين.", en: "Done! Check your email for the reset link." },
+  "forgot.backLogin": { ar: "العودة لتسجيل الدخول", en: "Back to login" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
