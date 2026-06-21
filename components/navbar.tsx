@@ -109,13 +109,7 @@ export function Navbar() {
             >
               <div className="flex items-center justify-between px-6 py-4 bg-background border-b border-border/50">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <MessageSquare className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <span
-                    className="font-[family-name:var(--font-pt-mono)] font-bold text-base text-foreground"
-                    style={{ letterSpacing: "-0.05em" }}
-                  >
-                    BASMA
-                  </span>
+                  <img src="/basma-logo.png" alt="BASMA" className="h-8 w-auto object-contain" />
                 </Link>
                 <button
                   type="button"
