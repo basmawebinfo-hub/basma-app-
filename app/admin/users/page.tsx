@@ -66,7 +66,7 @@ export default function AdminUsers() {
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input placeholder=t("au.search") value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
+          <input placeholder={t("au.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm">
           <option value="all">{t("au.allStatuses")}</option>
