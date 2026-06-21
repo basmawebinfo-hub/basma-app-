@@ -363,6 +363,33 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "sb.apiDocs": { ar: "دليل المطوّر", en: "API Docs" },
   "sb.account": { ar: "الحساب", en: "Account" },
   "sb.viewSettings": { ar: "عرض الإعدادات", en: "View settings" },
+  // Connect extras
+  "cn.backChannels": { ar: "رجوع للقنوات", en: "Back to channels" },
+  "cn.waNumbers": { ar: "أرقام واتساب", en: "WhatsApp Numbers" },
+  "cn.addNumber": { ar: "إضافة رقم", en: "Add number" },
+  "cn.waitingScan": { ar: "في انتظار المسح...", en: "Waiting for scan..." },
+  "cn.refreshQr": { ar: "تحديث الكود", en: "Refresh QR" },
+  // Inbox extra
+  "ib.selectChat": { ar: "اختر محادثة لبدء المراسلة", en: "Select a chat to start messaging" },
+  // Settings extras
+  "set.backLanding": { ar: "رجوع للموقع", en: "Back to landing page" },
+  "set.signout": { ar: "تسجيل الخروج", en: "Sign out" },
+  // Webhooks extra
+  "wh.newConfig": { ar: "إعداد Webhook جديد", en: "New Webhook Config" },
+  "wh.saving": { ar: "جارٍ الحفظ...", en: "Saving..." },
+  // Notifications bell
+  "nb.title": { ar: "الإشعارات", en: "Notifications" },
+  "nb.none": { ar: "لا توجد إشعارات", en: "No notifications" },
+  // Telegram link component
+  "tl.title": { ar: "إشعارات تليجرام", en: "Telegram Notifications" },
+  "tl.connected": { ar: "تليجرام متصل", en: "Telegram connected" },
+  "tl.desc": { ar: "تستقبل كل التنبيهات على تليجرام.", en: "You receive all alerts on Telegram." },
+  "tl.unlink": { ar: "إلغاء ربط تليجرام", en: "Unlink Telegram" },
+  "tl.openBot": { ar: "افتح بوت تليجرام", en: "Open Telegram bot" },
+  // Hero extras
+  "hero.simulate": { ar: "حاكِ رسالة واتساب...", en: "Simulate a WhatsApp message..." },
+  "hero.tryIt": { ar: "جرّب", en: "Try it" },
+  "logo.integrates": { ar: "يتكامل مع الأدوات التي تستخدمها بالفعل", en: "Integrates with the tools you already use" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
