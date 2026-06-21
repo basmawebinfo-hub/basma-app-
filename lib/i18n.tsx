@@ -401,6 +401,16 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "adm.msgTotal": { ar: "الإجمالي", en: "total" },
   "adm.totalBalance": { ar: "إجمالي الرصيد", en: "Total Balance" },
   "adm.msgWeek": { ar: "الرسائل — آخر 7 أيام", en: "Messages — Last 7 days" },
+  // Admin layout
+  "adm.panel": { ar: "لوحة تحكم المالك", en: "Owner control panel" },
+  "adm.navOverview": { ar: "نظرة عامة", en: "Overview" },
+  "adm.navUsers": { ar: "المستخدمون", en: "Users" },
+  "adm.navConnections": { ar: "الاتصالات", en: "Connections" },
+  "adm.navBilling": { ar: "الفوترة", en: "Billing" },
+  "adm.navSupport": { ar: "دردشة الدعم", en: "Support Chat" },
+  "adm.navLogs": { ar: "سجل النشاط", en: "Activity Log" },
+  "adm.navAdmins": { ar: "المشرفون", en: "Admins" },
+  "adm.signout": { ar: "تسجيل الخروج", en: "Sign out" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
