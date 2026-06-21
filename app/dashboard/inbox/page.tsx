@@ -379,7 +379,7 @@ export default function InboxPage() {
       <div className="hidden lg:flex flex-1 flex-col min-w-0">
         {!selectedChat ? (
           <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-            Select a chat to start messaging
+            {t("ib.selectChat")}
           </div>
         ) : (
           <>
