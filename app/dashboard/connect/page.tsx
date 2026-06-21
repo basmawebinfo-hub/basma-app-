@@ -120,7 +120,7 @@ export default function ConnectPage() {
     const channels = [
       { key: "whatsapp", name: "WhatsApp", desc: "Connect your WhatsApp numbers for messaging & automation", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
       { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Link your Telegram", onClick: () => setView("telegram") },
-      { key: "instagram", name: "Instagram", desc: "Auto-reply to comments & DMs with keyword automation (ManyChat-style)", icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: true, status: igConnected ? "Connected ✓" : "Connect Instagram", onClick: openInstagramConnect },
+      { key: "instagram", name: "Instagram", desc: "Auto-reply to comments & DMs with keyword automation (ManyChat-style)", icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: true, status: "إدارة الأتمتة", onClick: () => { window.location.href = "/dashboard/instagram" } },
     ]
     return (
       <div className="p-8 max-w-5xl mx-auto">
