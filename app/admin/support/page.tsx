@@ -7,10 +7,10 @@ interface Convo { chat_id: string; user_id: string | null; name: string; avatar_
 interface Msg { direction: string; body: string; created_at: string }
 interface Customer { name: string; email: string | null; avatar_url: string | null }
 
-function Avatar({ name, url, size = 9 }: { name: string; url: string | null; size?: number }) {
-  const cls = `w-${size} h-${size}`
-  if (url) return <img src={url} alt={name} className={`${cls} rounded-full object-cover shrink-0`} />
-  return <div className={`${cls} rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0`}>{(name || "?").slice(0, 2).toUpperCase()}</div>
+function Avatar({ name, url, big = false }: { name: string; url: string | null; big?: boolean }) {
+  const cls = big ? "w-10 h-10" : "w-9 h-9"
+  if (url) return <img src={url} alt={name} className={cls + " rounded-full object-cover shrink-0"} />
+  return <div className={cls + " rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0"}>{(name || "?").slice(0, 2).toUpperCase()}</div>
 }
 
 export default function SupportPage() {
@@ -79,7 +79,7 @@ export default function SupportPage() {
               {/* Chat header with customer name + avatar */}
               {activeCustomer && (
                 <div className="flex items-center gap-3 p-3 border-b border-border bg-card/30">
-                  <Avatar name={activeCustomer.name} url={activeCustomer.avatar_url} size={10} />
+                  <Avatar name={activeCustomer.name} url={activeCustomer.avatar_url} big />
                   <div className="min-w-0">
                     <p className="font-semibold text-sm truncate">{activeCustomer.name}</p>
                     {activeCustomer.email && <p className="text-xs text-muted-foreground truncate">{activeCustomer.email}</p>}
