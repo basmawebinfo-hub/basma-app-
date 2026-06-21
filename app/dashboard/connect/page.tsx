@@ -41,31 +41,7 @@ export default function ConnectPage() {
   }, [])
   useEffect(() => { loadInstances() }, [loadInstances])
 
-  const [igConnected, setIgConnected] = useState(false)
 
-  async function checkIg() {
-    try { const r = await fetch("/api/instagram/status"); const d = await r.json(); setIgConnected(!!d.connected) } catch {}
-  }
-  useEffect(() => { checkIg() }, [])
-
-  function openInstagramConnect() {
-    const w = 600, h = 700
-    const left = window.screenX + (window.outerWidth - w) / 2
-    const top = window.screenY + (window.outerHeight - h) / 2
-    const popup = window.open("/api/instagram/connect", "ig_connect", `width=${w},height=${h},left=${left},top=${top}`)
-    // poll: when popup closes, re-check connection status from server (reliable)
-    const timer = setInterval(() => {
-      if (popup && popup.closed) {
-        clearInterval(timer)
-        checkIg().then(() => {})
-        setTimeout(checkIg, 1500)
-      }
-    }, 800)
-    const onMsg = (e: MessageEvent) => {
-      if (e.data === "ig_connected") { setIgConnected(true); window.removeEventListener("message", onMsg); try { popup?.close() } catch {} }
-    }
-    window.addEventListener("message", onMsg)
-  }
 
   // Poll for connection after QR
   useEffect(() => {
