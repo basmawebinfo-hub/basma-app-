@@ -191,6 +191,13 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "dash.qaWebhook": { ar: "أضف Webhook", en: "Add Webhook" },
   "dash.qaInbox": { ar: "صندوق الوارد", en: "Open Inbox" },
   "dash.qaDocs": { ar: "دليل المطوّر", en: "Developer Docs" },
+  // Auto-reply page
+  "ar.title": { ar: "الرد التلقائي — قريباً", en: "Auto Reply — Coming Soon" },
+  "ar.desc": { ar: "الردود الذكية المدعومة بالذكاء الاصطناعي في الطريق. حالياً يمكنك بناء تدفقات رد تلقائي قوية باستخدام Webhooks مع n8n.", en: "Smart AI-powered auto-replies are on the way. For now, you can build powerful auto-reply flows using Webhooks with n8n." },
+  "ar.cta": { ar: "إعداد Webhooks", en: "Set up Webhooks" },
+  // Campaigns page
+  "camp.title": { ar: "الحملات — قريباً", en: "Campaigns — Coming Soon" },
+  "camp.desc": { ar: "حملات البث الجماعي لجهات اتصالك في الطريق. ترقّب قريباً.", en: "Bulk broadcast campaigns to your contacts are on the way. Stay tuned." },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
