@@ -242,6 +242,18 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "tg.sentCheck": { ar: "لقد أرسلت الكود — تحقق الآن", en: "I sent the code — check now" },
   "tg.genCode": { ar: "إنشاء كود الربط", en: "Generate link code" },
   "tg.notLinked": { ar: "لم يتم الربط بعد. تأكد من إرسال الكود للبوت ثم حاول مجدداً.", en: "Not linked yet. Make sure you sent the code to the bot, then try again." },
+  // Dashboard docs
+  "doc.title": { ar: "دليل المطوّر", en: "Developer Documentation" },
+  "doc.subtitle": { ar: "اربط BASMA بـ n8n أو أي منصة. استقبل رسائل واتساب وأرسل الردود عبر الـ API.", en: "Connect BASMA to n8n or any platform. Receive WhatsApp messages and send replies via API." },
+  "doc.s1": { ar: "1. استقبال الرسائل (Webhook وارد)", en: "1. Receiving messages (Inbound Webhook)" },
+  "doc.s2": { ar: "2. المصادقة (مفتاح API)", en: "2. Authentication (API Key)" },
+  "doc.s3": { ar: "3. إرسال رسالة نصية", en: "3. Sending a text message" },
+  "doc.s4": { ar: "4. إرسال وسائط (صورة/فيديو/صوت/ملف)", en: "4. Sending media (image / video / audio / file)" },
+  "doc.s5": { ar: "5. جلب وسائط من رسالة واردة", en: "5. Fetching media from an incoming message" },
+  "doc.s6": { ar: "6. تدفق رد تلقائي كامل (مثال n8n)", en: "6. Full auto-reply flow (n8n example)" },
+  "doc.s7": { ar: "7. أكواد الاستجابة", en: "7. Response codes" },
+  "doc.help": { ar: "تحتاج مساعدة؟", en: "Need help?" },
+  "doc.helpDesc": { ar: "تواصل مع الدعم وسنساعدك في ربط منصة الأتمتة بتاعتك.", en: "Contact support and we'll help you connect your automation platform." },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
