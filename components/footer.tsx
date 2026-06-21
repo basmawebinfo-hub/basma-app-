@@ -7,7 +7,6 @@ export function Footer() {
   const cols = [
     { titleKey: "footer.product", links: [
       { key: "footer.features", href: "#how-it-works" },
-      { key: "footer.useCases", href: "#use-cases" },
       { key: "footer.pricing", href: "#pricing" },
     ]},
     { titleKey: "footer.company", links: [
