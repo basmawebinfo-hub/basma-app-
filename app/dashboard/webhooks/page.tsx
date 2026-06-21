@@ -41,15 +41,15 @@ interface DeliveryLog {
 
 const EVENTS = [
   // Core messaging events (most automations only need these)
-  { key: "MESSAGE_RECEIVED", label: t("wh.evMsgRecv") },
-  { key: "SEND_MESSAGE", label: t("wh.evMsgSent") },
-  { key: "MESSAGE_UPDATE", label: t("wh.evMsgStatus") },
+  { key: "MESSAGE_RECEIVED", labelKey: "wh.evMsgRecv" },
+  { key: "SEND_MESSAGE", labelKey: "wh.evMsgSent" },
+  { key: "MESSAGE_UPDATE", labelKey: "wh.evMsgStatus" },
   // Connection & contacts
-  { key: "CONNECTION_UPDATE", label: t("wh.evConn") },
-  { key: "CONTACTS_UPSERT", label: t("wh.evContact") },
-  { key: "CHATS_UPSERT", label: t("wh.evChat") },
+  { key: "CONNECTION_UPDATE", labelKey: "wh.evConn" },
+  { key: "CONTACTS_UPSERT", labelKey: "wh.evContact" },
+  { key: "CHATS_UPSERT", labelKey: "wh.evChat" },
   // Calls
-  { key: "CALL", label: t("wh.evCall") },
+  { key: "CALL", labelKey: "wh.evCall" },
 ]
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
@@ -332,7 +332,7 @@ export default function WebhooksPage() {
                   className="mt-0.5 shrink-0"
                 />
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground">{ev.label}</p>
+                  <p className="text-xs font-medium text-foreground">{t(ev.labelKey)}</p>
                   <p className="text-[10px] font-mono text-muted-foreground">{ev.key}</p>
                 </div>
               </label>
