@@ -1,10 +1,12 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Loader2, Trash2 } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 interface Inst { id: string; instance_name: string; display_name: string; phone: string | null; status: string; owner_email: string | null; created_at: string }
 
 export default function AdminInstances() {
+  const { t } = useI18n()
   const [rows, setRows] = useState<Inst[]>([])
   const [loading, setLoading] = useState(true)
   const load = () => { setLoading(true); fetch("/api/admin/instances").then(r=>r.json()).then(d=>setRows(d.instances??[])).finally(()=>setLoading(false)) }
@@ -20,7 +22,7 @@ export default function AdminInstances() {
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-card/60 text-muted-foreground"><tr className="text-right">
-            <th className="p-3">Name</th><th className="p-3">Owner</th><th className="p-3">Status</th><th className="p-3">Created</th><th className="p-3">Action</th>
+            <th className="p-3">{t("ai.name")}</th><th className="p-3">{t("ai.owner")}</th><th className="p-3">{t("ai.status")}</th><th className="p-3">{t("ai.created")}</th><th className="p-3">{t("ai.action")}</th>
           </tr></thead>
           <tbody>
             {rows.map(i=>(
