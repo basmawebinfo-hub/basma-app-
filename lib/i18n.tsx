@@ -229,6 +229,19 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "dp.customDesc": { ar: "لأكثر من 25 رقماً، تواصل معنا لسعر مخصص.", en: "For more than 25 numbers, contact us for custom pricing." },
   "dp.reqSent": { ar: "تم إرسال طلبك. سيتواصل معك فريقنا على واتساب لتأكيد الدفع والتفعيل.", en: "Your request was sent. Our team will contact you on WhatsApp to confirm payment and activate it." },
   "dp.reqError": { ar: "حدث خطأ. حاول مرة أخرى.", en: "Something went wrong. Please try again." },
+  // Link Telegram
+  "tg.title": { ar: "اربط تليجرام للمتابعة", en: "Link Telegram to continue" },
+  "tg.desc": { ar: "لاستخدام المنصة، يجب ربط حسابك بتليجرام لاستقبال تفاصيل اشتراكك ورصيدك وكل ما يخص حسابك.", en: "To use the platform, link your account with Telegram to receive your subscription, balance, and account details." },
+  "tg.step1": { ar: "1. افتح بوت تليجرام وأرسل هذا الكود:", en: "1. Open the Telegram bot and send this code:" },
+  "tg.expired": { ar: "انتهت صلاحية الكود. أنشئ كوداً جديداً.", en: "Code expired. Generate a new one." },
+  "tg.validFor": { ar: "صالح لمدة:", en: "Valid for:" },
+  "tg.newCode": { ar: "إنشاء كود جديد", en: "Generate new code" },
+  "tg.openBot": { ar: "افتح بوت تليجرام", en: "Open Telegram bot" },
+  "tg.step2": { ar: "2. بعد إرسال الكود، اضغط الزر بالأسفل.", en: "2. After sending the code, click the button below." },
+  "tg.checking": { ar: "جاري التحقق...", en: "Checking..." },
+  "tg.sentCheck": { ar: "لقد أرسلت الكود — تحقق الآن", en: "I sent the code — check now" },
+  "tg.genCode": { ar: "إنشاء كود الربط", en: "Generate link code" },
+  "tg.notLinked": { ar: "لم يتم الربط بعد. تأكد من إرسال الكود للبوت ثم حاول مجدداً.", en: "Not linked yet. Make sure you sent the code to the bot, then try again." },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
