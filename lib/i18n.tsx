@@ -474,6 +474,20 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "safety.dailyLimit": { ar: "حدك اليومي الآمن الآن", en: "Your safe daily limit now" },
   "safety.ageDays": { ar: "عمر الرقم (أيام)", en: "Number age (days)" },
   "safety.sentToday": { ar: "أُرسلت اليوم", en: "Sent today" },
+  // SDK page
+  "sdk.title": { ar: "مكتبات المطوّرين (SDKs)", en: "Developer SDKs" },
+  "sdk.desc": { ar: "مكتبات جاهزة لإرسال رسائل واتساب بأقل كود ممكن.", en: "Ready-made libraries to send WhatsApp messages with minimal code." },
+  "sdk.note": { ar: "انسخ الكلاس في مشروعك واستبدل bsm_live_xxxxx بمفتاحك من الإعدادات. لا يحتاج أي حزمة خارجية في Node (يستخدم fetch المدمج).", en: "Copy the class into your project and replace bsm_live_xxxxx with your key from Settings. No external package needed in Node (uses built-in fetch)." },
+  "sdk.link": { ar: "مكتبات المطوّرين (Node.js / Python)", en: "Developer SDKs (Node.js / Python)" },
+  // MCP page
+  "mcp.title": { ar: "ربط الذكاء الاصطناعي (MCP)", en: "AI Integration (MCP)" },
+  "mcp.desc": { ar: "اربط منصتك بوكلاء الذكاء الاصطناعي (Claude, n8n) عبر بروتوكول MCP لإرسال الرسائل تلقائياً.", en: "Connect your platform to AI agents (Claude, n8n) via the MCP protocol to send messages automatically." },
+  "mcp.link": { ar: "ربط الذكاء الاصطناعي (MCP)", en: "AI Integration (MCP)" },
+  "mcp.s1": { ar: "1. ما هو MCP؟", en: "1. What is MCP?" },
+  "mcp.s1d": { ar: "Model Context Protocol بروتوكول يسمح لوكلاء الذكاء الاصطناعي (مثل Claude) باستدعاء أدوات خارجية — مثل إرسال رسالة واتساب عبر منصتك.", en: "Model Context Protocol lets AI agents (like Claude) call external tools — such as sending a WhatsApp message via your platform." },
+  "mcp.s2": { ar: "2. الإعداد عبر n8n", en: "2. Setup via n8n" },
+  "mcp.s2d": { ar: "أضف عقدة HTTP Request في n8n تستدعي endpoint بصمة، واربطها بوكيل الذكاء الاصطناعي بتاعك.", en: "Add an HTTP Request node in n8n that calls the BASMA endpoint, and wire it to your AI agent." },
+  "mcp.s3": { ar: "3. أداة جاهزة للوكيل", en: "3. Ready tool definition" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
