@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
-import { sendText, sendMedia, sendAudio } from "@/lib/evolution"
+import { sendText, sendMedia, sendAudio, sendLocation, sendContact, sendPoll, sendSticker } from "@/lib/evolution"
 import { getUserPlan } from "@/lib/plan"
 import crypto from "crypto"
 
@@ -99,6 +99,17 @@ export async function POST(req: NextRequest) {
     media?: string       // URL or base64 (for image/video/audio/document)
     caption?: string
     fileName?: string
+    // location
+    latitude?: number
+    longitude?: number
+    name?: string
+    address?: string
+    // contact
+    contact?: { fullName: string; phoneNumber: string; organization?: string }
+    // poll
+    question?: string
+    options?: string[]
+    selectableCount?: number
   }
   try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: CORS }) }
 
@@ -113,7 +124,8 @@ export async function POST(req: NextRequest) {
   if (type === "text" && !text) {
     return NextResponse.json({ error: "'text' is required for text messages" }, { status: 400, headers: CORS })
   }
-  if (type !== "text" && !media) {
+  const mediaTypes = ["image", "video", "audio", "document", "sticker"]
+  if (mediaTypes.includes(type) && !media) {
     return NextResponse.json({ error: "'media' (URL or base64) is required for " + type + " messages" }, { status: 400, headers: CORS })
   }
 
@@ -157,6 +169,27 @@ export async function POST(req: NextRequest) {
       )
       storedType = type.toUpperCase()
       storedText = body.caption || (type === "document" ? (body.fileName || "[document]") : `[${type}]`)
+    } else if (type === "sticker") {
+      result = await sendSticker(inst.instance_name, to, media)
+      storedType = "STICKER"; storedText = "[sticker]"
+    } else if (type === "location") {
+      if (body.latitude == null || body.longitude == null) {
+        return NextResponse.json({ error: "'latitude' and 'longitude' are required for location" }, { status: 400, headers: CORS })
+      }
+      result = await sendLocation(inst.instance_name, to, body.latitude, body.longitude, body.name, body.address)
+      storedType = "LOCATION"; storedText = body.name || "[location]"
+    } else if (type === "contact") {
+      if (!body.contact?.fullName || !body.contact?.phoneNumber) {
+        return NextResponse.json({ error: "'contact' with fullName and phoneNumber is required" }, { status: 400, headers: CORS })
+      }
+      result = await sendContact(inst.instance_name, to, body.contact)
+      storedType = "CONTACT"; storedText = body.contact.fullName
+    } else if (type === "poll") {
+      if (!body.question || !Array.isArray(body.options) || body.options.length < 2) {
+        return NextResponse.json({ error: "'question' and at least 2 'options' are required for poll" }, { status: 400, headers: CORS })
+      }
+      result = await sendPoll(inst.instance_name, to, body.question, body.options, body.selectableCount ?? 1)
+      storedType = "POLL"; storedText = body.question
     } else {
       return NextResponse.json({ error: "Unsupported type: " + type }, { status: 400, headers: CORS })
     }
