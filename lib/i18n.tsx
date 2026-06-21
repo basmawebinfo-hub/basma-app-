@@ -272,6 +272,12 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "cn.cancel": { ar: "إلغاء", en: "Cancel" },
   "cn.done": { ar: "تم", en: "Done" },
   "cn.deleteConfirm": { ar: "حذف اتصال واتساب ده؟", en: "Delete this WhatsApp connection?" },
+  "trial.banner": { ar: "أنت في الفترة التجريبية", en: "You're on the free trial" },
+  "trial.daysLeft": { ar: "باقي", en: "left" },
+  "trial.days": { ar: "يوم", en: "days" },
+  "trial.day": { ar: "يوم", en: "day" },
+  "trial.expired": { ar: "انتهت فترتك التجريبية — اختر باقة للاستمرار", en: "Your trial has ended — choose a plan to continue" },
+  "trial.expiresOn": { ar: "تنتهي في", en: "Expires on" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
