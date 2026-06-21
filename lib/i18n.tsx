@@ -198,6 +198,18 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Campaigns page
   "camp.title": { ar: "الحملات — قريباً", en: "Campaigns — Coming Soon" },
   "camp.desc": { ar: "حملات البث الجماعي لجهات اتصالك في الطريق. ترقّب قريباً.", en: "Bulk broadcast campaigns to your contacts are on the way. Stay tuned." },
+  // Analytics
+  "an.title": { ar: "التحليلات", en: "Analytics" },
+  "an.subtitle": { ar: "حجم الرسائل والأنماط وأهم جهات الاتصال (آخر 30 يوماً)", en: "Message volume, patterns, and top contacts (last 30 days)" },
+  "an.loadError": { ar: "تعذّر تحميل التحليلات", en: "Could not load analytics" },
+  "an.empty": { ar: "لا توجد بيانات بعد. ابدأ باستقبال أو إرسال رسائل لتظهر التحليلات.", en: "No data yet. Start sending or receiving messages to see analytics." },
+  "an.total": { ar: "إجمالي الرسائل", en: "Total Messages" },
+  "an.sent": { ar: "المُرسلة", en: "Sent" },
+  "an.received": { ar: "المُستلمة", en: "Received" },
+  "an.last30": { ar: "الرسائل — آخر 30 يوماً", en: "Messages — Last 30 days" },
+  "an.byHour": { ar: "الرسائل حسب الساعة", en: "Messages by Hour" },
+  "an.types": { ar: "أنواع الرسائل", en: "Message Types" },
+  "an.topContacts": { ar: "أهم جهات الاتصال", en: "Top Contacts" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
