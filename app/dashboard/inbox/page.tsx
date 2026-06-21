@@ -303,7 +303,7 @@ export default function InboxPage() {
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label=t("ib.refreshChats")
+              aria-label={t("ib.refreshChats")}
               onClick={() => selectedInstance && loadChats(selectedInstance)}
               disabled={loadingChats}
             >
@@ -313,7 +313,7 @@ export default function InboxPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
-              placeholder=t("ib.searchChats")
+              placeholder={t("ib.searchChats")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-8 h-8 text-sm bg-muted/30"
@@ -433,11 +433,11 @@ export default function InboxPage() {
             {/* Input */}
             <div className="px-6 py-4 border-t border-border bg-card/30">
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon-sm" aria-label=t("ib.attachFile")>
+                <Button variant="ghost" size="icon-sm" aria-label={t("ib.attachFile")}>
                   <Paperclip className="w-4 h-4" />
                 </Button>
                 <Input
-                  placeholder=t("ib.typeMsg")
+                  placeholder={t("ib.typeMsg")}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
@@ -447,7 +447,7 @@ export default function InboxPage() {
                 <Button
                   size="icon-sm"
                   onClick={handleSend}
-                  aria-label=t("ib.sendMsg")
+                  aria-label={t("ib.sendMsg")}
                   disabled={!input.trim() || sending}
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
