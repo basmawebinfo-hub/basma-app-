@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
-import { sendText, sendMedia, sendAudio, sendLocation, sendContact, sendPoll, sendSticker } from "@/lib/evolution"
+import { sendText, sendMedia, sendAudio, sendLocation, sendContact, sendPoll, sendSticker, sendPresence } from "@/lib/evolution"
+import { checkWarmupGate, typingDuration, sleep } from "@/lib/anti-ban"
 import { getUserPlan } from "@/lib/plan"
 import crypto from "crypto"
 
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
   // 4. Resolve the instance (must belong to this user)
   let instanceQuery = db
     .from("instances")
-    .select("id, instance_name, status")
+    .select("id, instance_name, status, created_at")
     .eq("user_id", keyRow.user_id)
 
   if (body.instance_id) {
@@ -151,12 +152,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Instance is not connected" }, { status: 400, headers: CORS })
   }
 
+  // ── Anti-ban: enforce daily warmup limit based on the number's age ──
+  const gate = await checkWarmupGate(inst.id, (inst as { created_at: string }).created_at)
+  if (!gate.allowed) {
+    return NextResponse.json({
+      error: "Daily safe-send limit reached for this number",
+      warmup: { sent_today: gate.sentToday, daily_limit: gate.limit, account_age_days: gate.ageDays },
+      hint: "New WhatsApp numbers must warm up gradually to avoid bans. The limit increases as the number ages.",
+    }, { status: 429, headers: CORS })
+  }
+
   // 5. Send via Evolution (pick the right method based on type)
   try {
     let result: unknown
     let storedType = "TEXT"
     let storedText = text
     if (type === "text") {
+      // Anti-ban: brief "typing…" before a text reply makes it look human
+      try { await sendPresence(inst.instance_name, to, "composing", Math.min(typingDuration(text), 3000)); await sleep(Math.min(typingDuration(text), 3000)) } catch { /* best-effort */ }
       result = await sendText(inst.instance_name, to, text)
     } else if (type === "audio") {
       result = await sendAudio(inst.instance_name, to, media)
