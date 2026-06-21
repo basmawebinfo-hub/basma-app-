@@ -339,6 +339,17 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "wh.evChat": { ar: "محادثة جديدة/محدّثة", en: "New / updated chat" },
   "wh.evContact": { ar: "جهة اتصال جديدة/محدّثة", en: "New / updated contact" },
   "wh.evCall": { ar: "مكالمة واردة", en: "Incoming call" },
+  // Inbox
+  "ib.title": { ar: "صندوق الوارد", en: "Inbox" },
+  "ib.connections": { ar: "الاتصالات", en: "Connections" },
+  "ib.noConn": { ar: "لا توجد اتصالات واتساب بعد", en: "No WhatsApp connections yet" },
+  "ib.noChats": { ar: "لا توجد محادثات", en: "No chats found" },
+  "ib.noMsg": { ar: "لا توجد رسائل بعد", en: "No messages yet" },
+  "ib.searchChats": { ar: "ابحث في المحادثات...", en: "Search chats..." },
+  "ib.typeMsg": { ar: "اكتب رسالة...", en: "Type a message..." },
+  "ib.sendMsg": { ar: "إرسال الرسالة", en: "Send message" },
+  "ib.attachFile": { ar: "إرفاق ملف", en: "Attach file" },
+  "ib.refreshChats": { ar: "تحديث المحادثات", en: "Refresh chats" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
