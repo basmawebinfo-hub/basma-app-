@@ -283,6 +283,41 @@ export default function InboxPage() {
     }
   }
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
+  const handleAttach = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !selectedChat || !selectedInstance) return
+    setUploading(true)
+    try {
+      const base64: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result))
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const mime = file.type
+      let type = "document"
+      if (mime.startsWith("image/")) type = "image"
+      else if (mime.startsWith("video/")) type = "video"
+      else if (mime.startsWith("audio/")) type = "audio"
+      await fetch("/api/messages/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instance_id: selectedInstance.id,
+          to: jidToPhone(selectedChat.remoteJid),
+          type, media: base64, fileName: file.name,
+        }),
+      })
+      loadMessages(selectedInstance, selectedChat, true)
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
+
   const filteredChats = chats.filter((c) =>
     (c.pushName ?? c.name ?? jidToPhone(c.remoteJid))
       .toLowerCase()
@@ -462,7 +497,8 @@ export default function InboxPage() {
             {/* Input */}
             <div className="px-6 py-4 border-t border-border bg-card/30">
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon-sm" aria-label={t("ib.attachFile")}>
+                <input ref={fileInputRef} type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" className="hidden" onChange={handleAttach} />
+                <Button variant="ghost" size="icon-sm" aria-label={t("ib.attachFile")} disabled={uploading} onClick={() => fileInputRef.current?.click()}>
                   <Paperclip className="w-4 h-4" />
                 </Button>
                 <Input
