@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { Eye, EyeOff, Copy, Check, Loader2, Key, Webhook, User, RefreshCw, Camera, Activity, LogOut, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { logout } from "@/app/actions/auth"
+import { useI18n } from "@/lib/i18n"
 
 const WEBHOOK_URL = "https://www.basmaweb.com/api/evolution/webhook"
 
@@ -16,6 +17,7 @@ function Copyable({ value }: { value: string }) {
 }
 
 export default function SettingsPage() {
+  const { t } = useI18n()
   const [displayName, setDisplayName] = useState("")
   const [email, setEmail] = useState("")
   const [avatar, setAvatar] = useState<string | null>(null)
@@ -54,20 +56,20 @@ export default function SettingsPage() {
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 2 * 1024 * 1024) { alert("Image too large (max 2MB)"); return }
+    if (file.size > 2 * 1024 * 1024) { alert(t("set.imgLarge")); return }
     setUploading(true)
     const reader = new FileReader()
     reader.onload = async () => {
       const r = await fetch("/api/user/avatar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: reader.result }) })
       const d = await r.json()
-      if (r.ok) setAvatar(d.avatar_url); else alert(d.error ?? "Upload failed")
+      if (r.ok) setAvatar(d.avatar_url); else alert(d.error ?? t("set.uploadFail"))
       setUploading(false)
     }
     reader.readAsDataURL(file)
   }
 
   async function genApiKey() {
-    if (apiKey?.key_prefix && !confirm("This invalidates your current API key. Continue?")) return
+    if (apiKey?.key_prefix && !confirm(t("set.regenConfirm"))) return
     setGenKey(true); setNewApiKey(null)
     const r = await fetch("/api/user/api-key", { method: "POST" })
     const d = await r.json()
@@ -81,11 +83,11 @@ export default function SettingsPage() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-2xl font-bold">{t("set.title")}</h1>
 
       {/* Profile card with avatar */}
       <section className="rounded-2xl border border-border bg-card/50 p-6">
-        <div className="flex items-center gap-2 mb-5"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">Profile</h2></div>
+        <div className="flex items-center gap-2 mb-5"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.profile")}</h2></div>
         <div className="flex items-center gap-5 mb-5">
           <div className="relative">
             <div className="w-20 h-20 rounded-full overflow-hidden bg-primary/15 text-primary flex items-center justify-center text-2xl font-bold">
@@ -99,10 +101,10 @@ export default function SettingsPage() {
           <div>
             <div className="font-medium">{displayName || "—"}</div>
             <div className="text-sm text-muted-foreground">{email}</div>
-            <button onClick={() => fileRef.current?.click()} className="text-xs text-primary hover:underline mt-1">Change photo</button>
+            <button onClick={() => fileRef.current?.click()} className="text-xs text-primary hover:underline mt-1">{t("set.changePhoto")}</button>
           </div>
         </div>
-        <label className="text-xs text-muted-foreground">Display name</label>
+        <label className="text-xs text-muted-foreground">{t("set.displayName")}</label>
         <div className="flex items-center gap-2 mt-1">
           <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="flex-1 px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
           <button onClick={saveProfile} disabled={savingProfile} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">{profileSaved ? "Saved" : savingProfile ? "..." : "Save"}</button>
@@ -111,11 +113,11 @@ export default function SettingsPage() {
 
       {/* API Key */}
       <section className="rounded-2xl border border-border bg-card/50 p-6">
-        <div className="flex items-center gap-2 mb-3"><Key className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">API Key</h2></div>
-        <p className="text-sm text-muted-foreground mb-4">Use this key in n8n / Make to send messages via <code className="text-xs">/api/send</code>.</p>
+        <div className="flex items-center gap-2 mb-3"><Key className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.apiKey")}</h2></div>
+        <p className="text-sm text-muted-foreground mb-4">{t("set.useKeyN8n")} <code className="text-xs">/api/send</code>.</p>
         {newApiKey ? (
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 mb-3">
-            <p className="text-xs text-amber-700 mb-2">Copy your key now — it won't be shown again:</p>
+            <p className="text-xs text-amber-700 mb-2">{t("set.copyKey")}</p>
             <div className="flex items-center gap-2">
               <code className="flex-1 px-3 py-2 rounded-md bg-background border border-border text-xs font-mono break-all">{showKey ? newApiKey : newApiKey.slice(0, 12) + "••••••••"}</code>
               <button onClick={() => setShowKey(!showKey)} className="p-2 rounded-md border border-border">{showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}</button>
@@ -127,19 +129,19 @@ export default function SettingsPage() {
             <code className="flex-1 px-3 py-2 rounded-md bg-muted/30 border border-border text-xs font-mono">{apiKey.key_prefix}••••••••</code>
             <span className="text-xs text-muted-foreground">{apiKey.last_used_at ? "Last used " + new Date(apiKey.last_used_at).toLocaleDateString() : "Never used"}</span>
           </div>
-        ) : <p className="text-sm text-muted-foreground mb-3">No API key yet.</p>}
+        ) : <p className="text-sm text-muted-foreground mb-3">{t("set.noKey")}</p>}
         <button onClick={genApiKey} disabled={genKey} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted/40 disabled:opacity-50"><RefreshCw className="w-4 h-4" /> {apiKey?.key_prefix ? "Regenerate key" : "Generate key"}</button>
       </section>
 
       {/* Webhook */}
       <section className="rounded-2xl border border-border bg-card/50 p-6">
-        <div className="flex items-center gap-2 mb-3"><Webhook className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">Incoming Webhook</h2></div>
+        <div className="flex items-center gap-2 mb-3"><Webhook className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.incomingWebhook")}</h2></div>
         <p className="text-sm text-muted-foreground mb-4">Receive messages in n8n. Configure your destination URL on the Webhooks page.</p>
-        <label className="text-xs text-muted-foreground">Platform webhook URL</label>
+        <label className="text-xs text-muted-foreground">{t("set.platformWebhook")}</label>
         <div className="flex items-center gap-2 mt-1 mb-3"><code className="flex-1 px-3 py-2 rounded-md bg-muted/30 border border-border text-xs font-mono break-all">{WEBHOOK_URL}</code><Copyable value={WEBHOOK_URL} /></div>
         {webhook?.hmac_secret && (
           <>
-            <label className="text-xs text-muted-foreground">HMAC secret (verify signatures)</label>
+            <label className="text-xs text-muted-foreground">{t("set.hmac")}</label>
             <div className="flex items-center gap-2 mt-1"><code className="flex-1 px-3 py-2 rounded-md bg-muted/30 border border-border text-xs font-mono break-all">{showHmac ? webhook.hmac_secret : "••••••••••••••••"}</code><button onClick={() => setShowHmac(!showHmac)} className="p-2 rounded-md border border-border">{showHmac ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}</button><Copyable value={webhook.hmac_secret} /></div>
           </>
         )}
@@ -147,13 +149,13 @@ export default function SettingsPage() {
 
       {/* API Usage */}
       <section className="rounded-2xl border border-border bg-card/50 p-6">
-        <div className="flex items-center gap-2 mb-1"><Activity className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">API Usage</h2></div>
+        <div className="flex items-center gap-2 mb-1"><Activity className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.apiUsage")}</h2></div>
         <p className="text-sm text-muted-foreground mb-4">This month: <span className="font-medium text-foreground">{usageMonth}</span> calls.</p>
         <div className="rounded-xl border border-border overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-card/60 text-muted-foreground"><tr className="text-left"><th className="p-3 font-medium">Endpoint</th><th className="p-3 font-medium">Detail</th><th className="p-3 font-medium">Status</th><th className="p-3 font-medium">Time</th></tr></thead>
+            <thead className="bg-card/60 text-muted-foreground"><tr className="text-left"><th className="p-3 font-medium">{t("set.colEndpoint")}</th><th className="p-3 font-medium">{t("set.colDetail")}</th><th className="p-3 font-medium">{t("set.colStatus")}</th><th className="p-3 font-medium">{t("set.colTime")}</th></tr></thead>
             <tbody>
-              {usage.length === 0 ? <tr><td colSpan={4} className="p-6 text-center text-muted-foreground text-xs">No API calls yet</td></tr> : usage.map((c, i) => (
+              {usage.length === 0 ? <tr><td colSpan={4} className="p-6 text-center text-muted-foreground text-xs">{t("set.noApiCalls")}</td></tr> : usage.map((c, i) => (
                 <tr key={i} className="border-t border-border/40"><td className="p-3 font-mono text-xs">{c.endpoint}</td><td className="p-3 text-xs text-muted-foreground">{c.detail}</td><td className="p-3"><span className={"text-xs " + (c.status === 200 ? "text-green-600" : "text-red-600")}>{c.status}</span></td><td className="p-3 text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString()}</td></tr>
               ))}
             </tbody>
@@ -162,7 +164,7 @@ export default function SettingsPage() {
       </section>
       {/* Account */}
       <section className="rounded-2xl border border-border bg-card/50 p-6">
-        <div className="flex items-center gap-2 mb-4"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">Account</h2></div>
+        <div className="flex items-center gap-2 mb-4"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.account")}</h2></div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link href="/" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/40">
             <ArrowLeft className="w-4 h-4" /> Back to landing page
