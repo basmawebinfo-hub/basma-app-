@@ -200,3 +200,175 @@ export async function setInstanceWebhook(
     }),
   })
 }
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// QUALITY FEATURES (presence, typing, read receipts) — make the bot feel human
+// ════════════════════════════════════════════════════════════════════════════
+
+// Show "typing…" / "recording…" / online presence in the chat
+export async function sendPresence(
+  instanceName: string,
+  to: string,
+  presence: "composing" | "recording" | "paused" | "available" | "unavailable",
+  delayMs = 1200
+): Promise<unknown> {
+  return evoFetch(`/chat/sendPresence/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ number: to, presence, delay: delayMs }),
+  })
+}
+
+// Mark a message (or chat) as read — the blue ticks
+export async function markAsRead(
+  instanceName: string,
+  remoteJid: string,
+  messageId: string,
+  fromMe = false
+): Promise<unknown> {
+  return evoFetch(`/chat/markMessageAsRead/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ readMessages: [{ remoteJid, id: messageId, fromMe }] }),
+  })
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// EXTRA MESSAGE TYPES (location, contact, poll, sticker, reaction)
+// ════════════════════════════════════════════════════════════════════════════
+
+export async function sendLocation(
+  instanceName: string, to: string,
+  latitude: number, longitude: number, name?: string, address?: string
+): Promise<unknown> {
+  return evoFetch(`/message/sendLocation/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ number: to, latitude, longitude, name: name ?? "", address: address ?? "" }),
+  })
+}
+
+export async function sendContact(
+  instanceName: string, to: string,
+  contact: { fullName: string; phoneNumber: string; organization?: string }
+): Promise<unknown> {
+  return evoFetch(`/message/sendContact/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({
+      number: to,
+      contact: [{ fullName: contact.fullName, wuid: contact.phoneNumber.replace(/[^0-9]/g, ""), phoneNumber: contact.phoneNumber, organization: contact.organization ?? "" }],
+    }),
+  })
+}
+
+export async function sendPoll(
+  instanceName: string, to: string,
+  question: string, options: string[], selectableCount = 1
+): Promise<unknown> {
+  return evoFetch(`/message/sendPoll/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ number: to, name: question, selectableCount, values: options }),
+  })
+}
+
+export async function sendSticker(
+  instanceName: string, to: string, sticker: string
+): Promise<unknown> {
+  return evoFetch(`/message/sendSticker/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ number: to, sticker }),
+  })
+}
+
+// React to a message with an emoji
+export async function sendReaction(
+  instanceName: string, remoteJid: string, messageId: string, emoji: string, fromMe = false
+): Promise<unknown> {
+  return evoFetch(`/message/sendReaction/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ key: { remoteJid, id: messageId, fromMe }, reaction: emoji }),
+  })
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// GROUPS
+// ════════════════════════════════════════════════════════════════════════════
+
+export async function createGroup(
+  instanceName: string, subject: string, participants: string[]
+): Promise<unknown> {
+  return evoFetch(`/group/create/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({ subject, participants: participants.map((p) => p.replace(/[^0-9]/g, "")) }),
+  })
+}
+
+export async function fetchGroups(instanceName: string): Promise<unknown[]> {
+  try {
+    const res = await evoFetch<unknown[] | { groups: unknown[] }>(`/group/fetchAllGroups/${instanceName}?getParticipants=false`)
+    return Array.isArray(res) ? res : (res as { groups: unknown[] }).groups ?? []
+  } catch { return [] }
+}
+
+export async function getGroupInfo(instanceName: string, groupJid: string): Promise<unknown> {
+  return evoFetch(`/group/findGroupInfos/${instanceName}?groupJid=${encodeURIComponent(groupJid)}`)
+}
+
+export async function getGroupParticipants(instanceName: string, groupJid: string): Promise<unknown> {
+  return evoFetch(`/group/participants/${instanceName}?groupJid=${encodeURIComponent(groupJid)}`)
+}
+
+// action: "add" | "remove" | "promote" | "demote"
+export async function updateGroupParticipants(
+  instanceName: string, groupJid: string, action: string, participants: string[]
+): Promise<unknown> {
+  return evoFetch(`/group/updateParticipant/${instanceName}?groupJid=${encodeURIComponent(groupJid)}`, {
+    method: "POST",
+    body: JSON.stringify({ action, participants: participants.map((p) => p.replace(/[^0-9]/g, "")) }),
+  })
+}
+
+export async function updateGroupSubject(instanceName: string, groupJid: string, subject: string): Promise<unknown> {
+  return evoFetch(`/group/updateGroupSubject/${instanceName}?groupJid=${encodeURIComponent(groupJid)}`, {
+    method: "POST", body: JSON.stringify({ subject }),
+  })
+}
+
+// Send a text message to a group, optionally mentioning participants
+export async function sendGroupMessage(
+  instanceName: string, groupJid: string, text: string, mentions?: string[]
+): Promise<unknown> {
+  return evoFetch(`/message/sendText/${instanceName}`, {
+    method: "POST",
+    body: JSON.stringify({
+      number: groupJid,
+      text,
+      ...(mentions && mentions.length ? { mentioned: mentions.map((m) => m.replace(/[^0-9]/g, "")) } : {}),
+    }),
+  })
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CONTACTS
+// ════════════════════════════════════════════════════════════════════════════
+
+export async function fetchContacts(instanceName: string): Promise<unknown[]> {
+  try {
+    const res = await evoFetch<unknown[] | { contacts: unknown[] }>(`/chat/findContacts/${instanceName}`, {
+      method: "POST", body: JSON.stringify({}),
+    })
+    return Array.isArray(res) ? res : (res as { contacts: unknown[] }).contacts ?? []
+  } catch { return [] }
+}
+
+// Get a contact / group profile picture URL
+export async function getProfilePicture(instanceName: string, number: string): Promise<unknown> {
+  return evoFetch(`/chat/fetchProfilePictureUrl/${instanceName}`, {
+    method: "POST", body: JSON.stringify({ number }),
+  })
+}
+
+// Check if a number is registered on WhatsApp
+export async function checkNumberExists(instanceName: string, numbers: string[]): Promise<unknown> {
+  return evoFetch(`/chat/whatsappNumbers/${instanceName}`, {
+    method: "POST", body: JSON.stringify({ numbers: numbers.map((n) => n.replace(/[^0-9]/g, "")) }),
+  })
+}
