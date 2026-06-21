@@ -254,6 +254,24 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "doc.s7": { ar: "7. أكواد الاستجابة", en: "7. Response codes" },
   "doc.help": { ar: "تحتاج مساعدة؟", en: "Need help?" },
   "doc.helpDesc": { ar: "تواصل مع الدعم وسنساعدك في ربط منصة الأتمتة بتاعتك.", en: "Contact support and we'll help you connect your automation platform." },
+  // Connect page
+  "cn.title": { ar: "الاتصالات", en: "Connections" },
+  "cn.subtitle": { ar: "اربط وأدر كل قنواتك في مكان واحد.", en: "Connect and manage all your channels in one place." },
+  "cn.whatsapp": { ar: "واتساب", en: "WhatsApp" },
+  "cn.whatsappDesc": { ar: "اربط أرقام واتساب للمراسلة والأتمتة", en: "Connect your WhatsApp numbers for messaging & automation" },
+  "cn.telegram": { ar: "تليجرام", en: "Telegram" },
+  "cn.telegramDesc": { ar: "اربط تليجرام لاستقبال التنبيهات والتواصل مع الدعم", en: "Link Telegram to receive alerts & talk to support" },
+  "cn.telegramAction": { ar: "اربط تليجرام", en: "Link your Telegram" },
+  "cn.igDesc": { ar: "رد تلقائي على التعليقات والرسائل بالكلمات المفتاحية", en: "Auto-reply to comments & DMs with keyword automation" },
+  "cn.comingSoon": { ar: "قريباً", en: "Coming soon" },
+  "cn.connected": { ar: "متصل", en: "CONNECTED" },
+  "cn.connecting": { ar: "جارٍ الاتصال", en: "CONNECTING" },
+  "cn.noNumbers": { ar: "لا توجد أرقام واتساب بعد. اضغط \"إضافة رقم\" لربط واحد.", en: "No WhatsApp numbers yet. Click \"Add number\" to connect one." },
+  "cn.nameNumber": { ar: "سمِّ هذا الرقم (مثل: مبيعات، دعم)", en: "Name this number (e.g. Sales, Support)" },
+  "cn.connectedOk": { ar: "تم الاتصال بنجاح!", en: "Connected successfully!" },
+  "cn.cancel": { ar: "إلغاء", en: "Cancel" },
+  "cn.done": { ar: "تم", en: "Done" },
+  "cn.deleteConfirm": { ar: "حذف اتصال واتساب ده؟", en: "Delete this WhatsApp connection?" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
