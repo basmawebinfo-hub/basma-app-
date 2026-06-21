@@ -390,6 +390,17 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "hero.simulate": { ar: "حاكِ رسالة واتساب...", en: "Simulate a WhatsApp message..." },
   "hero.tryIt": { ar: "جرّب", en: "Try it" },
   "logo.integrates": { ar: "يتكامل مع الأدوات التي تستخدمها بالفعل", en: "Integrates with the tools you already use" },
+  // Admin
+  "adm.overview": { ar: "نظرة عامة على المنصة", en: "Platform Overview" },
+  "adm.loadFail": { ar: "تعذّر تحميل الإحصائيات", en: "Failed to load stats" },
+  "adm.users": { ar: "المستخدمون", en: "Users" },
+  "adm.suspended": { ar: "موقوف", en: "suspended" },
+  "adm.activeConn": { ar: "الاتصالات النشطة", en: "Active Connections" },
+  "adm.connTotal": { ar: "متصل / الإجمالي", en: "connected / total" },
+  "adm.msgToday": { ar: "رسائل اليوم", en: "Messages Today" },
+  "adm.msgTotal": { ar: "الإجمالي", en: "total" },
+  "adm.totalBalance": { ar: "إجمالي الرصيد", en: "Total Balance" },
+  "adm.msgWeek": { ar: "الرسائل — آخر 7 أيام", en: "Messages — Last 7 days" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
