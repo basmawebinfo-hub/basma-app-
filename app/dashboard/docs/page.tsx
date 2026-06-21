@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 import { useState } from "react"
 import { Copy, Check, ArrowRight, ArrowLeft, Webhook, Send, Image as ImageIcon, KeyRound } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -186,6 +187,17 @@ GET https://www.basmaweb.com/api/contacts?number=201112223334`}</Code>
 429  Monthly message limit reached (paid plans are unlimited)
 502  WhatsApp/Evolution error`}</Code>
       </Section>
+
+      <div className="grid sm:grid-cols-2 gap-3 mb-6">
+        <Link href="/dashboard/docs/sdk" className="rounded-xl border border-border bg-card/40 p-4 hover:border-primary/40 transition-colors">
+          <h3 className="font-semibold text-foreground mb-1">{t("sdk.link")}</h3>
+          <p className="text-xs text-muted-foreground">{t("sdk.desc")}</p>
+        </Link>
+        <Link href="/dashboard/docs/mcp" className="rounded-xl border border-border bg-card/40 p-4 hover:border-primary/40 transition-colors">
+          <h3 className="font-semibold text-foreground mb-1">{t("mcp.link")}</h3>
+          <p className="text-xs text-muted-foreground">{t("mcp.desc")}</p>
+        </Link>
+      </div>
 
       <div className="rounded-xl border border-border bg-card/30 p-5 text-sm">
         <b>{t("doc.help")}</b> {t("doc.helpDesc")}
