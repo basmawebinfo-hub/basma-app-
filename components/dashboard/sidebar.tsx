@@ -78,13 +78,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-border bg-sidebar">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-border">
-          <MessageSquare className="w-5 h-5 text-primary" />
-          <span
-            className="font-[family-name:var(--font-pt-mono)] font-bold text-sm text-sidebar-foreground"
-            style={{ letterSpacing: "-0.05em" }}
-          >
-            BASMA
-          </span>
+          <img src="/basma-logo.png" alt="BASMA" className="h-7 w-auto object-contain" />
         </div>
         <nav className="px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
           <NavLinks />
@@ -109,13 +103,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
       >
         <div className="flex items-center justify-between px-5 py-5 border-b border-border">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-primary" />
-            <span
-              className="font-[family-name:var(--font-pt-mono)] font-bold text-sm text-sidebar-foreground"
-              style={{ letterSpacing: "-0.05em" }}
-            >
-              BASMA
-            </span>
+            <img src="/basma-logo.png" alt="BASMA" className="h-7 w-auto object-contain" />
           </div>
           <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
             <X className="w-4 h-4 text-muted-foreground" />
@@ -137,12 +125,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
         >
           <Menu className="w-5 h-5" />
         </Button>
-        <span
-          className="font-[family-name:var(--font-pt-mono)] font-bold text-sm"
-          style={{ letterSpacing: "-0.05em" }}
-        >
-          BASMA
-        </span>
+        <img src="/basma-logo.png" alt="BASMA" className="h-7 w-auto object-contain" />
       </header>
     </>
   )
