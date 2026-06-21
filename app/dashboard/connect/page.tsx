@@ -41,14 +41,28 @@ export default function ConnectPage() {
   }, [])
   useEffect(() => { loadInstances() }, [loadInstances])
 
+  const [igConnected, setIgConnected] = useState(false)
+
+  async function checkIg() {
+    try { const r = await fetch("/api/instagram/status"); const d = await r.json(); setIgConnected(!!d.connected) } catch {}
+  }
+  useEffect(() => { checkIg() }, [])
+
   function openInstagramConnect() {
     const w = 600, h = 700
     const left = window.screenX + (window.outerWidth - w) / 2
     const top = window.screenY + (window.outerHeight - h) / 2
     const popup = window.open("/api/instagram/connect", "ig_connect", `width=${w},height=${h},left=${left},top=${top}`)
+    // poll: when popup closes, re-check connection status from server (reliable)
+    const timer = setInterval(() => {
+      if (popup && popup.closed) {
+        clearInterval(timer)
+        checkIg().then(() => {})
+        setTimeout(checkIg, 1500)
+      }
+    }, 800)
     const onMsg = (e: MessageEvent) => {
-      if (e.data === "ig_connected") { alert("تم ربط إنستغرام بنجاح ✅"); window.removeEventListener("message", onMsg); try { popup?.close() } catch {} }
-      else if (e.data === "ig_error") { alert("فشل ربط إنستغرام. حاول مرة أخرى."); window.removeEventListener("message", onMsg) }
+      if (e.data === "ig_connected") { setIgConnected(true); window.removeEventListener("message", onMsg); try { popup?.close() } catch {} }
     }
     window.addEventListener("message", onMsg)
   }
@@ -106,7 +120,7 @@ export default function ConnectPage() {
     const channels = [
       { key: "whatsapp", name: "WhatsApp", desc: "Connect your WhatsApp numbers for messaging & automation", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
       { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Link your Telegram", onClick: () => setView("telegram") },
-      { key: "instagram", name: "Instagram", desc: "Auto-reply to comments & DMs with keyword automation (ManyChat-style)", icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: true, status: "Connect Instagram", onClick: openInstagramConnect },
+      { key: "instagram", name: "Instagram", desc: "Auto-reply to comments & DMs with keyword automation (ManyChat-style)", icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: true, status: igConnected ? "Connected ✓" : "Connect Instagram", onClick: openInstagramConnect },
     ]
     return (
       <div className="p-8 max-w-5xl mx-auto">
