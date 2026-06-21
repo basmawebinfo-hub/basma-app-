@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { instance_id, to, type, media, fileName } = await req.json().catch(() => ({}))
+  const { instance_id, to, type, media, fileName, mimetype } = await req.json().catch(() => ({}))
   if (!instance_id || !to || !type || !media) {
     return NextResponse.json({ error: "instance_id, to, type, media required" }, { status: 400 })
   }
@@ -20,13 +20,15 @@ export async function POST(req: NextRequest) {
 
   // strip data URL prefix if present (Evolution wants raw base64 or URL)
   const mediaPayload = typeof media === "string" && media.includes(",") ? media.split(",")[1] : media
+  // extract mimetype from data URL (e.g. "data:image/png;base64,...")
+  const mt = mimetype || (typeof media === "string" && media.startsWith("data:") ? media.slice(5, media.indexOf(";")) : undefined)
 
   try {
     let result: unknown
     if (type === "audio") {
       result = await sendAudio(inst.instance_name, to, mediaPayload)
     } else {
-      result = await sendMedia(inst.instance_name, to, type as "image" | "video" | "document", mediaPayload, undefined, fileName)
+      result = await sendMedia(inst.instance_name, to, type as "image" | "video" | "document", mediaPayload, undefined, fileName, mt)
     }
 
     // persist outgoing message
