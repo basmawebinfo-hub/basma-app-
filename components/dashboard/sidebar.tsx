@@ -55,18 +55,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
     </>
   )
 
-  const SidebarFooter = () => (
-    <div className="p-3 border-t border-border flex justify-center">
-      <Link
-        href="/dashboard/settings"
-        title={t("sb.viewSettings")}
-        aria-label={t("sb.viewSettings")}
-        className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold hover:bg-primary/25 transition-colors"
-      >
-        {(userEmail ?? "?").slice(0, 2).toUpperCase()}
-      </Link>
-    </div>
-  )
+  
 
   return (
     <>
@@ -78,7 +67,6 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
         <nav className="px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Sidebar navigation">
           <NavLinks />
         </nav>
-        <SidebarFooter />
       </aside>
 
       {/* Mobile overlay */}
@@ -107,7 +95,6 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           <NavLinks onClick={() => setSidebarOpen(false)} />
         </nav>
-        <SidebarFooter />
       </aside>
 
       {/* Mobile topbar */}
