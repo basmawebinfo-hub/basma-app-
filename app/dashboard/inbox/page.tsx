@@ -57,50 +57,79 @@ function getMessageText(msg: EvoMessage): string {
   )
 }
 
-function renderMessageBody(msg: EvoMessage) {
+function MediaMessage({ msg, instanceId }: { msg: EvoMessage; instanceId: string }) {
   const type = msg.messageType ?? "TEXT"
   const media = msg.media
   const caption = msg.text && !msg.text.startsWith("[") ? msg.text : null
+  const [dataUrl, setDataUrl] = useState<string | null>(media?.mediaUrl || null)
+  const [loading, setLoading] = useState(false)
+  const [fileName, setFileName] = useState<string | null>(media?.fileName ?? null)
+
+  async function loadMedia() {
+    if (dataUrl || loading || !instanceId) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/inbox/media?instance_id=${instanceId}&message_id=${encodeURIComponent(msg.key.id)}`)
+      const d = await res.json()
+      if (d.dataUrl) { setDataUrl(d.dataUrl); if (d.fileName) setFileName(d.fileName) }
+    } finally { setLoading(false) }
+  }
 
   if (type === "IMAGE" || type === "STICKER") {
-    const src = media?.thumbnail
+    const src = dataUrl || media?.thumbnail
     return (
       <div className="space-y-1">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt="image" className="rounded-lg max-w-[220px] max-h-[220px] object-cover" />
+          <img src={src} alt="image" onClick={loadMedia} className="rounded-lg max-w-[240px] max-h-[300px] object-cover cursor-pointer" />
         ) : (
-          <p className="opacity-80">[image]</p>
+          <button onClick={loadMedia} className="flex items-center gap-2 text-sm underline">{loading ? "..." : "عرض الصورة"}</button>
         )}
-        {caption && <p>{caption}</p>}
+        {caption && <p className="mt-1">{caption}</p>}
       </div>
     )
   }
   if (type === "VIDEO") {
     return (
       <div className="space-y-1">
-        {media?.thumbnail ? (
-          <div className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={media.thumbnail} alt="video" className="rounded-lg max-w-[220px] object-cover" />
-            <span className="absolute inset-0 flex items-center justify-center text-2xl">▶</span>
-          </div>
+        {dataUrl ? (
+          <video src={dataUrl} controls className="rounded-lg max-w-[260px]" />
         ) : (
-          <p className="opacity-80">[video]</p>
+          <button onClick={loadMedia} className="text-sm underline">{loading ? "..." : "تشغيل الفيديو"}</button>
         )}
-        {caption && <p>{caption}</p>}
+        {caption && <p className="mt-1">{caption}</p>}
       </div>
     )
   }
   if (type === "AUDIO") {
-    const secs = media?.seconds ? `${Math.round(media.seconds)}s` : ""
-    return <p className="flex items-center gap-2">🎤 <span>Voice message {secs}</span></p>
+    return dataUrl ? (
+      <audio src={dataUrl} controls className="max-w-[240px] h-10" />
+    ) : (
+      <button onClick={loadMedia} className="flex items-center gap-2 text-sm underline">🎤 {loading ? "..." : "تشغيل الصوت"}</button>
+    )
   }
   if (type === "DOCUMENT") {
-    return <p className="flex items-center gap-2">📄 <span>{media?.fileName ?? "Document"}</span></p>
+    return dataUrl ? (
+      <a href={dataUrl} download={fileName ?? "document"} className="flex items-center gap-2 text-sm underline">📄 {fileName ?? "الملف"}</a>
+    ) : (
+      <button onClick={loadMedia} className="flex items-center gap-2 text-sm underline">📄 {loading ? "..." : (fileName ?? "تحميل الملف")}</button>
+    )
   }
-  if (type === "LOCATION") return <p>📍 Location</p>
-  if (type === "CONTACT") return <p>👤 Contact card</p>
+  if (type === "LOCATION") {
+    const raw = msg.message as { locationMessage?: { degreesLatitude?: number; degreesLongitude?: number } }
+    const lat = raw?.locationMessage?.degreesLatitude
+    const lng = raw?.locationMessage?.degreesLongitude
+    if (lat && lng) {
+      return (
+        <a href={`https://www.google.com/maps?q=${lat},${lng}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm underline">
+          📍 {caption || "عرض الموقع"}
+        </a>
+      )
+    }
+    return <p>📍 {caption || "موقع"}</p>
+  }
+  if (type === "CONTACT") return <p className="flex items-center gap-2">👤 {caption || "كارت جهة اتصال"}</p>
+  if (type === "POLL") return <p className="flex items-center gap-2">📊 {caption || "تصويت"}</p>
   return <p>{getMessageText(msg)}</p>
 }
 
