@@ -167,11 +167,11 @@ export default function SettingsPage() {
         <div className="flex items-center gap-2 mb-4"><User className="w-4 h-4 text-primary" /><h2 className="text-base font-semibold">{t("set.account")}</h2></div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link href="/" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/40">
-            <ArrowLeft className="w-4 h-4" /> Back to landing page
+            <ArrowLeft className="w-4 h-4" /> {t("set.backLanding")}
           </Link>
           <form action={logout} className="flex-1">
             <button type="submit" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/30 text-sm font-medium text-red-600 hover:bg-red-500/10">
-              <LogOut className="w-4 h-4" /> Sign out
+              <LogOut className="w-4 h-4" /> {t("set.signout")}
             </button>
           </form>
         </div>
