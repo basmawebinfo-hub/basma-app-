@@ -222,7 +222,7 @@ export default function WebhooksPage() {
                       <Send className="w-3.5 h-3.5" />
                     </Button>
                   )}
-                  <Button variant="ghost" size="icon-sm" aria-label=t("wh.delete") onClick={() => handleDelete(cfg.id)}>
+                  <Button variant="ghost" size="icon-sm" aria-label={t("wh.delete")} onClick={() => handleDelete(cfg.id)}>
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                   </Button>
                 </div>
@@ -256,7 +256,7 @@ export default function WebhooksPage() {
               onValueChange={(v) => setForm((p) => ({ ...p, destination_type: v }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder=t("wh.selectType") />
+                <SelectValue placeholder={t("wh.selectType")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="URL">URL</SelectItem>
