@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { Copy, Check, ArrowRight, ArrowLeft, Webhook, Send, Image as ImageIcon, KeyRound } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 function Code({ children }: { children: string }) {
   const [copied, setCopied] = useState(false)
@@ -28,12 +29,13 @@ function Section({ icon: Icon, title, children }: { icon: React.ElementType; tit
 }
 
 export default function DocsPage() {
+  const { t } = useI18n()
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Developer Documentation</h1>
-      <p className="text-muted-foreground mb-8">Connect BASMA to n8n, Make, Zapier, or any platform. Receive WhatsApp messages and send replies via API.</p>
+      <h1 className="text-3xl font-bold mb-2">{t("doc.title")}</h1>
+      <p className="text-muted-foreground mb-8">{t("doc.subtitle")}</p>
 
-      <Section icon={ArrowLeft} title="1. Receiving messages (Inbound Webhook)">
+      <Section icon={ArrowLeft} title={t("doc.s1")}>
         <p>Every incoming WhatsApp message can be forwarded to your automation platform in real time.</p>
         <p><b>Setup:</b> Go to <b>Webhooks</b> in the dashboard, add a new config, paste your platform's webhook URL, and select the events you want.</p>
         <p>BASMA will <b>POST</b> a JSON payload to your URL for each message. Example payload:</p>
@@ -63,13 +65,13 @@ Is from me:    $json.body.data.key.fromMe     (filter out true to avoid loops)`}
         </p>
       </Section>
 
-      <Section icon={KeyRound} title="2. Authentication (API Key)">
+      <Section icon={KeyRound} title={t("doc.s2")}>
         <p>Sending messages requires your personal API key. Get it from <b>Settings → API Key</b>.</p>
         <p>Pass it in the <code>Authorization</code> header on every request:</p>
         <Code>{`Authorization: Bearer bsm_live_xxxxxxxxxxxxxxxxxxxx`}</Code>
       </Section>
 
-      <Section icon={Send} title="3. Sending a text message">
+      <Section icon={Send} title={t("doc.s3")}>
         <p><b>POST</b> to <code>https://www.basmaweb.com/api/send</code></p>
         <Code>{`POST https://www.basmaweb.com/api/send
 Authorization: Bearer bsm_live_xxxxx
@@ -82,7 +84,7 @@ Content-Type: application/json
         <p>If you have multiple numbers, add <code>"instance_id": "uuid"</code> to pick one. Otherwise it uses your first connected number.</p>
       </Section>
 
-      <Section icon={ImageIcon} title="4. Sending media (image / video / audio / file)">
+      <Section icon={ImageIcon} title={t("doc.s4")}>
         <p>Use the same endpoint with a <code>type</code> and <code>media</code> (URL or base64):</p>
         <Code>{`// Image
 { "to": "201234567890", "type": "image", "media": "https://example.com/pic.jpg", "caption": "Optional" }
@@ -97,7 +99,7 @@ Content-Type: application/json
 { "to": "201234567890", "type": "document", "media": "https://example.com/file.pdf", "fileName": "report.pdf" }`}</Code>
       </Section>
 
-      <Section icon={ArrowLeft} title="5. Fetching media from an incoming message">
+      <Section icon={ArrowLeft} title={t("doc.s5")}>
         <p>WhatsApp media is encrypted. To get the actual file bytes (e.g. to transcribe a voice note), call:</p>
         <Code>{`POST https://www.basmaweb.com/api/media
 Authorization: Bearer bsm_live_xxxxx
@@ -108,7 +110,7 @@ Content-Type: application/json
 // Returns: { "base64": "...", "mimetype": "audio/ogg", "fileName": "...", "mediaType": "..." }`}</Code>
       </Section>
 
-      <Section icon={Webhook} title="6. Full auto-reply flow (n8n example)">
+      <Section icon={Webhook} title={t("doc.s6")}>
         <p>A simple AI auto-reply workflow:</p>
         <Code>{`[Webhook Trigger]   <- incoming message from BASMA
       |
@@ -124,7 +126,7 @@ Content-Type: application/json
 }`}</Code>
       </Section>
 
-      <Section icon={ArrowRight} title="7. Response codes">
+      <Section icon={ArrowRight} title={t("doc.s7")}>
         <Code>{`200  Success
 401  Missing or invalid API key
 403  Account suspended
@@ -134,7 +136,7 @@ Content-Type: application/json
       </Section>
 
       <div className="rounded-xl border border-border bg-card/30 p-5 text-sm">
-        <b>Need help?</b> Contact support and we'll help you connect your automation platform.
+        <b>{t("doc.help")}</b> {t("doc.helpDesc")}
       </div>
     </div>
   )
