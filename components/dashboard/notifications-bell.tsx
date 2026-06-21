@@ -1,10 +1,12 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Bell } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 interface Notif { id: string; title: string; body: string|null; level: string; is_read: boolean; created_at: string }
 
 export function NotificationsBell() {
+  const { t } = useI18n()
   const [items, setItems] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
   const unread = items.filter(n => !n.is_read).length
@@ -22,9 +24,9 @@ export function NotificationsBell() {
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-80 max-w-[90vw] max-h-96 overflow-y-auto rounded-xl border border-border bg-card shadow-xl z-50" >
-          <div className="p-3 border-b border-border text-sm font-semibold">Notifications</div>
+          <div className="p-3 border-b border-border text-sm font-semibold">{t("nb.title")}</div>
           {items.length === 0 ? (
-            <div className="p-6 text-center text-xs text-muted-foreground">No notifications</div>
+            <div className="p-6 text-center text-xs text-muted-foreground">{t("nb.none")}</div>
           ) : items.map(n => (
             <div key={n.id} className={"p-3 border-b border-border/40 " + (n.is_read ? "" : "bg-primary/5")}>
               <div className="flex items-center gap-2">
