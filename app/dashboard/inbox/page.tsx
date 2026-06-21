@@ -308,7 +308,7 @@ export default function InboxPage() {
         body: JSON.stringify({
           instance_id: selectedInstance.id,
           to: jidToPhone(selectedChat.remoteJid),
-          type, media: base64, fileName: file.name,
+          type, media: base64, fileName: file.name, mimetype: file.type,
         }),
       })
       loadMessages(selectedInstance, selectedChat, true)
