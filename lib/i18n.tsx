@@ -350,6 +350,19 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "ib.sendMsg": { ar: "إرسال الرسالة", en: "Send message" },
   "ib.attachFile": { ar: "إرفاق ملف", en: "Attach file" },
   "ib.refreshChats": { ar: "تحديث المحادثات", en: "Refresh chats" },
+  // Sidebar nav
+  "sb.overview": { ar: "نظرة عامة", en: "Overview" },
+  "sb.inbox": { ar: "صندوق الوارد", en: "Inbox" },
+  "sb.connections": { ar: "الاتصالات", en: "Connections" },
+  "sb.campaigns": { ar: "الحملات", en: "Campaigns" },
+  "sb.autoReply": { ar: "الرد التلقائي", en: "Auto Reply" },
+  "sb.webhooks": { ar: "Webhooks", en: "Webhooks" },
+  "sb.analytics": { ar: "التحليلات", en: "Analytics" },
+  "sb.settings": { ar: "الإعدادات", en: "Settings" },
+  "sb.pricing": { ar: "الأسعار", en: "Pricing" },
+  "sb.apiDocs": { ar: "دليل المطوّر", en: "API Docs" },
+  "sb.account": { ar: "الحساب", en: "Account" },
+  "sb.viewSettings": { ar: "عرض الإعدادات", en: "View settings" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
