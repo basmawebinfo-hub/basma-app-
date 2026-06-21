@@ -38,7 +38,16 @@ export default function LoginPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex relative">
+
+      {/* Back to website - clear button, top corner */}
+      <Link
+        href="/"
+        className="absolute top-5 end-5 z-30 inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border bg-card/80 backdrop-blur-sm text-sm font-medium text-foreground hover:bg-card hover:border-primary/40 transition-all shadow-sm"
+      >
+        <span aria-hidden>&larr;</span> {t("auth.back")}
+      </Link>
+
 
       {/* ── Left panel ── */}
       <div className="hidden lg:flex relative w-1/2 flex-col overflow-hidden bg-card border-e border-border">
@@ -73,9 +82,6 @@ export default function LoginPage() {
           </motion.div>
         </div>
 
-        <div className="relative z-10 p-10">
-          <Link href="/" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">&larr; {t("auth.back")}</Link>
-        </div>
       </div>
 
       {/* ── Right panel — form ── */}
@@ -114,9 +120,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-muted-foreground/40 mt-6 lg:hidden">
-            <Link href="/" className="hover:text-muted-foreground transition-colors">&larr; {t("auth.back")}</Link>
-          </p>
         </motion.div>
       </div>
     </div>
