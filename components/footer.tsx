@@ -15,9 +15,9 @@ export function Footer() {
       { key: "footer.contact", href: "#footer" },
     ]},
     { titleKey: "footer.legal", links: [
-      { key: "footer.privacy", href: "#" },
-      { key: "footer.terms", href: "#" },
-      { key: "footer.docs", href: "#" },
+      { key: "footer.privacy", href: "/privacy" },
+      { key: "footer.terms", href: "/terms" },
+      { key: "footer.docs", href: "/docs" },
     ]},
   ]
   return (
