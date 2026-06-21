@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Megaphone, Wifi, WifiOff, QrCode, RefreshCw, Instagram } from "lucide-react"
+import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Wifi, WifiOff, QrCode, RefreshCw, Instagram } from "lucide-react"
 import { TelegramLink } from "@/components/dashboard/telegram-link"
 
 interface Instance {
