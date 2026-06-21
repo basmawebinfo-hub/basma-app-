@@ -418,6 +418,19 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "sup.typeReply": { ar: "اكتب ردك...", en: "Type your reply..." },
   "sup.notDelivered": { ar: "تم الحفظ لكن لم يصل عبر تليجرام (تأكد من إعداد البوت).", en: "Saved but not delivered via Telegram (check bot setup)." },
   "sup.customer": { ar: "عميل", en: "Customer" },
+  // Admin users
+  "au.title": { ar: "إدارة المستخدمين", en: "User Management" },
+  "au.search": { ar: "ابحث بالبريد أو الاسم...", en: "Search by email or name..." },
+  "au.allStatuses": { ar: "كل الحالات", en: "All statuses" },
+  "au.active": { ar: "نشط", en: "Active" },
+  "au.pending": { ar: "قيد المراجعة", en: "Pending" },
+  "au.suspended": { ar: "موقوف", en: "Suspended" },
+  "au.colUser": { ar: "المستخدم", en: "User" },
+  "au.colStatus": { ar: "الحالة", en: "Status" },
+  "au.colPlan": { ar: "الباقة", en: "Plan" },
+  "au.colBalance": { ar: "الرصيد", en: "Balance" },
+  "au.colConn": { ar: "اتصالات", en: "Conn." },
+  "au.colMsgs": { ar: "رسائل (صادر/وارد)", en: "Msgs (out/in)" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
