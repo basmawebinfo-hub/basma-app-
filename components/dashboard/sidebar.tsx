@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, MessageSquare, Plug, Webhook, BarChart2, Settings, Menu, X, Megaphone, Bot, CreditCard, BookOpen, Instagram } from "lucide-react"
+import { LayoutDashboard, MessageSquare, Plug, Webhook, BarChart2, Settings, Menu, X, Megaphone, Bot, CreditCard, BookOpen } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,6 @@ const SIDEBAR_LINKS = [
   { icon: LayoutDashboard, label: "Overview",     href: "/dashboard" },
   { icon: MessageSquare,   label: "Inbox",        href: "/dashboard/inbox" },
   { icon: Plug,            label: "Connections",  href: "/dashboard/connect" },
-  { icon: Instagram, label: "Instagram", href: "/dashboard/instagram" },
   { icon: Megaphone,       label: "Campaigns",    href: "/dashboard/campaigns" },
   { icon: Bot,             label: "Auto Reply",   href: "/dashboard/auto-reply" },
   { icon: Webhook,         label: "Webhooks",     href: "/dashboard/webhooks" },
