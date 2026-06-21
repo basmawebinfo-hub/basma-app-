@@ -118,6 +118,26 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "hero.getStarted": { ar: "ابدأ مجاناً", en: "Get Started Free" },
   "hero.signin": { ar: "تسجيل الدخول", en: "Sign in" },
   "hero.integrates": { ar: "يتكامل مع أدواتك المفضّلة", en: "Integrates with your favorite tools" },
+  // Auth / Login
+  "auth.welcome": { ar: "أهلاً بعودتك", en: "Welcome back" },
+  "auth.noAccount": { ar: "ليس لديك حساب؟", en: "Don't have an account?" },
+  "auth.signupFree": { ar: "أنشئ حساباً مجاناً", en: "Sign up free" },
+  "auth.email": { ar: "البريد الإلكتروني", en: "Email address" },
+  "auth.password": { ar: "كلمة المرور", en: "Password" },
+  "auth.forgot": { ar: "نسيت كلمة المرور؟", en: "Forgot password?" },
+  "auth.signin": { ar: "تسجيل الدخول", en: "Sign in" },
+  "auth.signingin": { ar: "جارٍ تسجيل الدخول...", en: "Signing in..." },
+  "auth.back": { ar: "العودة للموقع", en: "Back to website" },
+  "auth.headline1": { ar: "أتمت أعمالك على واتساب", en: "Automate your business" },
+  "auth.headline2": { ar: "بدون أي كود", en: "with zero code" },
+  "auth.subtext": { ar: "Webhooks وصندوق وارد وأتمتة — كلها في مكان واحد.", en: "Webhooks, inbox, and automation — all in one place." },
+  "auth.statIntegrations": { ar: "تكامل", en: "Integrations" },
+  "auth.statUptime": { ar: "وقت تشغيل", en: "Uptime" },
+  "auth.statFree": { ar: "للبدء", en: "to start" },
+  "auth.b1": { ar: "تم تأكيد الطلب ✓", en: "Order confirmed ✓" },
+  "auth.b2": { ar: "عميل جديد من الموقع 🎯", en: "New lead from web 🎯" },
+  "auth.b3": { ar: "تم استلام الدفعة 💳", en: "Payment received 💳" },
+  "auth.b4": { ar: "تم إرسال Webhook ⚡", en: "Webhook sent ⚡" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
