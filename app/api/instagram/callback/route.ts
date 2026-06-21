@@ -12,8 +12,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(base + "?ig=error")
   }
 
-  const appId = process.env.META_APP_ID ?? ""
-  const appSecret = process.env.META_APP_SECRET ?? ""
+  const appId = process.env.INSTAGRAM_APP_ID ?? ""
+  const appSecret = process.env.INSTAGRAM_APP_SECRET ?? ""
   const redirectUri = "https://www.basmaweb.com/api/instagram/callback"
 
   try {
@@ -68,8 +68,15 @@ export async function GET(req: NextRequest) {
       connected_at: new Date().toISOString(),
     }, { onConflict: "ig_user_id" })
 
-    return NextResponse.redirect(base + "?ig=connected")
+    // close the popup and tell the opener it is connected
+    return new NextResponse(
+      "<html><body><script>if(window.opener){window.opener.postMessage('ig_connected','*');window.close();}else{window.location.href='" + base + "?ig=connected';}</script><p>Connected. You can close this window.</p></body></html>",
+      { status: 200, headers: { "Content-Type": "text/html" } }
+    )
   } catch {
-    return NextResponse.redirect(base + "?ig=error")
+    return new NextResponse(
+      "<html><body><script>if(window.opener){window.opener.postMessage('ig_error','*');window.close();}else{window.location.href='" + base + "?ig=error';}</script><p>Error.</p></body></html>",
+      { status: 200, headers: { "Content-Type": "text/html" } }
+    )
   }
 }
