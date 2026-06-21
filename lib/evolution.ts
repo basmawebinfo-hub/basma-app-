@@ -119,7 +119,8 @@ export async function sendMedia(
   mediatype: "image" | "video" | "document",
   media: string,            // URL or base64 string
   caption?: string,
-  fileName?: string
+  fileName?: string,
+  mimetype?: string         // required when media is base64
 ): Promise<unknown> {
   return evoFetch(`/message/sendMedia/${instanceName}`, {
     method: "POST",
@@ -127,6 +128,7 @@ export async function sendMedia(
       number: to,
       mediatype,
       media,
+      ...(mimetype ? { mimetype } : {}),
       ...(caption ? { caption } : {}),
       ...(fileName ? { fileName } : {}),
     }),
