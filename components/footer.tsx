@@ -10,7 +10,7 @@ export function Footer() {
       { key: "footer.pricing", href: "#pricing" },
     ]},
     { titleKey: "footer.company", links: [
-      { key: "footer.about", href: "#" },
+      { key: "footer.about", href: "#footer" },
       { key: "footer.faq", href: "#faq" },
       { key: "footer.contact", href: "#footer" },
     ]},
