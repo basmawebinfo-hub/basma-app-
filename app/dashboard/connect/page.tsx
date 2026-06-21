@@ -123,7 +123,7 @@ export default function ConnectPage() {
   if (view === "telegram") {
     return (
       <div className="p-8 max-w-2xl mx-auto">
-        <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> Back to channels</button>
+        <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> {t("cn.backChannels")}</button>
         <TelegramLink />
       </div>
     )
@@ -132,14 +132,14 @@ export default function ConnectPage() {
   // ===== WHATSAPP MANAGEMENT =====
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> Back to channels</button>
+      <button onClick={() => setView("channels")} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> {t("cn.backChannels")}</button>
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><MessageSquare className="w-6 h-6 text-green-500" /> WhatsApp Numbers</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><MessageSquare className="w-6 h-6 text-green-500" /> {t("cn.waNumbers")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{connectedCount} of {instances.length} connected</p>
         </div>
-        {!showWizard && <button onClick={() => setShowWizard(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"><Plus className="w-4 h-4" /> Add number</button>}
+        {!showWizard && <button onClick={() => setShowWizard(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"><Plus className="w-4 h-4" /> {t("cn.addNumber")}</button>}
       </div>
 
       {/* Wizard */}
@@ -168,8 +168,8 @@ export default function ConnectPage() {
               <div className="flex items-center justify-center min-h-[220px]">
                 {qrLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : qrError ? <p className="text-red-500 text-sm">{qrError}</p> : qrBase64 ? <img src={qrBase64.startsWith("data:") ? qrBase64 : "data:image/png;base64," + qrBase64} alt="QR" className="w-56 h-56 rounded-lg bg-white p-2" /> : <QrCode className="w-12 h-12 text-muted-foreground" />}
               </div>
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Waiting for scan...</div>
-              {newInstance && <button onClick={() => fetchQR(newInstance)} className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto"><RefreshCw className="w-3 h-3" /> Refresh QR</button>}
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> {t("cn.waitingScan")}</div>
+              {newInstance && <button onClick={() => fetchQR(newInstance)} className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto"><RefreshCw className="w-3 h-3" /> {t("cn.refreshQr")}</button>}
             </div>
           )}
           {step === 3 && (
