@@ -6,18 +6,19 @@ import { LayoutDashboard, MessageSquare, Plug, Webhook, BarChart2, Settings, Men
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/lib/i18n"
 
 const SIDEBAR_LINKS = [
-  { icon: LayoutDashboard, label: "Overview",     href: "/dashboard" },
-  { icon: MessageSquare,   label: "Inbox",        href: "/dashboard/inbox" },
-  { icon: Plug,            label: "Connections",  href: "/dashboard/connect" },
-  { icon: Megaphone,       label: "Campaigns",    href: "/dashboard/campaigns" },
-  { icon: Bot,             label: "Auto Reply",   href: "/dashboard/auto-reply" },
-  { icon: Webhook,         label: "Webhooks",     href: "/dashboard/webhooks" },
-  { icon: BarChart2,       label: "Analytics",    href: "/dashboard/analytics" },
-  { icon: Settings,        label: "Settings",     href: "/dashboard/settings" },
-  { icon: CreditCard,      label: "Pricing",      href: "/dashboard/pricing" },
-  { icon: BookOpen,        label: "API Docs",     href: "/dashboard/docs" },
+  { icon: LayoutDashboard, key: "sb.overview",    href: "/dashboard" },
+  { icon: MessageSquare,   key: "sb.inbox",       href: "/dashboard/inbox" },
+  { icon: Plug,            key: "sb.connections", href: "/dashboard/connect" },
+  { icon: Megaphone,       key: "sb.campaigns",   href: "/dashboard/campaigns" },
+  { icon: Bot,             key: "sb.autoReply",   href: "/dashboard/auto-reply" },
+  { icon: Webhook,         key: "sb.webhooks",    href: "/dashboard/webhooks" },
+  { icon: BarChart2,       key: "sb.analytics",   href: "/dashboard/analytics" },
+  { icon: Settings,        key: "sb.settings",    href: "/dashboard/settings" },
+  { icon: CreditCard,      key: "sb.pricing",     href: "/dashboard/pricing" },
+  { icon: BookOpen,        key: "sb.apiDocs",     href: "/dashboard/docs" },
 ]
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ interface SidebarProps {
 }
 
 export function DashboardSidebar({ userEmail }: SidebarProps) {
+  const { t } = useI18n()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -46,7 +48,7 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
             )}
           >
             <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-            {link.label}
+            {t(link.key)}
           </Link>
         )
       })}
@@ -63,8 +65,8 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
           {(userEmail ?? "?").slice(0, 2).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium truncate text-sidebar-foreground">{userEmail ?? "Account"}</p>
-          <p className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">View settings</p>
+          <p className="text-xs font-medium truncate text-sidebar-foreground">{userEmail ?? t("sb.account")}</p>
+          <p className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">{t("sb.viewSettings")}</p>
         </div>
         <Settings className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
       </Link>
