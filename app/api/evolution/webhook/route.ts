@@ -39,9 +39,49 @@ export async function POST(request: NextRequest) {
       const statusMap: Record<string, string> = {
         open: "CONNECTED", close: "DISCONNECTED", connecting: "CONNECTING",
       }
+      const newStatus = statusMap[state] ?? "DISCONNECTED"
+
+      // Fetch current state to detect a sudden CONNECTED -> DISCONNECTED drop (possible ban)
+      const { data: instRow } = await supabase.from("instances")
+        .select("id, user_id, status, created_at, instance_name").eq("instance_name", instanceName).maybeSingle()
+
       await supabase.from("instances")
-        .update({ status: statusMap[state] ?? "DISCONNECTED", updated_at: new Date().toISOString() })
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
         .eq("instance_name", instanceName)
+
+      // ── Ban detection: was CONNECTED, now dropped to close ──
+      if (instRow && instRow.status === "CONNECTED" && newStatus === "DISCONNECTED") {
+        const reason = data?.statusReason ?? data?.lastDisconnect?.error?.output?.statusCode
+        // 401/403/440 from WhatsApp usually means logged out / banned
+        const likelyBan = [401, 403, 440].includes(Number(reason))
+
+        // notify the user (telegram + in-app notification, best-effort)
+        try {
+          await supabase.from("notifications").insert({
+            user_id: instRow.user_id,
+            title: likelyBan ? "تحذير: رقم واتساب قد يكون محظوراً" : "تنبيه: انقطع اتصال رقم واتساب",
+            body: likelyBan
+              ? `الرقم "${instanceName}" انقطع فجأة بكود (${reason}) — قد يكون محظوراً أو تم تسجيل الخروج. راجع الرقم فوراً.`
+              : `الرقم "${instanceName}" انقطع. أعد ربطه من صفحة الاتصالات.`,
+            type: likelyBan ? "ban_warning" : "disconnect",
+          })
+        } catch { /* notifications table best-effort */ }
+
+        // telegram alert if linked
+        try {
+          const { data: prof } = await supabase.from("profiles").select("telegram_chat_id").eq("id", instRow.user_id).maybeSingle()
+          const token = process.env.TELEGRAM_BOT_TOKEN ?? ""
+          if (prof?.telegram_chat_id && token) {
+            const msg = likelyBan
+              ? `🚨 تحذير حظر محتمل!\nالرقم "${instanceName}" انقطع فجأة (كود ${reason}). قد يكون محظوراً.\nخفّف الإرسال وتجنّب الرسائل الجماعية.`
+              : `⚠️ انقطع اتصال الرقم "${instanceName}". أعد ربطه من المنصة.`
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ chat_id: prof.telegram_chat_id, text: msg }),
+            })
+          }
+        } catch { /* best-effort */ }
+      }
     }
 
     // QRCODE_UPDATED
