@@ -11,12 +11,14 @@ export default function PricingPage() {
   const [rate, setRate] = useState(50)
   const [loading, setLoading] = useState(true)
   const [requesting, setRequesting] = useState<string | null>(null)
+  const [sub, setSub] = useState<{ days_left: number | null; is_trial: boolean; plan: string | null } | null>(null)
 
   useEffect(() => {
     fetch("/api/pricing")
       .then((r) => r.json())
       .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50) })
       .finally(() => setLoading(false))
+    fetch("/api/my-subscription").then((r) => r.json()).then(setSub).catch(() => {})
   }, [])
 
   async function choose(planId: string, name: string) {
@@ -46,6 +48,18 @@ export default function PricingPage() {
         <p className="text-muted-foreground mt-2">{t("dp.subtitle")}</p>
         <p className="text-xs text-muted-foreground mt-1">{t("dp.rateNote")} (~{rate.toFixed(2)} EGP/USD).</p>
       </div>
+      {sub?.is_trial && sub?.days_left !== null && (
+        <div className={"max-w-md mx-auto mb-8 rounded-xl border px-5 py-4 text-center " + (sub.days_left > 0 ? "border-primary/30 bg-primary/10" : "border-red-500/30 bg-red-500/10")}>
+          {sub.days_left > 0 ? (
+            <p className="text-sm font-medium text-foreground">
+              {t("trial.banner")} — {t("trial.daysLeft")} <span className="text-primary font-bold text-base">{sub.days_left}</span> {sub.days_left === 1 ? t("trial.day") : t("trial.days")}
+            </p>
+          ) : (
+            <p className="text-sm font-medium text-red-500">{t("trial.expired")}</p>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {plans.filter((p) => p.name !== "مخصص" && p.name !== "Custom").map((p) => {
           const egp = Math.round(p.price_monthly * rate)
