@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Wifi, WifiOff, QrCode, RefreshCw, Instagram } from "lucide-react"
 import { TelegramLink } from "@/components/dashboard/telegram-link"
 import { useI18n } from "@/lib/i18n"
+import { SafetyTips } from "@/components/dashboard/safety-tips"
 
 interface Instance {
   id: string
@@ -141,6 +142,8 @@ export default function ConnectPage() {
         </div>
         {!showWizard && <button onClick={() => setShowWizard(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"><Plus className="w-4 h-4" /> {t("cn.addNumber")}</button>}
       </div>
+
+        <div className="mb-6"><SafetyTips compact /></div>
 
       {/* Wizard */}
       {showWizard && (
