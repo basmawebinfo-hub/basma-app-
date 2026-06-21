@@ -144,6 +144,27 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "forgot.sending": { ar: "جارٍ الإرسال...", en: "Sending..." },
   "forgot.sent": { ar: "تم! تفقّد بريدك الإلكتروني لرابط إعادة التعيين.", en: "Done! Check your email for the reset link." },
   "forgot.backLogin": { ar: "العودة لتسجيل الدخول", en: "Back to login" },
+  // Register
+  "reg.title": { ar: "أنشئ حسابك", en: "Create an account" },
+  "reg.haveAccount": { ar: "لديك حساب بالفعل؟", en: "Already have an account?" },
+  "reg.login": { ar: "تسجيل الدخول", en: "Log in" },
+  "reg.firstName": { ar: "الاسم الأول", en: "First name" },
+  "reg.lastName": { ar: "اسم العائلة", en: "Last name" },
+  "reg.whatsapp": { ar: "رقم واتساب (لنتواصل معك)", en: "WhatsApp number (so we can contact you)" },
+  "reg.confirmPassword": { ar: "تأكيد كلمة المرور", en: "Confirm password" },
+  "reg.passwordHint": { ar: "8 أحرف على الأقل", en: "Min. 8 characters" },
+  "reg.agree": { ar: "أوافق على", en: "I agree to the" },
+  "reg.terms": { ar: "الشروط والأحكام", en: "Terms & Conditions" },
+  "reg.create": { ar: "إنشاء الحساب", en: "Create account" },
+  "reg.creating": { ar: "جارٍ إنشاء الحساب...", en: "Creating account..." },
+  "reg.agreeError": { ar: "يرجى الموافقة على الشروط والأحكام للمتابعة.", en: "Please agree to the Terms & Conditions to continue." },
+  "reg.pwShort": { ar: "كلمة المرور يجب أن تكون 8 أحرف على الأقل.", en: "Password must be at least 8 characters." },
+  "reg.pwMismatch": { ar: "كلمتا المرور غير متطابقتين.", en: "Passwords do not match." },
+  "reg.successTitle": { ar: "حسابك قيد المراجعة", en: "Account under review" },
+  "reg.successDesc": { ar: "شكراً لتسجيلك! حسابك قيد المراجعة ويتم تأكيد الدفع. سيتواصل معك فريقنا على واتساب قريباً لتفعيل حسابك.", en: "Thanks for signing up! Your account is being reviewed and payment confirmed. Our team will contact you on WhatsApp shortly to activate your account." },
+  "reg.f1": { ar: "مجاني للبدء — بدون بطاقة ائتمان", en: "Free to start — no credit card" },
+  "reg.f2": { ar: "اربط في أقل من 30 ثانية", en: "Connect in under 30 seconds" },
+  "reg.f3": { ar: "+200 وجهة تكامل", en: "200+ integration destinations" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
