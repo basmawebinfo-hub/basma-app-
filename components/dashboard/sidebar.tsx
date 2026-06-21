@@ -56,19 +56,14 @@ export function DashboardSidebar({ userEmail }: SidebarProps) {
   )
 
   const SidebarFooter = () => (
-    <div className="p-3 border-t border-border">
+    <div className="p-3 border-t border-border flex justify-center">
       <Link
         href="/dashboard/settings"
-        className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group"
+        title={t("sb.viewSettings")}
+        aria-label={t("sb.viewSettings")}
+        className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold hover:bg-primary/25 transition-colors"
       >
-        <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-          {(userEmail ?? "?").slice(0, 2).toUpperCase()}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium truncate text-sidebar-foreground">{userEmail ?? t("sb.account")}</p>
-          <p className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">{t("sb.viewSettings")}</p>
-        </div>
-        <Settings className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
+        {(userEmail ?? "?").slice(0, 2).toUpperCase()}
       </Link>
     </div>
   )
