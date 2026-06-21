@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -122,6 +123,7 @@ function jidToPhone(jid: string): string {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function InboxPage() {
+  const { t } = useI18n()
   const [instances, setInstances] = useState<Instance[]>([])
   const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
   const [chats, setChats] = useState<EvoChat[]>([])
@@ -266,9 +268,9 @@ export default function InboxPage() {
           <MessageSquare className="w-8 h-8 text-muted-foreground/50" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-foreground">No WhatsApp connections yet</h2>
+          <h2 className="text-base font-semibold text-foreground">{t("ib.noConn")}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Go to <a href="/dashboard/connect" className="text-primary underline">Connections</a> to link a WhatsApp number first.
+            Go to <a href="/dashboard/connect" className="text-primary underline">{t("ib.connections")}</a> to link a WhatsApp number first.
           </p>
         </div>
       </div>
@@ -283,7 +285,7 @@ export default function InboxPage() {
         {/* Header + instance selector */}
         <div className="p-4 border-b border-border space-y-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-base font-semibold text-foreground">Inbox</h1>
+            <h1 className="text-base font-semibold text-foreground">{t("ib.title")}</h1>
             {instances.length > 1 && (
               <select
                 className="text-xs bg-muted/30 border border-border rounded-md px-2 py-1 text-foreground"
@@ -301,7 +303,7 @@ export default function InboxPage() {
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Refresh chats"
+              aria-label=t("ib.refreshChats")
               onClick={() => selectedInstance && loadChats(selectedInstance)}
               disabled={loadingChats}
             >
@@ -311,7 +313,7 @@ export default function InboxPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
-              placeholder="Search chats..."
+              placeholder=t("ib.searchChats")
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-8 h-8 text-sm bg-muted/30"
@@ -328,7 +330,7 @@ export default function InboxPage() {
           ) : error ? (
             <p className="text-xs text-destructive p-4">{error}</p>
           ) : filteredChats.length === 0 ? (
-            <p className="text-xs text-muted-foreground p-4">No chats found</p>
+            <p className="text-xs text-muted-foreground p-4">{t("ib.noChats")}</p>
           ) : (
             filteredChats.map((chat) => {
               const name = chat.pushName ?? chat.name ?? jidToPhone(chat.remoteJid)
@@ -401,7 +403,7 @@ export default function InboxPage() {
                   <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                 </div>
               ) : messages.length === 0 ? (
-                <p className="text-center text-xs text-muted-foreground pt-10">No messages yet</p>
+                <p className="text-center text-xs text-muted-foreground pt-10">{t("ib.noMsg")}</p>
               ) : (
                 messages.map((msg, i) => (
                   <div
@@ -431,11 +433,11 @@ export default function InboxPage() {
             {/* Input */}
             <div className="px-6 py-4 border-t border-border bg-card/30">
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon-sm" aria-label="Attach file">
+                <Button variant="ghost" size="icon-sm" aria-label=t("ib.attachFile")>
                   <Paperclip className="w-4 h-4" />
                 </Button>
                 <Input
-                  placeholder="Type a message..."
+                  placeholder=t("ib.typeMsg")
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
@@ -445,7 +447,7 @@ export default function InboxPage() {
                 <Button
                   size="icon-sm"
                   onClick={handleSend}
-                  aria-label="Send message"
+                  aria-label=t("ib.sendMsg")
                   disabled={!input.trim() || sending}
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
