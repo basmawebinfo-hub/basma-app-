@@ -416,7 +416,7 @@ export default function InboxPage() {
                         ? "bg-green-600 text-white rounded-br-sm"
                         : "bg-card border border-border text-foreground rounded-bl-sm"
                     )}>
-                      {renderMessageBody(msg)}
+                      <MediaMessage msg={msg} instanceId={selectedInstance ?? ""} />
                       <p className={cn(
                         "text-[10px] mt-1 text-right",
                         msg.key.fromMe ? "text-white/70" : "text-muted-foreground"
