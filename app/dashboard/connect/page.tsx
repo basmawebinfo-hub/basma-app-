@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Check, Trash2, Loader2, Plus, ArrowLeft, MessageSquare, Send, Wifi, WifiOff, QrCode, RefreshCw, Instagram } from "lucide-react"
 import { TelegramLink } from "@/components/dashboard/telegram-link"
+import { useI18n } from "@/lib/i18n"
 
 interface Instance {
   id: string
@@ -18,6 +19,7 @@ type View = "channels" | "whatsapp" | "telegram"
 type Step = 1 | 2 | 3
 
 export default function ConnectPage() {
+  const { t } = useI18n()
   const router = useRouter()
   const [view, setView] = useState<View>("channels")
   const [instances, setInstances] = useState<Instance[]>([])
@@ -82,7 +84,7 @@ export default function ConnectPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this WhatsApp connection?")) return
+    if (!confirm(t("cn.deleteConfirm"))) return
     await fetch("/api/instances?id=" + id, { method: "DELETE" })
     setInstances((prev) => prev.filter((i) => i.id !== id))
   }
@@ -94,14 +96,14 @@ export default function ConnectPage() {
   // ===== CHANNELS OVERVIEW =====
   if (view === "channels") {
     const channels = [
-      { key: "whatsapp", name: "WhatsApp", desc: "Connect your WhatsApp numbers for messaging & automation", icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
-      { key: "telegram", name: "Telegram", desc: "Link Telegram to receive alerts & talk to support", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: "Link your Telegram", onClick: () => setView("telegram") },
-      { key: "instagram", name: "Instagram", desc: "Auto-reply to comments & DMs with keyword automation", icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: false, status: "Coming soon", onClick: () => {} },
+      { key: "whatsapp", name: t("cn.whatsapp"), desc: t("cn.whatsappDesc"), icon: MessageSquare, color: "text-green-500", bg: "bg-green-500/10", active: true, status: instances.length ? `${connectedCount}/${instances.length} connected` : "Not connected", onClick: () => setView("whatsapp") },
+      { key: "telegram", name: t("cn.telegram"), desc: t("cn.telegramDesc"), icon: Send, color: "text-blue-500", bg: "bg-blue-500/10", active: true, status: t("cn.telegramAction"), onClick: () => setView("telegram") },
+      { key: "instagram", name: "Instagram", desc: t("cn.igDesc"), icon: Instagram, color: "text-pink-500", bg: "bg-pink-500/10", active: false, status: t("cn.comingSoon"), onClick: () => {} },
     ]
     return (
       <div className="p-8 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-1">Connections</h1>
-        <p className="text-sm text-muted-foreground mb-6">Connect and manage all your channels in one place.</p>
+        <h1 className="text-2xl font-bold mb-1">{t("cn.title")}</h1>
+        <p className="text-sm text-muted-foreground mb-6">{t("cn.subtitle")}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {channels.map((c) => (
             <button key={c.key} onClick={c.onClick} disabled={!c.active}
@@ -149,12 +151,12 @@ export default function ConnectPage() {
                 <div key={n} className={"w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold " + (step >= n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>{step > n ? <Check className="w-4 h-4" /> : n}</div>
               ))}
             </div>
-            <button onClick={resetWizard} className="text-xs text-muted-foreground hover:text-foreground">Cancel</button>
+            <button onClick={resetWizard} className="text-xs text-muted-foreground hover:text-foreground">{t("cn.cancel")}</button>
           </div>
 
           {step === 1 && (
             <div className="space-y-3">
-              <label className="text-sm font-medium">Name this number (e.g. Sales, Support)</label>
+              <label className="text-sm font-medium"></label>
               <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Sales Line" className="w-full px-3 py-2 rounded-lg bg-muted/30 border border-border text-sm" />
               {createError && <p className="text-xs text-red-500">{createError}</p>}
               <button onClick={handleCreate} disabled={creating || !displayName.trim()} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">{creating ? "Creating..." : "Next: Get QR Code"}</button>
@@ -173,8 +175,8 @@ export default function ConnectPage() {
           {step === 3 && (
             <div className="text-center space-y-3 py-4">
               <div className="w-14 h-14 rounded-full bg-green-500/15 flex items-center justify-center mx-auto"><Check className="w-7 h-7 text-green-500" /></div>
-              <h3 className="font-semibold">Connected successfully!</h3>
-              <button onClick={resetWizard} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Done</button>
+              <h3 className="font-semibold">{t("cn.connectedOk")}</h3>
+              <button onClick={resetWizard} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">{t("cn.done")}</button>
             </div>
           )}
         </div>
@@ -184,7 +186,7 @@ export default function ConnectPage() {
       {loadingInstances ? (
         <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin" /></div>
       ) : instances.length === 0 && !showWizard ? (
-        <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground text-sm">No WhatsApp numbers yet. Click "Add number" to connect one.</div>
+        <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground text-sm">{t("cn.noNumbers")}</div>
       ) : (
         <div className="space-y-2">
           {instances.map((inst) => (
