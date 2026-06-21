@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,15 +41,15 @@ interface DeliveryLog {
 
 const EVENTS = [
   // Core messaging events (most automations only need these)
-  { key: "MESSAGE_RECEIVED", label: "New incoming message" },
-  { key: "SEND_MESSAGE", label: "Outgoing message sent" },
-  { key: "MESSAGE_UPDATE", label: "Message status (delivered/read)" },
+  { key: "MESSAGE_RECEIVED", label: t("wh.evMsgRecv") },
+  { key: "SEND_MESSAGE", label: t("wh.evMsgSent") },
+  { key: "MESSAGE_UPDATE", label: t("wh.evMsgStatus") },
   // Connection & contacts
-  { key: "CONNECTION_UPDATE", label: "Connection status changed" },
-  { key: "CONTACTS_UPSERT", label: "New / updated contact" },
-  { key: "CHATS_UPSERT", label: "New / updated chat" },
+  { key: "CONNECTION_UPDATE", label: t("wh.evConn") },
+  { key: "CONTACTS_UPSERT", label: t("wh.evContact") },
+  { key: "CHATS_UPSERT", label: t("wh.evChat") },
   // Calls
-  { key: "CALL", label: "Incoming call" },
+  { key: "CALL", label: t("wh.evCall") },
 ]
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
@@ -69,6 +70,7 @@ const EMPTY_FORM = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function WebhooksPage() {
+  const { t } = useI18n()
   const [configs, setConfigs] = useState<WebhookConfig[]>([])
   const [logs, setLogs] = useState<DeliveryLog[]>([])
   const [loadingConfigs, setLoadingConfigs] = useState(true)
@@ -131,7 +133,7 @@ export default function WebhooksPage() {
         body: JSON.stringify(body),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? "Failed to save")
+      if (!res.ok) throw new Error(data.error ?? t("wh.saveFail"))
       setConfigs((prev) => [data, ...prev])
       setForm(EMPTY_FORM)
       setSelectedEvents(["MESSAGE_RECEIVED"])
@@ -177,14 +179,14 @@ export default function WebhooksPage() {
   return (
     <div className="p-6 space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Webhooks</h1>
-        <p className="text-sm text-muted-foreground mt-1">Configure where WhatsApp events are delivered</p>
+        <h1 className="text-2xl font-bold text-foreground">{t("wh.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("wh.subtitle")}</p>
       </div>
 
       {/* ─── Existing configs ─────────────────────────────────────────────────── */}
       {!loadingConfigs && configs.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Active Configs</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("wh.activeConfigs")}</h2>
           <div className="space-y-2">
             {configs.map((cfg) => (
               <div
@@ -195,7 +197,7 @@ export default function WebhooksPage() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-foreground">{cfg.name}</p>
                     <Badge variant="outline" className="text-[10px] uppercase">{cfg.destination_type}</Badge>
-                    {!cfg.is_active && <Badge variant="secondary" className="text-[10px]">Paused</Badge>}
+                    {!cfg.is_active && <Badge variant="secondary" className="text-[10px]">{t("wh.paused")}</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
                     {cfg.destination_url ?? cfg.destination_email ?? "—"}
@@ -207,7 +209,7 @@ export default function WebhooksPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => handleToggle(cfg.id, cfg.is_active)}
-                    aria-label={cfg.is_active ? "Pause" : "Resume"}
+                    aria-label={cfg.is_active ? "Pause" : t("wh.resume")}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {cfg.is_active
@@ -220,7 +222,7 @@ export default function WebhooksPage() {
                       <Send className="w-3.5 h-3.5" />
                     </Button>
                   )}
-                  <Button variant="ghost" size="icon-sm" aria-label="Delete" onClick={() => handleDelete(cfg.id)}>
+                  <Button variant="ghost" size="icon-sm" aria-label=t("wh.delete") onClick={() => handleDelete(cfg.id)}>
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                   </Button>
                 </div>
@@ -248,13 +250,13 @@ export default function WebhooksPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Destination type</Label>
+            <Label>{t("wh.destType")}</Label>
             <Select
               value={form.destination_type}
               onValueChange={(v) => setForm((p) => ({ ...p, destination_type: v }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select type..." />
+                <SelectValue placeholder=t("wh.selectType") />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="URL">URL</SelectItem>
@@ -267,7 +269,7 @@ export default function WebhooksPage() {
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="dest-url">{!destIsUrl ? "Email address" : "Destination URL"}</Label>
+            <Label htmlFor="dest-url">{!destIsUrl ? t("wh.emailAddr") : t("wh.destUrl")}</Label>
             <Input
               id="dest-url"
               placeholder={
@@ -288,7 +290,7 @@ export default function WebhooksPage() {
           </div>
 
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="secret">Signing secret (optional)</Label>
+            <Label htmlFor="secret">{t("wh.signingSecret")}</Label>
             <div className="relative">
               <Input
                 id="secret"
@@ -302,7 +304,7 @@ export default function WebhooksPage() {
                 type="button"
                 onClick={() => setShowSecret((v) => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                aria-label={showSecret ? "Hide secret" : "Show secret"}
+                aria-label={showSecret ? t("wh.hideSecret") : t("wh.showSecret")}
               >
                 {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -313,9 +315,9 @@ export default function WebhooksPage() {
         {/* Events */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Events to subscribe</Label>
+            <Label>{t("wh.events")}</Label>
             <button onClick={toggleAll} className="text-xs text-primary hover:underline">
-              {selectedEvents.length === EVENTS.length ? "Deselect all" : "Select all"}
+              {selectedEvents.length === EVENTS.length ? t("wh.deselectAll") : t("wh.selectAll")}
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -345,14 +347,14 @@ export default function WebhooksPage() {
           onClick={handleSave}
           disabled={!form.name || !form.destination_type || selectedEvents.length === 0 || saving}
         >
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : "Save Config"}
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : t("wh.saveConfig")}
         </Button>
       </div>
 
       {/* ─── Delivery log ─────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">Delivery Log</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("wh.deliveryLog")}</h2>
         </div>
         <div className="overflow-x-auto">
           {loadingLogs ? (
@@ -360,12 +362,12 @@ export default function WebhooksPage() {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
           ) : logs.length === 0 ? (
-            <p className="text-xs text-muted-foreground px-6 py-8">No delivery logs yet.</p>
+            <p className="text-xs text-muted-foreground px-6 py-8">{t("wh.noLogs")}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {["Event", "Destination", "Status", "Sent At", "Code", "Attempts"].map((h) => (
+                  {["Event", t("wh.colDest"), "Status", t("wh.colSentAt"), "Code", t("wh.colAttempts")].map((h) => (
                     <th key={h} className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">{h}</th>
                   ))}
                 </tr>
