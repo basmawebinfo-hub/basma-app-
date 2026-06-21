@@ -12,9 +12,23 @@ export async function GET(req: NextRequest) {
   if (chatId) {
     const { data: msgs } = await db.from("support_messages")
       .select("direction, body, created_at").eq("chat_id", chatId).order("created_at", { ascending: true })
-    // mark incoming as read
     await db.from("support_messages").update({ read_by_admin: true }).eq("chat_id", chatId).eq("direction", "in")
-    return NextResponse.json({ messages: msgs ?? [] })
+
+    // resolve customer name + avatar for the header (by user_id OR telegram_chat_id)
+    let customer: { name: string; email: string | null; avatar_url: string | null } | null = null
+    const { data: anyMsg } = await db.from("support_messages").select("user_id").eq("chat_id", chatId).not("user_id", "is", null).limit(1).maybeSingle()
+    let prof = null
+    if (anyMsg?.user_id) {
+      const { data } = await db.from("profiles").select("full_name, email, avatar_url").eq("id", anyMsg.user_id).maybeSingle()
+      prof = data
+    }
+    if (!prof) {
+      const { data } = await db.from("profiles").select("full_name, email, avatar_url").eq("telegram_chat_id", chatId).maybeSingle()
+      prof = data
+    }
+    if (prof) customer = { name: prof.full_name || prof.email || "Customer", email: prof.email, avatar_url: prof.avatar_url }
+
+    return NextResponse.json({ messages: msgs ?? [], customer })
   }
 
   // conversations: latest message per chat_id + customer name + unread count
@@ -25,20 +39,35 @@ export async function GET(req: NextRequest) {
   const convos = new Map<string, { chat_id: string; user_id: string | null; last_body: string; last_at: string; unread: number }>()
   for (const m of (all ?? []) as { chat_id: string; user_id: string | null; direction: string; body: string; read_by_admin: boolean; created_at: string }[]) {
     if (!convos.has(m.chat_id)) convos.set(m.chat_id, { chat_id: m.chat_id, user_id: m.user_id, last_body: m.body, last_at: m.created_at, unread: 0 })
+    // keep the first non-null user_id we see for this chat
+    if (m.user_id && !convos.get(m.chat_id)!.user_id) convos.get(m.chat_id)!.user_id = m.user_id
     if (m.direction === "in" && !m.read_by_admin) convos.get(m.chat_id)!.unread++
   }
-  // attach customer names
+
   const list = Array.from(convos.values())
+  // resolve names + avatars: by user_id first, then by telegram_chat_id fallback
   const uids = list.map((c) => c.user_id).filter(Boolean) as string[]
-  const names = new Map<string, string>()
+  const chatIds = list.map((c) => c.chat_id)
+  const byId = new Map<string, { name: string; avatar: string | null }>()
+  const byTg = new Map<string, { name: string; avatar: string | null }>()
   if (uids.length) {
-    const { data: profs } = await db.from("profiles").select("id, full_name, email").in("id", uids)
-    for (const p of (profs ?? []) as { id: string; full_name: string; email: string }[]) names.set(p.id, p.full_name || p.email)
+    const { data: profs } = await db.from("profiles").select("id, full_name, email, avatar_url").in("id", uids)
+    for (const p of (profs ?? []) as { id: string; full_name: string; email: string; avatar_url: string | null }[]) byId.set(p.id, { name: p.full_name || p.email, avatar: p.avatar_url })
   }
-  return NextResponse.json({ conversations: list.map((c) => ({ ...c, name: c.user_id ? (names.get(c.user_id) ?? "Customer") : "Unknown" })) })
+  if (chatIds.length) {
+    const { data: profs2 } = await db.from("profiles").select("telegram_chat_id, full_name, email, avatar_url").in("telegram_chat_id", chatIds)
+    for (const p of (profs2 ?? []) as { telegram_chat_id: string; full_name: string; email: string; avatar_url: string | null }[]) byTg.set(String(p.telegram_chat_id), { name: p.full_name || p.email, avatar: p.avatar_url })
+  }
+
+  return NextResponse.json({
+    conversations: list.map((c) => {
+      const resolved = (c.user_id && byId.get(c.user_id)) || byTg.get(String(c.chat_id)) || null
+      return { ...c, name: resolved?.name ?? "Customer", avatar_url: resolved?.avatar ?? null }
+    }),
+  })
 }
 
-// POST /api/admin/support  { chat_id, body }  -> admin replies to customer via Telegram
+// POST /api/admin/support  { chat_id, body }
 export async function POST(req: NextRequest) {
   const gate = await requireAdmin()
   if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status })
