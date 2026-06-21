@@ -1,10 +1,12 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Send, Check, Loader2, Copy } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 interface TgStatus { linked: boolean; linked_at: string | null }
 
 export function TelegramLink() {
+  const { t } = useI18n()
   const [status, setStatus] = useState<TgStatus | null>(null)
   const [code, setCode] = useState<string | null>(null)
   const [botLink, setBotLink] = useState<string | null>(null)
@@ -31,7 +33,7 @@ export function TelegramLink() {
     <section>
       <div className="flex items-center gap-2 mb-1">
         <Send className="w-4 h-4 text-primary" />
-        <h2 className="text-base font-semibold">Telegram Notifications</h2>
+        <h2 className="text-base font-semibold">{t("tl.title")}</h2>
       </div>
       <p className="text-sm text-muted-foreground mb-4">Link your Telegram to receive alerts (subscription reminders, admin messages).</p>
 
@@ -40,8 +42,8 @@ export function TelegramLink() {
           <div className="flex items-center gap-3 mb-3">
             <Check className="w-5 h-5 text-green-600" />
             <div>
-              <div className="text-sm font-medium">Telegram connected</div>
-              <div className="text-xs text-muted-foreground">You receive all alerts on Telegram.</div>
+              <div className="text-sm font-medium">{t("tl.connected")}</div>
+              <div className="text-xs text-muted-foreground">{t("tl.desc")}</div>
             </div>
           </div>
           <button
@@ -70,7 +72,7 @@ export function TelegramLink() {
                   {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
-              {botLink && <a href={botLink} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Open Telegram bot</a>}
+              {botLink && <a href={botLink} target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium">{t("tl.openBot")}</a>}
               <p className="text-xs text-muted-foreground">2. After sending the code, your Telegram will be linked automatically.</p>
               <button onClick={load} className="text-xs text-primary hover:underline">I have sent it — refresh status</button>
             </div>
