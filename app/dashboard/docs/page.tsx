@@ -126,6 +126,58 @@ Content-Type: application/json
 }`}</Code>
       </Section>
 
+      <Section icon={Send} title="8. Location, Contact, Poll & Sticker">
+        <p>Same <code>/api/send</code> endpoint, just change <code>type</code>:</p>
+        <Code>{`// Location
+{ "to": "201234567890", "type": "location", "latitude": 30.0444, "longitude": 31.2357, "name": "Cairo", "address": "Egypt" }
+
+// Contact card
+{ "to": "201234567890", "type": "contact", "contact": { "fullName": "Ahmed Ali", "phoneNumber": "201112223334" } }
+
+// Poll
+{ "to": "201234567890", "type": "poll", "question": "Pick a time", "options": ["9 AM", "2 PM", "6 PM"], "selectableCount": 1 }
+
+// Sticker (.webp)
+{ "to": "201234567890", "type": "sticker", "media": "https://example.com/sticker.webp" }`}</Code>
+      </Section>
+
+      <Section icon={ArrowRight} title="9. Quality: typing indicator & read receipts">
+        <p>Make your bot feel human. Show "typing…" before replying, and mark messages as read (blue ticks).</p>
+        <Code>{`// Show "typing…" for ~1.2s
+POST https://www.basmaweb.com/api/presence
+{ "to": "201234567890", "presence": "composing", "delay": 1200 }
+
+// Mark a message as read (blue ticks)
+POST https://www.basmaweb.com/api/mark-read
+{ "remote_jid": "201234567890@s.whatsapp.net", "message_id": "ABC123" }`}</Code>
+        <p className="text-xs">Presence values: <code>composing</code> (typing), <code>recording</code> (voice), <code>available</code> (online), <code>paused</code>.</p>
+      </Section>
+
+      <Section icon={Webhook} title="10. Groups">
+        <Code>{`// Create a group
+POST https://www.basmaweb.com/api/groups
+{ "subject": "My Team", "participants": ["201112223334", "201556667778"] }
+
+// List all groups
+GET https://www.basmaweb.com/api/groups
+
+// Add / remove / promote / demote members
+POST https://www.basmaweb.com/api/groups/participants
+{ "group_jid": "12036...@g.us", "action": "add", "participants": ["201112223334"] }
+
+// Send to a group with @mentions
+POST https://www.basmaweb.com/api/send
+{ "to": "12036...@g.us", "text": "Hello @everyone", "mentions": ["201112223334"] }`}</Code>
+      </Section>
+
+      <Section icon={KeyRound} title="11. Contacts">
+        <Code>{`// List all contacts
+GET https://www.basmaweb.com/api/contacts
+
+// Get one contact's picture + WhatsApp status
+GET https://www.basmaweb.com/api/contacts?number=201112223334`}</Code>
+      </Section>
+
       <Section icon={ArrowRight} title={t("doc.s7")}>
         <Code>{`200  Success
 401  Missing or invalid API key
