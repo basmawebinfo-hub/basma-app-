@@ -431,6 +431,39 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "au.colBalance": { ar: "الرصيد", en: "Balance" },
   "au.colConn": { ar: "اتصالات", en: "Conn." },
   "au.colMsgs": { ar: "رسائل (صادر/وارد)", en: "Msgs (out/in)" },
+  // Admin instances
+  "ai.title": { ar: "الاتصالات", en: "Connections" },
+  "ai.name": { ar: "الاسم", en: "Name" },
+  "ai.owner": { ar: "المالك", en: "Owner" },
+  "ai.status": { ar: "الحالة", en: "Status" },
+  "ai.created": { ar: "تاريخ الإنشاء", en: "Created" },
+  "ai.action": { ar: "إجراء", en: "Action" },
+  // Admin billing
+  "ab.balances": { ar: "أرصدة المستخدمين", en: "User Balances" },
+  "ab.recentTx": { ar: "أحدث المعاملات", en: "Recent Transactions" },
+  "ab.user": { ar: "المستخدم", en: "User" },
+  "ab.amount": { ar: "المبلغ", en: "Amount" },
+  "ab.type": { ar: "النوع", en: "Type" },
+  "ab.reason": { ar: "السبب", en: "Reason" },
+  "ab.date": { ar: "التاريخ", en: "Date" },
+  // Admin logs
+  "al.title": { ar: "سجل نشاط المشرفين", en: "Admin Activity Log" },
+  "al.none": { ar: "لا يوجد نشاط بعد", en: "No activity yet" },
+  "al.admin": { ar: "المشرف", en: "Admin" },
+  "al.action": { ar: "الإجراء", en: "Action" },
+  "al.target": { ar: "الهدف", en: "Target" },
+  "al.time": { ar: "الوقت", en: "Time" },
+  // Admin admins
+  "am.title": { ar: "إدارة المشرفين", en: "Admin Management" },
+  "am.superOnly": { ar: "هذه الصفحة للمشرف الأعلى فقط.", en: "This page is for the super admin only." },
+  "am.createTitle": { ar: "إنشاء مشرف جديد", en: "Create New Admin" },
+  "am.create": { ar: "إنشاء", en: "Create" },
+  "am.user": { ar: "المستخدم", en: "User" },
+  "am.role": { ar: "الدور", en: "Role" },
+  "am.action": { ar: "إجراء", en: "Action" },
+  "am.name": { ar: "الاسم", en: "Name" },
+  "am.email": { ar: "البريد الإلكتروني", en: "Email" },
+  "am.password": { ar: "كلمة المرور", en: "Password" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
