@@ -76,3 +76,32 @@ export function breakDuration(): number {
 export function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms))
 }
+
+
+// ── 8. Warmup gate (server-side enforcement) ──────────────────────────────────
+// Checks how many messages an instance already sent TODAY and whether sending
+// one more would exceed its warmup limit (based on the instance's age).
+// Returns { allowed, limit, sentToday, ageDays }.
+import { createClient as createSvc } from "@supabase/supabase-js"
+
+function svc() {
+  return createSvc(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+}
+
+export async function checkWarmupGate(instanceId: string, instanceCreatedAt: string): Promise<{
+  allowed: boolean; limit: number; sentToday: number; ageDays: number
+}> {
+  const ageDays = Math.floor((Date.now() - new Date(instanceCreatedAt).getTime()) / (1000 * 60 * 60 * 24))
+  const limit = warmupDailyLimit(ageDays)
+
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0)
+  const db = svc()
+  const { count } = await db.from("messages")
+    .select("id", { count: "exact", head: true })
+    .eq("instance_id", instanceId)
+    .eq("from_me", true)
+    .gte("timestamp", dayStart.toISOString())
+
+  const sentToday = count ?? 0
+  return { allowed: sentToday < limit, limit, sentToday, ageDays }
+}
