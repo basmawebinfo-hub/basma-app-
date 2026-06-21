@@ -210,6 +210,25 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "an.byHour": { ar: "الرسائل حسب الساعة", en: "Messages by Hour" },
   "an.types": { ar: "أنواع الرسائل", en: "Message Types" },
   "an.topContacts": { ar: "أهم جهات الاتصال", en: "Top Contacts" },
+  // Dashboard pricing
+  "dp.title": { ar: "الباقات والأسعار", en: "Plans & Pricing" },
+  "dp.subtitle": { ar: "رسائل غير محدودة في كل الباقات المدفوعة. ادفع حسب عدد أرقام واتساب.", en: "Unlimited messages on all paid plans. Pay by number of WhatsApp connections." },
+  "dp.rateNote": { ar: "الأسعار بالدولار. تدفع ما يعادلها بالجنيه بسعر اليوم", en: "Prices in USD. You pay the equivalent in EGP at today's rate" },
+  "dp.month": { ar: "/شهرياً", en: "/month" },
+  "dp.egpMonth": { ar: "جنيه/شهر", en: "EGP / month" },
+  "dp.number": { ar: "رقم واتساب", en: "WhatsApp number" },
+  "dp.numbers": { ar: "أرقام واتساب", en: "WhatsApp numbers" },
+  "dp.unlimited": { ar: "رسائل غير محدودة", en: "Unlimited messages" },
+  "dp.msgsMo": { ar: "رسالة/شهر", en: "messages/mo" },
+  "dp.feat3": { ar: "Webhooks وواجهة أتمتة", en: "Webhooks & automation API" },
+  "dp.feat4": { ar: "صندوق وارد وتحليلات", en: "Inbox & analytics" },
+  "dp.current": { ar: "الحالية / تجريبي", en: "Current / Trial" },
+  "dp.sending": { ar: "جارٍ الإرسال...", en: "Sending..." },
+  "dp.choose": { ar: "اختر الباقة", en: "Choose plan" },
+  "dp.customTitle": { ar: "تحتاج باقة مخصصة؟", en: "Need a custom plan?" },
+  "dp.customDesc": { ar: "لأكثر من 25 رقماً، تواصل معنا لسعر مخصص.", en: "For more than 25 numbers, contact us for custom pricing." },
+  "dp.reqSent": { ar: "تم إرسال طلبك. سيتواصل معك فريقنا على واتساب لتأكيد الدفع والتفعيل.", en: "Your request was sent. Our team will contact you on WhatsApp to confirm payment and activate it." },
+  "dp.reqError": { ar: "حدث خطأ. حاول مرة أخرى.", en: "Something went wrong. Please try again." },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
