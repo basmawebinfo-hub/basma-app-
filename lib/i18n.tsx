@@ -411,6 +411,13 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "adm.navLogs": { ar: "سجل النشاط", en: "Activity Log" },
   "adm.navAdmins": { ar: "المشرفون", en: "Admins" },
   "adm.signout": { ar: "تسجيل الخروج", en: "Sign out" },
+  // Admin support
+  "sup.title": { ar: "دردشة الدعم", en: "Support Chat" },
+  "sup.noConvos": { ar: "لا توجد محادثات بعد", en: "No conversations yet" },
+  "sup.selectConvo": { ar: "اختر محادثة", en: "Select a conversation" },
+  "sup.typeReply": { ar: "اكتب ردك...", en: "Type your reply..." },
+  "sup.notDelivered": { ar: "تم الحفظ لكن لم يصل عبر تليجرام (تأكد من إعداد البوت).", en: "Saved but not delivered via Telegram (check bot setup)." },
+  "sup.customer": { ar: "عميل", en: "Customer" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
