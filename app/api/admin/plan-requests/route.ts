@@ -26,7 +26,13 @@ export async function GET() {
     for (const p of (plans ?? []) as { id: string; name: string; price_monthly: number }[]) planById.set(p.id, { name: p.name, price_monthly: p.price_monthly })
   }
 
+  // users whose balance ran out and need to renew
+  const { data: renewals } = await db.from("profiles")
+    .select("id, email, full_name, balance, status")
+    .eq("status", "needs_renewal")
+
   return NextResponse.json({
+    renewals: (renewals ?? []).map((u) => ({ id: u.id, email: u.email, name: u.full_name, balance: u.balance })),
     requests: list.map((r) => ({
       id: r.id,
       status: r.status,
