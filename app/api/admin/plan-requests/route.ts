@@ -45,19 +45,22 @@ export async function GET() {
     }
   }
   const activeSubscribers = (activeSubs ?? []).map((s) => {
-    const end = s.current_period_end ? new Date(s.current_period_end).getTime() : null
-    const daysLeft = end ? Math.max(0, Math.ceil((end - Date.now()) / 86400000)) : null
+    // start date = period start, else creation date
+    const startDate = s.current_period_start ?? s.created_at ?? null
+    // end date = period end, else start + 30 days (so days-left is always shown)
+    let endTime: number | null = s.current_period_end ? new Date(s.current_period_end).getTime() : null
+    if (!endTime && startDate) endTime = new Date(startDate).getTime() + 30 * 86400000
+    const endIso = endTime ? new Date(endTime).toISOString() : null
+    const daysLeft = endTime ? Math.max(0, Math.ceil((endTime - Date.now()) / 86400000)) : null
     const pr = activeProfById.get(s.user_id)
     const price = planPriceById.get(s.plan_id) ?? 0
     const bal = Number(pr?.balance ?? 0)
-    // per-day value of the wallet over a 30-day cycle (professional display)
     const perDay = Math.round((bal / 30) * 100) / 100
-    const startDate = s.current_period_start ?? s.created_at ?? null
     return {
       user_id: s.user_id, email: pr?.email ?? null, name: pr?.full_name ?? null,
       balance: bal, plan_name: planNameById.get(s.plan_id) ?? null, plan_price: price,
       days_left: daysLeft, per_day: perDay,
-      start_date: startDate, end_date: s.current_period_end ?? null,
+      start_date: startDate, end_date: endIso,
     }
   })
 
