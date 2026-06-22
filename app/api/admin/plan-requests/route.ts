@@ -26,13 +26,17 @@ export async function GET() {
     for (const p of (plans ?? []) as { id: string; name: string; price_monthly: number }[]) planById.set(p.id, { name: p.name, price_monthly: p.price_monthly })
   }
 
-  // users whose balance ran out and need to renew
-  const { data: renewals } = await db.from("profiles")
-    .select("id, email, full_name, balance, status")
-    .eq("status", "needs_renewal")
+  // users whose subscription is past_due (balance ran out) and need to renew
+  const { data: pastDue } = await db.from("subscriptions").select("user_id").eq("status", "past_due")
+  const pdIds = [...new Set((pastDue ?? []).map((s) => s.user_id))]
+  let renewalProfiles: { id: string; email: string; full_name: string | null; balance: number | null }[] = []
+  if (pdIds.length) {
+    const { data: rp } = await db.from("profiles").select("id, email, full_name, balance").in("id", pdIds)
+    renewalProfiles = (rp ?? []) as typeof renewalProfiles
+  }
 
   return NextResponse.json({
-    renewals: (renewals ?? []).map((u) => ({ id: u.id, email: u.email, name: u.full_name, balance: u.balance })),
+    renewals: renewalProfiles.map((u) => ({ id: u.id, email: u.email, name: u.full_name, balance: u.balance })),
     requests: list.map((r) => ({
       id: r.id,
       status: r.status,
