@@ -4,6 +4,7 @@ import { Loader2, Check, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 interface Renewal { id: string; email: string | null; name: string | null; balance: number | null }
+interface ActiveSub { user_id: string; email: string | null; name: string | null; balance: number | null; plan_name: string | null; days_left: number | null }
 interface Req {
   id: string; status: string; created_at: string
   email: string | null; name: string | null
@@ -14,10 +15,11 @@ export default function PlanRequestsPage() {
   const { t } = useI18n()
   const [reqs, setReqs] = useState<Req[]>([])
   const [renewals, setRenewals] = useState<Renewal[]>([])
+  const [activeSubs, setActiveSubs] = useState<ActiveSub[]>([])
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState<string | null>(null)
 
-  const load = () => fetch("/api/admin/plan-requests").then((r) => r.json()).then((d) => { setReqs(d.requests ?? []); setRenewals(d.renewals ?? []) }).finally(() => setLoading(false))
+  const load = () => fetch("/api/admin/plan-requests").then((r) => r.json()).then((d) => { setReqs(d.requests ?? []); setRenewals(d.renewals ?? []); setActiveSubs(d.active_subscribers ?? []) }).finally(() => setLoading(false))
   useEffect(() => { load() }, [])
 
   async function act(id: string, action: "approve" | "reject") {
@@ -42,6 +44,26 @@ export default function PlanRequestsPage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">{t("apr.title")}</h1>
+
+      {activeSubs.length > 0 && (
+        <div className="mb-8 rounded-xl border border-border bg-card/30 p-5">
+          <h2 className="text-sm font-semibold mb-3">{t("apr.active")} ({activeSubs.length})</h2>
+          <div className="space-y-2">
+            {activeSubs.map((u) => (
+              <div key={u.user_id} className="flex items-center justify-between text-sm border-b border-border/30 pb-2">
+                <div>
+                  <span className="font-medium">{u.name || u.email}</span>
+                  <span className="text-xs text-muted-foreground ms-2">{u.plan_name}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">${Number(u.balance ?? 0).toFixed(2)}</span>
+                  <span className={"text-xs font-medium " + ((u.days_left ?? 99) <= 5 ? "text-red-500" : "text-primary")}>{u.days_left ?? "—"} {t("apr.daysLeft")}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {renewals.length > 0 && (
         <div className="mb-8 rounded-xl border border-red-500/30 bg-red-500/5 p-5">
