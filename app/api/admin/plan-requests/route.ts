@@ -28,22 +28,36 @@ export async function GET() {
   }
 
   // active subscriptions: compute days left per user
-  const { data: activeSubs } = await db.from("subscriptions").select("user_id, plan_id, current_period_end").eq("status", "active")
+  const { data: activeSubs } = await db.from("subscriptions").select("user_id, plan_id, current_period_start, current_period_end, created_at").eq("status", "active")
   const activeUserIds = [...new Set((activeSubs ?? []).map((s) => s.user_id))]
   const activeProfById = new Map<string, { email: string; full_name: string | null; balance: number | null }>()
   const planNameById = new Map<string, string>()
+  const planPriceById = new Map<string, number>()
   if (activeUserIds.length) {
     const { data: aprofs } = await db.from("profiles").select("id, email, full_name, balance").in("id", activeUserIds)
     for (const p of (aprofs ?? []) as { id: string; email: string; full_name: string | null; balance: number | null }[]) activeProfById.set(p.id, { email: p.email, full_name: p.full_name, balance: p.balance })
     const aPlanIds = [...new Set((activeSubs ?? []).map((s) => s.plan_id))]
-    const { data: aplans } = await db.from("plans").select("id, name").in("id", aPlanIds)
-    for (const p of (aplans ?? []) as { id: string; name: string }[]) planNameById.set(p.id, p.name)
+    const { data: aplans } = await db.from("plans").select("id, name, price_monthly").in("id", aPlanIds)
+    for (const p of (aplans ?? []) as { id: string; name: string; price_monthly: number }[]) {
+      planNameById.set(p.id, p.name)
+      planPriceById.set(p.id, p.price_monthly)
+    }
   }
   const activeSubscribers = (activeSubs ?? []).map((s) => {
     const end = s.current_period_end ? new Date(s.current_period_end).getTime() : null
     const daysLeft = end ? Math.max(0, Math.ceil((end - Date.now()) / 86400000)) : null
     const pr = activeProfById.get(s.user_id)
-    return { user_id: s.user_id, email: pr?.email ?? null, name: pr?.full_name ?? null, balance: pr?.balance ?? null, plan_name: planNameById.get(s.plan_id) ?? null, days_left: daysLeft }
+    const price = planPriceById.get(s.plan_id) ?? 0
+    const bal = Number(pr?.balance ?? 0)
+    // per-day value of the wallet over a 30-day cycle (professional display)
+    const perDay = Math.round((bal / 30) * 100) / 100
+    const startDate = s.current_period_start ?? s.created_at ?? null
+    return {
+      user_id: s.user_id, email: pr?.email ?? null, name: pr?.full_name ?? null,
+      balance: bal, plan_name: planNameById.get(s.plan_id) ?? null, plan_price: price,
+      days_left: daysLeft, per_day: perDay,
+      start_date: startDate, end_date: s.current_period_end ?? null,
+    }
   })
 
   // users whose subscription is past_due (balance ran out) and need to renew
