@@ -31,12 +31,12 @@ export async function GET() {
   // active subscriptions: compute days left per user
   const { data: activeSubs } = await db.from("subscriptions").select("user_id, plan_id, current_period_start, current_period_end, created_at").eq("status", "active")
   const activeUserIds = [...new Set((activeSubs ?? []).map((s) => s.user_id))]
-  const activeProfById = new Map<string, { email: string; full_name: string | null; balance: number | null }>()
+  const activeProfById = new Map<string, { email: string; full_name: string | null; balance: number | null; role: string | null }>()
   const planNameById = new Map<string, string>()
   const planPriceById = new Map<string, number>()
   if (activeUserIds.length) {
-    const { data: aprofs } = await db.from("profiles").select("id, email, full_name, balance").in("id", activeUserIds)
-    for (const p of (aprofs ?? []) as { id: string; email: string; full_name: string | null; balance: number | null }[]) activeProfById.set(p.id, { email: p.email, full_name: p.full_name, balance: p.balance })
+    const { data: aprofs } = await db.from("profiles").select("id, email, full_name, balance, role").in("id", activeUserIds)
+    for (const p of (aprofs ?? []) as { id: string; email: string; full_name: string | null; balance: number | null; role: string | null }[]) activeProfById.set(p.id, { email: p.email, full_name: p.full_name, balance: p.balance, role: p.role })
     const aPlanIds = [...new Set((activeSubs ?? []).map((s) => s.plan_id))]
     const { data: aplans } = await db.from("plans").select("id, name, price_monthly").in("id", aPlanIds)
     for (const p of (aplans ?? []) as { id: string; name: string; price_monthly: number }[]) {
@@ -61,8 +61,9 @@ export async function GET() {
       balance: bal, plan_name: planNameById.get(s.plan_id) ?? null, plan_price: price,
       days_left: daysLeft, per_day: perDay,
       start_date: startDate, end_date: endIso,
+      _role: pr?.role ?? null,
     }
-  })
+  }).filter((s) => s._role !== "admin" && s._role !== "super_admin")
 
   // users whose subscription is past_due (balance ran out) and need to renew
   const { data: pastDue } = await db.from("subscriptions").select("user_id").eq("status", "past_due")
