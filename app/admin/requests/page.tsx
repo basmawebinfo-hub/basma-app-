@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { Loader2, Check, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
+interface Renewal { id: string; email: string | null; name: string | null; balance: number | null }
 interface Req {
   id: string; status: string; created_at: string
   email: string | null; name: string | null
@@ -12,10 +13,11 @@ interface Req {
 export default function PlanRequestsPage() {
   const { t } = useI18n()
   const [reqs, setReqs] = useState<Req[]>([])
+  const [renewals, setRenewals] = useState<Renewal[]>([])
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState<string | null>(null)
 
-  const load = () => fetch("/api/admin/plan-requests").then((r) => r.json()).then((d) => setReqs(d.requests ?? [])).finally(() => setLoading(false))
+  const load = () => fetch("/api/admin/plan-requests").then((r) => r.json()).then((d) => { setReqs(d.requests ?? []); setRenewals(d.renewals ?? []) }).finally(() => setLoading(false))
   useEffect(() => { load() }, [])
 
   async function act(id: string, action: "approve" | "reject") {
@@ -40,6 +42,23 @@ export default function PlanRequestsPage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">{t("apr.title")}</h1>
+
+      {renewals.length > 0 && (
+        <div className="mb-8 rounded-xl border border-red-500/30 bg-red-500/5 p-5">
+          <h2 className="text-sm font-semibold text-red-500 mb-3">{t("apr.renewals")} ({renewals.length})</h2>
+          <div className="space-y-2">
+            {renewals.map((u) => (
+              <div key={u.id} className="flex items-center justify-between text-sm border-b border-border/30 pb-2">
+                <div>
+                  <span className="font-medium">{u.name || u.email}</span>
+                  {u.name && u.email && <span className="text-xs text-muted-foreground ms-2">{u.email}</span>}
+                </div>
+                <span className="text-red-500 font-medium">{t("apr.balance")}: ${Number(u.balance ?? 0).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {reqs.length === 0 ? (
         <div className="rounded-xl border border-border p-8 text-center text-muted-foreground text-sm">{t("apr.none")}</div>
       ) : (
