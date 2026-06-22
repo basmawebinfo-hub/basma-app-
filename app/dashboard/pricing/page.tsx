@@ -12,6 +12,7 @@ export default function PricingPage() {
   const [rates, setRates] = useState<Record<string, number>>({ USD: 1, EGP: 50 })
   const [currencies, setCurrencies] = useState<string[]>(["USD", "EGP"])
   const [currency, setCurrency] = useState("EGP")
+  const [supportLink, setSupportLink] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [requesting, setRequesting] = useState<string | null>(null)
   const [sub, setSub] = useState<{ days_left: number | null; is_trial: boolean; plan: string | null } | null>(null)
@@ -19,7 +20,7 @@ export default function PricingPage() {
   useEffect(() => {
     fetch("/api/pricing")
       .then((r) => r.json())
-      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50); setRates(d.rates ?? { USD: 1, EGP: 50 }); setCurrencies(d.currencies ?? ["USD", "EGP"]) })
+      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50); setRates(d.rates ?? { USD: 1, EGP: 50 }); setCurrencies(d.currencies ?? ["USD", "EGP"]); setSupportLink(d.support_telegram ?? null) })
       .finally(() => setLoading(false))
     fetch("/api/my-subscription").then((r) => r.json()).then(setSub).catch(() => {})
   }, [])
@@ -104,9 +105,20 @@ export default function PricingPage() {
           )
         })}
       </div>
-      <div className="mt-8 text-center rounded-xl border border-border bg-card/30 p-6">
-        <h3 className="font-semibold">{t("dp.customTitle")}</h3>
-        <p className="text-sm text-muted-foreground mt-1">{t("dp.customDesc")}</p>
+      <div className="mt-6 rounded-2xl border-2 border-primary/40 bg-primary/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-center sm:text-start">
+          <h3 className="text-lg font-bold">{t("dp.customPlanTitle")}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{t("dp.customPlanDesc")}</p>
+          <p className="text-sm font-semibold text-primary mt-2">{t("dp.customPrice")}</p>
+        </div>
+        <a
+          href={supportLink ?? "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={"shrink-0 px-6 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition " + (supportLink ? "" : "opacity-50 pointer-events-none")}
+        >
+          {t("dp.customBtn")}
+        </a>
       </div>
     </div>
   )
