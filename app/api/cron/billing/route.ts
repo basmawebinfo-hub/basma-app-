@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
       // not enough balance -> suspend numbers + notify
       await db.from("instances").update({ status: "DISCONNECTED" }).eq("user_id", sub.user_id)
       await db.from("subscriptions").update({ status: "past_due" }).eq("user_id", sub.user_id)
-      await db.from("profiles").update({ status: "needs_renewal" }).eq("id", sub.user_id)
+      // note: we track "needs renewal" via subscriptions.status = past_due
+      // (profiles.status has a CHECK constraint allowing only active/suspended/pending)
       suspended++
 
       // in-app notification
