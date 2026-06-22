@@ -510,6 +510,10 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "dp.customPlanDesc": { ar: "أكثر من 25 رقم؟ تواصل معنا لباقة مفصّلة على احتياجك.", en: "More than 25 numbers? Contact us for a tailored plan." },
   "dp.customPrice": { ar: "حسب احتياجك", en: "Tailored" },
   "dp.customBtn": { ar: "تواصل عبر تليجرام", en: "Contact on Telegram" },
+  // Renewals
+  "apr.renewals": { ar: "مستخدمون يحتاجون تجديد الرصيد", en: "Users needing renewal" },
+  "apr.balance": { ar: "الرصيد", en: "Balance" },
+  "apr.noRenewals": { ar: "لا يوجد مستخدمون يحتاجون تجديد", en: "No users need renewal" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
