@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   // Enforce account status + per-plan instance limit (from subscriptions)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("status")
+    .select("status, balance")
     .eq("id", user.id)
     .single()
 
@@ -62,8 +62,27 @@ export async function POST(req: NextRequest) {
   const maxInstances = plan.max_instances ?? 1
   if ((currentCount ?? 0) >= maxInstances) {
     return NextResponse.json(
-      { error: `You reached your plan limit (${maxInstances} numbers). Upgrade to add more.` },
+      { error: `وصلت إلى حد باقتك (${maxInstances} رقم). جدّد أو رقِّ باقتك لإضافة المزيد.` },
       { status: 403 }
+    )
+  }
+
+  // ── Balance gate: each number costs (plan price / number of numbers) per month ──
+  const costPerNumber = maxInstances > 0 && plan.max_instances ? 0 : 0
+  // resolve plan price for cost-per-number
+  let pricePerNumber = 0
+  if (plan.plan_id) {
+    const { data: planRow } = await supabase.from("plans").select("price_monthly, max_instances").eq("id", plan.plan_id).maybeSingle()
+    if (planRow && planRow.max_instances > 0) {
+      pricePerNumber = Number(planRow.price_monthly) / Number(planRow.max_instances)
+    }
+  }
+  const balance = Number(profile?.balance ?? 0)
+  // free/trial plans (price 0) skip the balance gate
+  if (pricePerNumber > 0 && balance < pricePerNumber) {
+    return NextResponse.json(
+      { error: `رصيدك غير كافٍ لإضافة رقم جديد. تكلفة الرقم $${pricePerNumber.toFixed(2)}/شهر ورصيدك $${balance.toFixed(2)}. يرجى تجديد الرصيد.`, need_topup: true },
+      { status: 402 }
     )
   }
 
@@ -72,6 +91,11 @@ export async function POST(req: NextRequest) {
 
   // 1. Create instance in Evolution API
   await createInstance(instance_name)
+
+  // Deduct the per-number monthly cost from the user's balance
+  if (pricePerNumber > 0) {
+    await supabase.from("profiles").update({ balance: Math.round((balance - pricePerNumber) * 100) / 100 }).eq("id", user.id)
+  }
 
   // 2. Auto-set webhook in Evolution API — user never needs to touch Evolution API
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.basmaweb.com"
