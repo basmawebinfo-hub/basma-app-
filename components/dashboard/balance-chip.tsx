@@ -5,7 +5,7 @@ import { Wallet, Sparkles, AlertTriangle } from "lucide-react"
 export function BalanceChip() {
   const [data, setData] = useState<{
     balance: number; plan: string | null; days_left: number | null
-    is_trial: boolean; past_due: boolean; max_instances: number | null; numbers_used: number
+    is_trial: boolean; past_due: boolean; max_instances: number | null; numbers_used: number; role: string
   } | null>(null)
 
   useEffect(() => {
@@ -13,13 +13,15 @@ export function BalanceChip() {
       setData({
         balance: d.balance ?? 0, plan: d.plan ?? null, days_left: d.days_left ?? null,
         is_trial: !!d.is_trial, past_due: !!d.past_due,
-        max_instances: d.max_instances ?? null, numbers_used: d.numbers_used ?? 0,
+        max_instances: d.max_instances ?? null, numbers_used: d.numbers_used ?? 0, role: d.role ?? "user",
       })
     }).catch(() => {})
     load(); const t = setInterval(load, 30000); return () => clearInterval(t)
   }, [])
 
   if (!data) return null
+  // Admins/owners are not subscribers — hide the billing chip for them
+  if (data.role === "admin" || data.role === "super_admin") return null
   const low = data.days_left !== null && data.days_left <= 5
 
   // Past due -> renewal warning
