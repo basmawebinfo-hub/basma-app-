@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, balance, status, created_at")
+    .select("plan, balance, status, created_at, role")
     .eq("id", user.id)
     .maybeSingle()
 
@@ -59,6 +59,7 @@ export async function GET() {
     past_due: pastDue,
     balance: profile.balance ?? 0,
     status: profile.status ?? null,
+    role: profile.role ?? "user",
     max_instances: maxInstances,
     numbers_used: numbersUsed ?? 0,
   })
