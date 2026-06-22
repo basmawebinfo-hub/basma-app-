@@ -72,6 +72,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Account suspended" }, { status: 403, headers: CORS })
   }
 
+  // ── Block sending when subscription is past_due (balance ran out, needs renewal) ──
+  const { data: subRow } = await db.from("subscriptions").select("status").eq("user_id", keyRow.user_id).maybeSingle()
+  if (subRow?.status === "past_due") {
+    return NextResponse.json({ error: "اشتراكك يحتاج تجديد. يرجى تجديد رصيدك لإعادة التفعيل.", needs_renewal: true }, { status: 402, headers: CORS })
+  }
+
   // Count outgoing messages this calendar month (limit from real plan; 0 = unlimited)
   const plan = await getUserPlan(keyRow.user_id)
   const maxMessages = plan.max_messages_mo ?? 0
