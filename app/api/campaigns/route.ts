@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
   }))
 
   await supabase.from("campaign_contacts").insert(contactRows)
+  await notifyUser(user.id, "تم إنشاء حملة جديدة", `تم إنشاء الحملة "${campaign?.name ?? ""}" بنجاح وهي جاهزة للتشغيل.`, "\ud83d\udce2")
   return NextResponse.json(campaign)
 }
 
