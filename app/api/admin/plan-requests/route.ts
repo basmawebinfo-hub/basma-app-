@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin, adminService } from "@/lib/admin"
+import { getQRCode } from "@/lib/evolution"
 
 // GET /api/admin/plan-requests — list subscription requests
 export async function GET() {
@@ -100,8 +101,12 @@ export async function POST(req: NextRequest) {
     if (subErr) return NextResponse.json({ error: "Failed to activate subscription: " + subErr.message }, { status: 400 })
 
     // Reactivate the user's numbers that were suspended for non-payment.
-    // We flip them back to CONNECTING so the platform reconnects them (Evolution
-    // session is preserved — no QR rescan needed unless the session truly expired).
+    // Call Evolution /instance/connect for each — if the WhatsApp session is still
+    // alive it reconnects with NO QR rescan; the connection webhook flips it to CONNECTED.
+    const { data: downInsts } = await db.from("instances").select("instance_name").eq("user_id", reqRow.user_id).eq("status", "DISCONNECTED")
+    for (const di of (downInsts ?? []) as { instance_name: string }[]) {
+      try { await getQRCode(di.instance_name) } catch { /* will need manual QR if session expired */ }
+    }
     await db.from("instances").update({ status: "CONNECTING" }).eq("user_id", reqRow.user_id).eq("status", "DISCONNECTED")
     // grant balance = plan price, set limits, activate
     if (plan) {
