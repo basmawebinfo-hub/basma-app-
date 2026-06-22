@@ -488,6 +488,9 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "mcp.s2": { ar: "2. الإعداد عبر n8n", en: "2. Setup via n8n" },
   "mcp.s2d": { ar: "أضف عقدة HTTP Request في n8n تستدعي endpoint بصمة، واربطها بوكيل الذكاء الاصطناعي بتاعك.", en: "Add an HTTP Request node in n8n that calls the BASMA endpoint, and wire it to your AI agent." },
   "mcp.s3": { ar: "3. أداة جاهزة للوكيل", en: "3. Ready tool definition" },
+  // Currency selector
+  "dp.currency": { ar: "اعرض الأسعار بـ", en: "Show prices in" },
+  "dp.payNote": { ar: "ستدفع ما يعادل المبلغ بعملتك بسعر اليوم", en: "You'll pay the equivalent in your currency at today's rate" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
