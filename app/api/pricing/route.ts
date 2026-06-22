@@ -26,10 +26,14 @@ export async function GET() {
     }
   } catch { /* keep fallback */ }
 
+  const botUser = process.env.TELEGRAM_BOT_USERNAME ?? ""
+  const supportLink = botUser ? `https://t.me/${botUser}?start=custom_plan` : null
+
   return NextResponse.json({
     plans: plans ?? [],
     usd_to_egp: rates.EGP,   // kept for backward compatibility
     rates,
     currencies: SUPPORTED,
+    support_telegram: supportLink,
   })
 }
