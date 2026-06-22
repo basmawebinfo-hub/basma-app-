@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import crypto from "crypto"
@@ -42,6 +43,7 @@ export async function POST() {
   )
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  await notifyUser(user.id, "تم توليد مفتاح API جديد", "تم توليد مفتاح API جديد لحسابك. إذا لم تقم بذلك، تواصل مع الدعم فوراً.", "\ud83d\udd11")
   return NextResponse.json({ key, prefix, message: "Copy this key now — it will not be shown again." })
 }
 
