@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Balance gate: each number costs (plan price / number of numbers) per month ──
-  const costPerNumber = maxInstances > 0 && plan.max_instances ? 0 : 0
   // resolve plan price for cost-per-number
   let pricePerNumber = 0
   if (plan.plan_id) {
