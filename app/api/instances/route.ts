@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 import { createInstance, deleteInstance, setInstanceWebhook } from "@/lib/evolution"
 import { getUserPlan } from "@/lib/plan"
@@ -27,6 +28,10 @@ export async function GET() {
     .order("created_at", { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Confirm to the user that the number was added (Telegram + in-app)
+  await notifyUser(user.id, "تمت إضافة رقم جديد", `تمت إضافة الرقم "${display_name}" بنجاح. امسح رمز QR من واتساب لإكمال الربط.`, "\ud83d\udcf1")
+
   return NextResponse.json(data)
 }
 
@@ -115,6 +120,10 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Confirm to the user that the number was added (Telegram + in-app)
+  await notifyUser(user.id, "تمت إضافة رقم جديد", `تمت إضافة الرقم "${display_name}" بنجاح. امسح رمز QR من واتساب لإكمال الربط.`, "\ud83d\udcf1")
+
   return NextResponse.json(data)
 }
 
@@ -129,7 +138,7 @@ export async function DELETE(req: NextRequest) {
 
   const { data: inst } = await supabase
     .from("instances")
-    .select("instance_name")
+    .select("instance_name, display_name")
     .eq("id", id)
     .eq("user_id", user.id)
     .single()
@@ -139,5 +148,9 @@ export async function DELETE(req: NextRequest) {
   try { await deleteInstance(inst.instance_name) } catch {}
 
   await supabase.from("instances").delete().eq("id", id)
+
+  // Confirm the deletion to the user
+  await notifyUser(user.id, "تم حذف الرقم", `تم حذف الرقم "${inst.display_name || ""}" من حسابك بنجاح.`, "\ud83d\uddd1\ufe0f")
+
   return NextResponse.json({ ok: true })
 }
