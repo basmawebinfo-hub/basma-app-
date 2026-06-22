@@ -38,6 +38,19 @@ export async function POST(req: NextRequest) {
   const text = (msg?.text ?? "").trim()
   if (!chatId || !text) return NextResponse.json({ ok: true })
 
+  // ===== Custom plan request (from pricing page "Contact on Telegram") =====
+  if (text.startsWith("/start") && text.includes("custom_plan")) {
+    // put the chat into support mode and notify admin via support inbox
+    await svc.from("telegram_chat_state").upsert({ chat_id: chatId, support_mode: true }, { onConflict: "chat_id" })
+    const { data: linkedUser } = await svc.from("profiles").select("id").eq("telegram_chat_id", chatId).maybeSingle()
+    await svc.from("support_messages").insert({
+      user_id: linkedUser?.id ?? null, chat_id: chatId, direction: "in",
+      body: "🟢 طلب باقة مخصصة — العميل يريد باقة بأكثر من 25 رقم.", read_by_admin: false,
+    })
+    await sendTelegram(chatId, "أهلاً بك 👋 لطلب باقة مخصصة (أكثر من 25 رقم)، اكتب احتياجك (عدد الأرقام المطلوب) وسيتواصل معك فريقنا في أقرب وقت.", EXIT_BTN)
+    return NextResponse.json({ ok: true })
+  }
+
   const match = text.match(/BSM-[A-F0-9]{6}/i)
   const code = match ? match[0].toUpperCase() : null
 
