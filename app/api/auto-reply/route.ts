@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  await notifyUser(user.id, "تم تحديث الرد التلقائي", "تم حفظ إعدادات الرد التلقائي بنجاح.", "\ud83e\udd16")
   return NextResponse.json(data)
 }
 
