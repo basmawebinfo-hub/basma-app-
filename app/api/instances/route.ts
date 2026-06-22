@@ -68,8 +68,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Subscription is a fixed monthly plan — adding a number is free while under the
-  // count limit. We only block if the account is past_due / needs renewal.
-  if (profile?.status === "needs_renewal") {
+  // count limit. We only block if the subscription is past_due (needs renewal).
+  const { data: subStatus } = await supabase.from("subscriptions").select("status").eq("user_id", user.id).maybeSingle()
+  if (subStatus?.status === "past_due") {
     return NextResponse.json(
       { error: "اشتراكك يحتاج تجديد. يرجى تجديد الرصيد لإعادة تفعيل أرقامك.", need_topup: true },
       { status: 402 }
