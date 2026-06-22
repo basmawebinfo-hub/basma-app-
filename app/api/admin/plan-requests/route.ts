@@ -26,6 +26,25 @@ export async function GET() {
     for (const p of (plans ?? []) as { id: string; name: string; price_monthly: number }[]) planById.set(p.id, { name: p.name, price_monthly: p.price_monthly })
   }
 
+  // active subscriptions: compute days left per user
+  const { data: activeSubs } = await db.from("subscriptions").select("user_id, plan_id, current_period_end").eq("status", "active")
+  const activeUserIds = [...new Set((activeSubs ?? []).map((s) => s.user_id))]
+  const activeProfById = new Map<string, { email: string; full_name: string | null; balance: number | null }>()
+  const planNameById = new Map<string, string>()
+  if (activeUserIds.length) {
+    const { data: aprofs } = await db.from("profiles").select("id, email, full_name, balance").in("id", activeUserIds)
+    for (const p of (aprofs ?? []) as { id: string; email: string; full_name: string | null; balance: number | null }[]) activeProfById.set(p.id, { email: p.email, full_name: p.full_name, balance: p.balance })
+    const aPlanIds = [...new Set((activeSubs ?? []).map((s) => s.plan_id))]
+    const { data: aplans } = await db.from("plans").select("id, name").in("id", aPlanIds)
+    for (const p of (aplans ?? []) as { id: string; name: string }[]) planNameById.set(p.id, p.name)
+  }
+  const activeSubscribers = (activeSubs ?? []).map((s) => {
+    const end = s.current_period_end ? new Date(s.current_period_end).getTime() : null
+    const daysLeft = end ? Math.max(0, Math.ceil((end - Date.now()) / 86400000)) : null
+    const pr = activeProfById.get(s.user_id)
+    return { user_id: s.user_id, email: pr?.email ?? null, name: pr?.full_name ?? null, balance: pr?.balance ?? null, plan_name: planNameById.get(s.plan_id) ?? null, days_left: daysLeft }
+  }).filter((s) => (planNameById.get("") , true))
+
   // users whose subscription is past_due (balance ran out) and need to renew
   const { data: pastDue } = await db.from("subscriptions").select("user_id").eq("status", "past_due")
   const pdIds = [...new Set((pastDue ?? []).map((s) => s.user_id))]
@@ -37,6 +56,7 @@ export async function GET() {
 
   return NextResponse.json({
     renewals: renewalProfiles.map((u) => ({ id: u.id, email: u.email, name: u.full_name, balance: u.balance })),
+    active_subscribers: activeSubscribers,
     requests: list.map((r) => ({
       id: r.id,
       status: r.status,
