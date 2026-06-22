@@ -25,6 +25,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     case "approve": {
       const status = action === "suspend" ? "suspended" : "active"
       await db.from("profiles").update({ status, updated_at: new Date().toISOString() }).eq("id", targetUserId)
+      // notify the user (in-app + Telegram)
+      const sTitle = action === "suspend" ? "تم إيقاف حسابك" : "تم تفعيل حسابك"
+      const sBody = action === "suspend"
+        ? "تم إيقاف حسابك مؤقتاً. للاستفسار أو إعادة التفعيل، يرجى التواصل مع الدعم."
+        : "تم إعادة تفعيل حسابك. يمكنك الآن استخدام جميع الخدمات."
+      await db.from("notifications").insert({ user_id: targetUserId, title: sTitle, body: sBody, level: action === "suspend" ? "warning" : "info", created_by: gate.userId })
+      if (profile.telegram_chat_id) {
+        const icon = action === "suspend" ? "\u26d4" : "\u2705"
+        await sendTelegram(profile.telegram_chat_id, `${icon} <b>${sTitle}</b>\n${sBody}`)
+      }
       await logAdminAction(gate.userId, action, "user", targetUserId, { status })
       return NextResponse.json({ ok: true, status })
     }
@@ -119,6 +129,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // ── Delete user (and cascade their data) ──
     case "delete": {
+      // notify the user before deletion (Telegram)
+      if (profile.telegram_chat_id) {
+        await sendTelegram(profile.telegram_chat_id, "\u26a0\ufe0f <b>تم حذف حسابك</b>\nتم حذف حسابك من منصة بصمة. إذا كان هذا عن طريق الخطأ، يرجى التواصل مع الدعم.")
+      }
       // delete auth user (cascades to profiles/instances/... via FKs)
       await db.auth.admin.deleteUser(targetUserId).catch(() => {})
       await db.from("profiles").delete().eq("id", targetUserId)
