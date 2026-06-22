@@ -98,6 +98,11 @@ export async function POST(req: NextRequest) {
       status: "active", messages_used: 0, updated_at: now.toISOString(),
     }, { onConflict: "user_id" })
     if (subErr) return NextResponse.json({ error: "Failed to activate subscription: " + subErr.message }, { status: 400 })
+
+    // Reactivate the user's numbers that were suspended for non-payment.
+    // We flip them back to CONNECTING so the platform reconnects them (Evolution
+    // session is preserved — no QR rescan needed unless the session truly expired).
+    await db.from("instances").update({ status: "CONNECTING" }).eq("user_id", reqRow.user_id).eq("status", "DISCONNECTED")
     // grant balance = plan price, set limits, activate
     if (plan) {
       await db.from("profiles").update({
