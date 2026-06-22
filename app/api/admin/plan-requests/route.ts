@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin, adminService } from "@/lib/admin"
 import { getQRCode } from "@/lib/evolution"
+import { sendTelegram } from "@/lib/telegram"
 
 // GET /api/admin/plan-requests — list subscription requests
 export async function GET() {
@@ -91,7 +92,36 @@ export async function POST(req: NextRequest) {
   const gate = await requireAdmin()
   if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status })
   const db = adminService()
-  const { request_id, action } = await req.json().catch(() => ({}))
+  const body = await req.json().catch(() => ({}))
+  const { request_id, action, user_id } = body
+
+  // ── Admin actions on an active subscriber (by user_id) ──
+  if (action === "renew" && user_id) {
+    // renew: top up balance to plan price, extend 30 days, reactivate
+    const { data: sub } = await db.from("subscriptions").select("plan_id").eq("user_id", user_id).maybeSingle()
+    const { data: plan } = sub ? await db.from("plans").select("name, price_monthly").eq("id", sub.plan_id).maybeSingle() : { data: null }
+    const now = new Date(); const end = new Date(now.getTime() + 30 * 86400000)
+    await db.from("profiles").update({ balance: plan?.price_monthly ?? 0 }).eq("id", user_id)
+    await db.from("subscriptions").update({ status: "active", current_period_start: now.toISOString(), current_period_end: end.toISOString() }).eq("user_id", user_id)
+    // reactivate numbers
+    const { data: down } = await db.from("instances").select("instance_name").eq("user_id", user_id).eq("status", "DISCONNECTED")
+    for (const di of (down ?? []) as { instance_name: string }[]) { try { await getQRCode(di.instance_name) } catch {} }
+    await db.from("instances").update({ status: "CONNECTING" }).eq("user_id", user_id).eq("status", "DISCONNECTED")
+    try { await db.from("notifications").insert({ user_id, title: "تم تجديد اشتراكك", body: `تم تجديد باقتك "${plan?.name ?? ""}" لمدة 30 يوماً ورصيدك الآن $${plan?.price_monthly ?? 0}.`, type: "renewal" }) } catch {}
+    const { data: prof } = await db.from("profiles").select("telegram_chat_id").eq("id", user_id).maybeSingle()
+    if (prof?.telegram_chat_id) { try { await sendTelegram(prof.telegram_chat_id, `✅ <b>تم تجديد اشتراكك في بصمة</b>\nباقتك مفعّلة لمدة 30 يوماً. شكراً لك!`) } catch {} }
+    return NextResponse.json({ ok: true })
+  }
+
+  if (action === "remind" && user_id) {
+    // send renewal reminder via telegram + in-app
+    const { data: prof } = await db.from("profiles").select("telegram_chat_id, full_name").eq("id", user_id).maybeSingle()
+    try { await db.from("notifications").insert({ user_id, title: "تذكير بتجديد الاشتراك", body: "اقترب موعد انتهاء اشتراكك. يرجى تجديد رصيدك للاستمرار دون انقطاع.", type: "renewal" }) } catch {}
+    let tg = false
+    if (prof?.telegram_chat_id) { try { tg = await sendTelegram(prof.telegram_chat_id, `🔔 <b>تذكير من بصمة</b>\nاقترب موعد انتهاء اشتراكك. يرجى تجديد رصيدك للاستمرار دون انقطاع في خدمة الواتساب.`) } catch {} }
+    return NextResponse.json({ ok: true, telegram_sent: tg })
+  }
+
   if (!request_id || !["approve", "reject"].includes(action)) {
     return NextResponse.json({ error: "request_id and valid action required" }, { status: 400 })
   }
