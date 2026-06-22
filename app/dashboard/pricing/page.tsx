@@ -9,6 +9,9 @@ export default function PricingPage() {
   const { t } = useI18n()
   const [plans, setPlans] = useState<Plan[]>([])
   const [rate, setRate] = useState(50)
+  const [rates, setRates] = useState<Record<string, number>>({ USD: 1, EGP: 50 })
+  const [currencies, setCurrencies] = useState<string[]>(["USD", "EGP"])
+  const [currency, setCurrency] = useState("EGP")
   const [loading, setLoading] = useState(true)
   const [requesting, setRequesting] = useState<string | null>(null)
   const [sub, setSub] = useState<{ days_left: number | null; is_trial: boolean; plan: string | null } | null>(null)
@@ -16,7 +19,7 @@ export default function PricingPage() {
   useEffect(() => {
     fetch("/api/pricing")
       .then((r) => r.json())
-      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50) })
+      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50); setRates(d.rates ?? { USD: 1, EGP: 50 }); setCurrencies(d.currencies ?? ["USD", "EGP"]) })
       .finally(() => setLoading(false))
     fetch("/api/my-subscription").then((r) => r.json()).then(setSub).catch(() => {})
   }, [])
@@ -46,7 +49,19 @@ export default function PricingPage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">{t("dp.title")}</h1>
         <p className="text-muted-foreground mt-2">{t("dp.subtitle")}</p>
-        <p className="text-xs text-muted-foreground mt-1">{t("dp.rateNote")} (~{rate.toFixed(2)} EGP/USD).</p>
+        <p className="text-xs text-muted-foreground mt-1">{t("dp.payNote")}.</p>
+        <div className="mt-4 inline-flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{t("dp.currency")}</span>
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium"
+          >
+            {currencies.map((cur) => (
+              <option key={cur} value={cur}>{cur}</option>
+            ))}
+          </select>
+        </div>
       </div>
       {sub?.is_trial && sub?.days_left !== null && (
         <div className={"max-w-md mx-auto mb-8 rounded-xl border px-5 py-4 text-center " + (sub.days_left > 0 ? "border-primary/30 bg-primary/10" : "border-red-500/30 bg-red-500/10")}>
@@ -62,7 +77,8 @@ export default function PricingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {plans.filter((p) => p.name !== "مخصص" && p.name !== "Custom").map((p) => {
-          const egp = Math.round(p.price_monthly * rate)
+          const converted = p.price_monthly * (rates[currency] ?? rate)
+          const convStr = currency === "USD" ? converted.toFixed(2) : Math.round(converted).toLocaleString()
           return (
             <div key={p.id} className="rounded-2xl border border-border bg-card/50 p-6 flex flex-col">
               <h3 className="text-lg font-semibold">{p.name}</h3>
@@ -70,7 +86,7 @@ export default function PricingPage() {
                 <span className="text-3xl font-bold">${p.price_monthly}</span>
                 <span className="text-muted-foreground text-sm">{t("dp.month")}</span>
               </div>
-              {p.price_monthly > 0 && <p className="text-xs text-muted-foreground mt-1">~ {egp} {t("dp.egpMonth")}</p>}
+              {p.price_monthly > 0 && currency !== "USD" && <p className="text-xs text-muted-foreground mt-1">~ {convStr} {currency} {t("dp.month")}</p>}
               <ul className="mt-4 space-y-2 text-sm flex-1">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_instances} {p.max_instances > 1 ? t("dp.numbers") : t("dp.number")}</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> {p.max_messages_mo === 0 ? t("dp.unlimited") : p.max_messages_mo + " " + t("dp.msgsMo")}</li>
