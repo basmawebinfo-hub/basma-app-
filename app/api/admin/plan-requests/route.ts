@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
   if (action === "approve") {
     // activate subscription for the user with the requested plan
-    const { data: plan } = await db.from("plans").select("max_instances, max_messages_mo").eq("id", reqRow.plan_id).maybeSingle()
+    const { data: plan } = await db.from("plans").select("name, price_monthly, max_instances, max_messages_mo").eq("id", reqRow.plan_id).maybeSingle()
     // upsert subscription
     const now = new Date()
     const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
@@ -68,9 +68,10 @@ export async function POST(req: NextRequest) {
       status: "active", messages_used: 0, updated_at: now.toISOString(),
     }, { onConflict: "user_id" })
     if (subErr) return NextResponse.json({ error: "Failed to activate subscription: " + subErr.message }, { status: 400 })
-    // update the profile limits
+    // grant balance = plan price, set limits, activate
     if (plan) {
       await db.from("profiles").update({
+        balance: plan.price_monthly ?? 0,   // wallet credit equals the plan price
         max_messages: plan.max_messages_mo ?? 0,
         status: "active",
       }).eq("id", reqRow.user_id)
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
       await db.from("notifications").insert({
         user_id: reqRow.user_id,
         title: "تم تفعيل اشتراكك",
-        body: "تمت الموافقة على طلب الاشتراك وتفعيل باقتك. شكراً لك!",
+        body: `تمت الموافقة على اشتراكك في باقة "${plan?.name ?? ""}". رصيدك الآن $${plan?.price_monthly ?? 0} ويمكنك ربط حتى ${plan?.max_instances ?? 1} رقم. شكراً لك!`,
         type: "subscription",
       })
     } catch { /* best-effort */ }
