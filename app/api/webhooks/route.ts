@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 
 // GET /api/webhooks — list configs for current user
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  await notifyUser(user.id, "تمت إضافة Webhook", "تمت إضافة الـ Webhook بنجاح وهو نشط الآن.", "\ud83d\udd17")
   return NextResponse.json(data)
 }
 
