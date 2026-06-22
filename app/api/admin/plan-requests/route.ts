@@ -60,10 +60,14 @@ export async function POST(req: NextRequest) {
     // upsert subscription
     const now = new Date()
     const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-    await db.from("subscriptions").insert({
+    // upsert: each user has one subscription row (user_id is unique) — update it to the new plan
+    const { error: subErr } = await db.from("subscriptions").upsert({
       user_id: reqRow.user_id, plan_id: reqRow.plan_id,
-      created_at: now.toISOString(), current_period_end: periodEnd.toISOString(), status: "active",
-    })
+      current_period_start: now.toISOString(),
+      current_period_end: periodEnd.toISOString(),
+      status: "active", messages_used: 0, updated_at: now.toISOString(),
+    }, { onConflict: "user_id" })
+    if (subErr) return NextResponse.json({ error: "Failed to activate subscription: " + subErr.message }, { status: 400 })
     // update the profile limits
     if (plan) {
       await db.from("profiles").update({
