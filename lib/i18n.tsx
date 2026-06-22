@@ -514,6 +514,9 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "apr.renewals": { ar: "مستخدمون يحتاجون تجديد الرصيد", en: "Users needing renewal" },
   "apr.balance": { ar: "الرصيد", en: "Balance" },
   "apr.noRenewals": { ar: "لا يوجد مستخدمون يحتاجون تجديد", en: "No users need renewal" },
+  "apr.active": { ar: "المشتركون النشطون", en: "Active subscribers" },
+  "apr.daysLeft": { ar: "يوم متبقي", en: "days left" },
+  "apr.noActive": { ar: "لا يوجد مشتركون نشطون", en: "No active subscribers" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
