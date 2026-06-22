@@ -491,6 +491,20 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Currency selector
   "dp.currency": { ar: "اعرض الأسعار بـ", en: "Show prices in" },
   "dp.payNote": { ar: "ستدفع ما يعادل المبلغ بعملتك بسعر اليوم", en: "You'll pay the equivalent in your currency at today's rate" },
+  // Admin plan requests
+  "apr.title": { ar: "طلبات الاشتراك", en: "Subscription Requests" },
+  "apr.nav": { ar: "طلبات الاشتراك", en: "Requests" },
+  "apr.none": { ar: "لا توجد طلبات", en: "No requests" },
+  "apr.user": { ar: "المستخدم", en: "User" },
+  "apr.plan": { ar: "الباقة", en: "Plan" },
+  "apr.date": { ar: "التاريخ", en: "Date" },
+  "apr.status": { ar: "الحالة", en: "Status" },
+  "apr.action": { ar: "إجراء", en: "Action" },
+  "apr.approve": { ar: "موافقة", en: "Approve" },
+  "apr.reject": { ar: "رفض", en: "Reject" },
+  "apr.pending": { ar: "قيد الانتظار", en: "Pending" },
+  "apr.approved": { ar: "تمت الموافقة", en: "Approved" },
+  "apr.rejected": { ar: "مرفوض", en: "Rejected" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
