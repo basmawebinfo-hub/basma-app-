@@ -43,7 +43,7 @@ export async function GET() {
     const daysLeft = end ? Math.max(0, Math.ceil((end - Date.now()) / 86400000)) : null
     const pr = activeProfById.get(s.user_id)
     return { user_id: s.user_id, email: pr?.email ?? null, name: pr?.full_name ?? null, balance: pr?.balance ?? null, plan_name: planNameById.get(s.plan_id) ?? null, days_left: daysLeft }
-  }).filter((s) => (planNameById.get("") , true))
+  })
 
   // users whose subscription is past_due (balance ran out) and need to renew
   const { data: pastDue } = await db.from("subscriptions").select("user_id").eq("status", "past_due")
