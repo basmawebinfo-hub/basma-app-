@@ -4,7 +4,7 @@ import { Loader2, Check, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 interface Renewal { id: string; email: string | null; name: string | null; balance: number | null }
-interface ActiveSub { user_id: string; email: string | null; name: string | null; balance: number | null; plan_name: string | null; days_left: number | null }
+interface ActiveSub { user_id: string; email: string | null; name: string | null; balance: number | null; plan_name: string | null; plan_price: number | null; days_left: number | null; per_day: number | null; start_date: string | null; end_date: string | null }
 interface Req {
   id: string; status: string; created_at: string
   email: string | null; name: string | null
@@ -21,6 +21,19 @@ export default function PlanRequestsPage() {
 
   const load = () => fetch("/api/admin/plan-requests").then((r) => r.json()).then((d) => { setReqs(d.requests ?? []); setRenewals(d.renewals ?? []); setActiveSubs(d.active_subscribers ?? []) }).finally(() => setLoading(false))
   useEffect(() => { load() }, [])
+
+  async function subAction(userId: string, action: "renew" | "remind") {
+    setActing(userId)
+    try {
+      const r = await fetch("/api/admin/plan-requests", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, action }),
+      })
+      const d = await r.json()
+      if (action === "remind") alert(t("apr.reminded")); else alert(t("apr.renewed"))
+      load()
+    } finally { setActing(null) }
+  }
 
   async function act(id: string, action: "approve" | "reject") {
     setActing(id)
@@ -48,19 +61,35 @@ export default function PlanRequestsPage() {
       {activeSubs.length > 0 && (
         <div className="mb-8 rounded-xl border border-border bg-card/30 p-5">
           <h2 className="text-sm font-semibold mb-3">{t("apr.active")} ({activeSubs.length})</h2>
-          <div className="space-y-2">
-            {activeSubs.map((u) => (
-              <div key={u.user_id} className="flex items-center justify-between text-sm border-b border-border/30 pb-2">
-                <div>
-                  <span className="font-medium">{u.name || u.email}</span>
-                  <span className="text-xs text-muted-foreground ms-2">{u.plan_name}</span>
+          <div className="space-y-3">
+            {activeSubs.map((u) => {
+              const low = (u.days_left ?? 99) <= 5
+              const fmt = (d: string | null) => d ? new Date(d).toLocaleDateString() : "—"
+              return (
+                <div key={u.user_id} className="rounded-lg border border-border/40 p-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <span className="font-medium">{u.name || u.email}</span>
+                      <span className="text-xs text-muted-foreground ms-2">{u.plan_name}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs">
+                      <span className="text-muted-foreground">${Number(u.balance ?? 0).toFixed(2)}</span>
+                      {u.per_day != null && <span className="text-muted-foreground">(${Number(u.per_day).toFixed(2)}{t("apr.perDay")})</span>}
+                      <span className={"font-medium " + (low ? "text-red-500" : "text-primary")}>{u.days_left ?? "—"} {t("apr.daysLeft")}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between flex-wrap gap-2 mt-2">
+                    <div className="text-xs text-muted-foreground">
+                      {t("apr.started")}: {fmt(u.start_date)} • {t("apr.ends")}: {fmt(u.end_date)}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => subAction(u.user_id, "remind")} disabled={acting === u.user_id} className="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-500 text-xs disabled:opacity-50">{t("apr.remind")}</button>
+                      <button onClick={() => subAction(u.user_id, "renew")} disabled={acting === u.user_id} className="px-2.5 py-1 rounded-lg bg-primary/15 text-primary text-xs disabled:opacity-50">{t("apr.renew")}</button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">${Number(u.balance ?? 0).toFixed(2)}</span>
-                  <span className={"text-xs font-medium " + ((u.days_left ?? 99) <= 5 ? "text-red-500" : "text-primary")}>{u.days_left ?? "—"} {t("apr.daysLeft")}</span>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
