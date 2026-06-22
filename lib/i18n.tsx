@@ -505,6 +505,11 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "apr.pending": { ar: "قيد الانتظار", en: "Pending" },
   "apr.approved": { ar: "تمت الموافقة", en: "Approved" },
   "apr.rejected": { ar: "مرفوض", en: "Rejected" },
+  // Custom plan card
+  "dp.customPlanTitle": { ar: "باقة مخصصة", en: "Custom Plan" },
+  "dp.customPlanDesc": { ar: "أكثر من 25 رقم؟ تواصل معنا لباقة مفصّلة على احتياجك.", en: "More than 25 numbers? Contact us for a tailored plan." },
+  "dp.customPrice": { ar: "حسب احتياجك", en: "Tailored" },
+  "dp.customBtn": { ar: "تواصل عبر تليجرام", en: "Contact on Telegram" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
