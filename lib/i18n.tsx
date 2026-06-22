@@ -517,6 +517,13 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "apr.active": { ar: "المشتركون النشطون", en: "Active subscribers" },
   "apr.daysLeft": { ar: "يوم متبقي", en: "days left" },
   "apr.noActive": { ar: "لا يوجد مشتركون نشطون", en: "No active subscribers" },
+  "apr.renew": { ar: "تجديد", en: "Renew" },
+  "apr.remind": { ar: "تذكير بالتجديد", en: "Send reminder" },
+  "apr.started": { ar: "بدأ", en: "Started" },
+  "apr.ends": { ar: "ينتهي", en: "Ends" },
+  "apr.perDay": { ar: "/يوم", en: "/day" },
+  "apr.reminded": { ar: "تم إرسال التذكير", en: "Reminder sent" },
+  "apr.renewed": { ar: "تم التجديد", en: "Renewed" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
