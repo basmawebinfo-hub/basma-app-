@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { LayoutDashboard, Users, Server, Wallet, ScrollText, ShieldCheck, LogOut, MessageCircle } from "lucide-react"
+import { LayoutDashboard, Users, Server, Wallet, ScrollText, ShieldCheck, LogOut, MessageCircle, CreditCard } from "lucide-react"
 import { logout } from "@/app/actions/auth"
 import { useI18n } from "@/lib/i18n"
 
@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/users", key: "adm.navUsers", icon: Users },
     { href: "/admin/instances", key: "adm.navConnections", icon: Server },
     { href: "/admin/billing", key: "adm.navBilling", icon: Wallet },
+    { href: "/admin/requests", key: "apr.nav", icon: CreditCard },
     { href: "/admin/support", key: "adm.navSupport", icon: MessageCircle },
     { href: "/admin/logs", key: "adm.navLogs", icon: ScrollText },
     { href: "/admin/admins", key: "adm.navAdmins", icon: ShieldCheck },
