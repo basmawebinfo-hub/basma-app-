@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
-import { createInstance, deleteInstance, setInstanceWebhook } from "@/lib/evolution"
+import { createInstance, deleteInstance, setInstanceWebhook , listEvolutionInstances } from "@/lib/evolution"
 import { getUserPlan } from "@/lib/plan"
 
 const WEBHOOK_EVENTS = [
