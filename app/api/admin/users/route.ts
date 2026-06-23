@@ -14,7 +14,8 @@ export async function GET() {
     .select("id, email, full_name, company, role, status, balance, plan, plan_expires_at, max_instances, max_messages, whatsapp, custom_max_instances, avatar_url, created_at")
     .order("created_at", { ascending: false })
 
-  const users = profiles ?? []
+  // Exclude admins/owners from the customer management list — they are not customers
+  const users = (profiles ?? []).filter((u) => u.role !== "admin" && u.role !== "super_admin")
   const ids = users.map((u) => u.id)
 
   // Instance counts per user
