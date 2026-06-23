@@ -29,10 +29,24 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Confirm to the user that the number was added (Telegram + in-app)
-  await notifyUser(user.id, "تمت إضافة رقم جديد", `تمت إضافة الرقم "${display_name}" بنجاح. امسح رمز QR من واتساب لإكمال الربط.`, "\ud83d\udcf1")
+  // ── Auto-sync: drop "ghost" instances that no longer exist on Evolution ──
+  // Prevents the count mismatch (DB says N, Evolution says 0).
+  const rows = data ?? []
+  if (rows.length > 0) {
+    try {
+      const live = await listEvolutionInstances() // names that actually exist on Evolution
+      if (live !== null) {
+        const liveSet = new Set(live)
+        const ghosts = rows.filter((row) => !liveSet.has(row.instance_name)).map((row) => row.id)
+        if (ghosts.length > 0) {
+          await supabase.from("instances").delete().in("id", ghosts)
+          return NextResponse.json(rows.filter((row) => liveSet.has(row.instance_name)))
+        }
+      }
+    } catch { /* if Evolution is unreachable, return DB rows as-is */ }
+  }
 
-  return NextResponse.json(data)
+  return NextResponse.json(rows)
 }
 
 // POST /api/instances — create instance + auto-set webhook
