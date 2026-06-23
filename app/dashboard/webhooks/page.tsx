@@ -391,7 +391,7 @@ export default function WebhooksPage() {
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
                       {row.last_attempt_at
-                        ? new Date(row.last_attempt_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        ? new Date(row.last_attempt_at).toLocaleString("ar-EG", { timeZone: "Africa/Cairo", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
                         : "—"}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
