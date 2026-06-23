@@ -374,3 +374,25 @@ export async function checkNumberExists(instanceName: string, numbers: string[])
     method: "POST", body: JSON.stringify({ numbers: numbers.map((n) => n.replace(/[^0-9]/g, "")) }),
   })
 }
+
+
+/**
+ * List instance names that actually exist on the Evolution server.
+ * Returns null if Evolution is unreachable (caller should then skip syncing).
+ * Used to detect & clean "ghost" instances left in our DB.
+ */
+export async function listEvolutionInstances(): Promise<string[] | null> {
+  try {
+    const res = await fetch(`${BASE_URL}/instance/fetchInstances`, {
+      headers: { apikey: API_KEY },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    if (!Array.isArray(data)) return null
+    return data
+      .map((i: { name?: string; instance?: { instanceName?: string } }) => i.name ?? i.instance?.instanceName)
+      .filter((n): n is string => typeof n === "string")
+  } catch {
+    return null
+  }
+}
