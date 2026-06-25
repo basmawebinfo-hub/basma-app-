@@ -172,33 +172,21 @@ export default function WebhooksPage() {
     if (!config.destination_url) return
     setTestingId(config.id)
     setTestResult(null)
-    // Send a realistic WhatsApp-shaped payload so the n8n BASMA Trigger recognizes it
-    const samplePayload = {
-      event: "MESSAGE_RECEIVED",
-      instance: "test_instance",
-      data: {
-        key: { remoteJid: "201234567890@s.whatsapp.net", fromMe: false, id: "TEST_" + Date.now() },
-        message: { conversation: "رسالة اختبار من بصمة - الويب هوك شغال!" },
-        pushName: "اختبار بصمة",
-        messageTimestamp: Math.floor(Date.now() / 1000),
-      },
-    }
+    // Replay the LAST REAL incoming WhatsApp message to this webhook (real data, full circle)
     try {
-      const res = await fetch(config.destination_url, {
+      const res = await fetch("/api/webhooks/replay", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(config.secret ? { "X-Basma-Secret": config.secret } : {}),
-        },
-        body: JSON.stringify(samplePayload),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: config.destination_url, secret: config.secret }),
       })
+      const d = await res.json().catch(() => ({}))
       setTestResult({
         id: config.id,
-        ok: res.ok,
-        msg: res.ok ? "تم الإرسال بنجاح! تحقق من n8n" : `فشل (${res.status}) - تأكد أن الـ workflow يستمع/مفعّل`,
+        ok: res.ok && d.ok !== false,
+        msg: d.message || d.error || (res.ok ? "تم الإرسال!" : "فشل الإرسال"),
       })
     } catch {
-      setTestResult({ id: config.id, ok: false, msg: "تعذّر الوصول للرابط" })
+      setTestResult({ id: config.id, ok: false, msg: "تعذّر الوصول" })
     } finally {
       setTestingId(null)
     }
