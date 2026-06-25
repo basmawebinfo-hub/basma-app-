@@ -239,11 +239,11 @@ export default function WebhooksPage() {
                     <Button variant="ghost" size="icon-sm" aria-label="Test" title="إرسال آخر رسالة حقيقية للاختبار" onClick={() => handleTest(cfg)} disabled={testingId === cfg.id}>
                       {testingId === cfg.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                     </Button>
-                    {testResult && testResult.id === cfg.id && (
-                      <span className={cn("text-xs", testResult.ok ? "text-green-500" : "text-red-500")}>
-                        {testResult.msg}
-                      </span>
-                    )}
+                  )}
+                  {testResult && testResult.id === cfg.id && (
+                    <span className={cn("text-xs", testResult.ok ? "text-green-500" : "text-red-500")}>
+                      {testResult.msg}
+                    </span>
                   )}
                   <Button variant="ghost" size="icon-sm" aria-label={t("wh.delete")} onClick={() => handleDelete(cfg.id)}>
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
