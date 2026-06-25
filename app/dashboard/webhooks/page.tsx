@@ -248,8 +248,8 @@ export default function WebhooksPage() {
                     }
                   </button>
                   {cfg.destination_url && (
-                    <Button variant="ghost" size="icon-sm" aria-label="Test" onClick={() => handleTest(cfg)}>
-                      <Send className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="icon-sm" aria-label="Test" title="إرسال رسالة اختبار" onClick={() => handleTest(cfg)} disabled={testingId === cfg.id}>
+                      {testingId === cfg.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                     </Button>
                   )}
                   <Button variant="ghost" size="icon-sm" aria-label={t("wh.delete")} onClick={() => handleDelete(cfg.id)}>
