@@ -165,13 +165,43 @@ export default function WebhooksPage() {
   }
 
   // ─── Send test ────────────────────────────────────────────────────────────────
+  const [testingId, setTestingId] = useState<string | null>(null)
+  const [testResult, setTestResult] = useState<{ id: string; ok: boolean; msg: string } | null>(null)
+
   const handleTest = async (config: WebhookConfig) => {
     if (!config.destination_url) return
-    await fetch(config.destination_url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ test: true, event: "TEST_EVENT", timestamp: Date.now() }),
-    }).catch(() => {})
+    setTestingId(config.id)
+    setTestResult(null)
+    // Send a realistic WhatsApp-shaped payload so the n8n BASMA Trigger recognizes it
+    const samplePayload = {
+      event: "MESSAGE_RECEIVED",
+      instance: "test_instance",
+      data: {
+        key: { remoteJid: "201234567890@s.whatsapp.net", fromMe: false, id: "TEST_" + Date.now() },
+        message: { conversation: "رسالة اختبار من بصمة - الويب هوك شغال!" },
+        pushName: "اختبار بصمة",
+        messageTimestamp: Math.floor(Date.now() / 1000),
+      },
+    }
+    try {
+      const res = await fetch(config.destination_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(config.secret ? { "X-Basma-Secret": config.secret } : {}),
+        },
+        body: JSON.stringify(samplePayload),
+      })
+      setTestResult({
+        id: config.id,
+        ok: res.ok,
+        msg: res.ok ? "تم الإرسال بنجاح! تحقق من n8n" : `فشل (${res.status}) - تأكد أن الـ workflow يستمع/مفعّل`,
+      })
+    } catch {
+      setTestResult({ id: config.id, ok: false, msg: "تعذّر الوصول للرابط" })
+    } finally {
+      setTestingId(null)
+    }
   }
 
   const destIsUrl = form.destination_type !== "EMAIL"
