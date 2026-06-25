@@ -301,7 +301,9 @@ async function deliverToDestination(
   payload: unknown,
   secret?: string
 ): Promise<{ ok: boolean; status: number; attempts: number; error?: string }> {
-  const maxAttempts = 3
+  // More retries for n8n test URLs (webhook-test) so the user has time to click "Listen"
+  const isTestUrl = url.includes("/webhook-test/")
+  const maxAttempts = isTestUrl ? 8 : 3
   let lastStatus = 0
   let lastError: string | undefined
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -320,7 +322,7 @@ async function deliverToDestination(
     } catch (e) {
       lastError = (e as Error).message
     }
-    if (attempt < maxAttempts) await new Promise((r) => setTimeout(r, attempt * 2000))
+    if (attempt < maxAttempts) await new Promise((r) => setTimeout(r, isTestUrl ? 3000 : attempt * 2000))
   }
   return { ok: false, status: lastStatus, attempts: maxAttempts, error: lastError }
 }
