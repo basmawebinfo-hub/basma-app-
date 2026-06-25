@@ -196,7 +196,7 @@ export async function setInstanceWebhook(
         enabled: true,
         url: webhookUrl,
         webhookByEvents: false,
-        webhookBase64: false,
+        webhookBase64: true,
         events,
       },
     }),
