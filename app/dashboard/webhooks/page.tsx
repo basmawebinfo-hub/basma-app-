@@ -374,7 +374,58 @@ export default function WebhooksPage() {
         </Button>
       </div>
 
-      {/* ─── Delivery log ─────────────────────────────────────────────────────── */}
+              {/* ─── n8n setup guide: Test & Production URLs + payload reference ─── */}
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            دليل الربط مع n8n
+          </h2>
+
+          {/* Test vs Production URLs */}
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3 space-y-1">
+              <div className="text-xs font-semibold text-yellow-500">Test URL (للتجربة)</div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                انسخه من الـ BASMA Trigger في n8n (فيه <span className="font-mono">webhook-test</span>) واضغط
+                &quot;Listen for test event&quot; قبل ما تبعت. يعمل لرسالة واحدة فقط لمعاينة البيانات أثناء البناء.
+              </p>
+            </div>
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-1">
+              <div className="text-xs font-semibold text-primary">Production URL (للتشغيل)</div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                انسخه من الـ BASMA Trigger (فيه <span className="font-mono">webhook</span> بدون test)، فعّل الـ workflow
+                (Active)، ثم ضعه هنا. يعمل دائماً 24/7 لكل الرسائل.
+              </p>
+            </div>
+          </div>
+
+          {/* Base URL note for sending */}
+          <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
+            <div className="text-xs font-semibold text-foreground">عند الإرسال عبر الـ API (n8n BASMA node):</div>
+            <p className="text-[11px] text-muted-foreground">
+              في الـ Credential ضع <span className="font-mono text-primary">Base URL = https://www.basmaweb.com</span> فقط
+              (بدون أي مسار بعده). الـ node يضيف <span className="font-mono">/api/send</span> تلقائياً.
+            </p>
+          </div>
+
+          {/* Payload fields the user actually needs */}
+          <div className="space-y-2">
+            <div className="text-xs font-semibold text-foreground">الحقول المتاحة في الرسالة الواردة:</div>
+            <div className="rounded-lg border border-border bg-muted/30 p-3 font-mono text-[11px] text-muted-foreground space-y-1 leading-relaxed">
+              <div><span className="text-primary">from</span> — رقم المُرسِل (نظيف)</div>
+              <div><span className="text-primary">text</span> — نص الرسالة</div>
+              <div><span className="text-primary">pushName</span> — اسم المُرسِل</div>
+              <div><span className="text-primary">messageType</span> — نوع الرسالة (text / image / ...)</div>
+              <div><span className="text-primary">mediaBase64</span> — الوسائط (إن وُجدت)</div>
+              <div><span className="text-primary">messageId</span> — معرّف الرسالة</div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              في الـ node استخدم مثلاً: <span className="font-mono text-primary">{`{{ $json.from }}`}</span> أو
+              <span className="font-mono text-primary"> {`{{ $json.text }}`}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* ─── Delivery log ─────────────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
           <h2 className="text-sm font-semibold text-foreground">{t("wh.deliveryLog")}</h2>
