@@ -524,6 +524,12 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "apr.perDay": { ar: "/يوم", en: "/day" },
   "apr.reminded": { ar: "تم إرسال التذكير", en: "Reminder sent" },
   "apr.renewed": { ar: "تم التجديد", en: "Renewed" },
+  // Sidebar — Phase 1 additions (Academy/Lab/Notifications)
+  "sb.academy": { ar: "الأكاديمية", en: "Academy" },
+  "sb.lab": { ar: "المختبر", en: "AI Lab" },
+  "sb.notifications": { ar: "الإشعارات", en: "Notifications" },
+  "sb.soon": { ar: "قريباً", en: "Soon" },
+  "sb.locked": { ar: "متاحة في باقة أعلى", en: "Available on a higher plan" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
