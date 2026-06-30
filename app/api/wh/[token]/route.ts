@@ -162,10 +162,31 @@ async function processAutoReply(
       }
       if (shouldReply) {
         const phone = "+" + remoteJid.replace(/@.*/, "").replace(/[^0-9]/g, "")
-        await fetch(`${process.env.EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
+        const replyText = rule.reply_text as string
+        const evoUrl = process.env.EVOLUTION_API_URL
+        const evoKey = process.env.EVOLUTION_API_KEY ?? ""
+
+        // ── Anti-ban: ALWAYS show a human-like "typing…" before replying ──
+        // Duration scales with message length + randomness, clamped 3s–8s.
+        const base = 1500 + (replyText?.length ?? 0) * 35
+        const jitter = Math.floor(Math.random() * 2500) // 0–2.5s random
+        const typingMs = Math.min(Math.max(base + jitter, 3000), 8000)
+
+        // 1) start "composing" presence
+        await fetch(`${evoUrl}/chat/sendPresence/${instanceName}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", apikey: process.env.EVOLUTION_API_KEY ?? "" },
-          body: JSON.stringify({ number: phone, text: rule.reply_text }),
+          headers: { "Content-Type": "application/json", apikey: evoKey },
+          body: JSON.stringify({ number: phone, presence: "composing", delay: typingMs }),
+        }).catch(() => {})
+
+        // 2) wait the typing duration (so it looks like a real person typing)
+        await new Promise((res) => setTimeout(res, typingMs))
+
+        // 3) then send the reply
+        await fetch(`${evoUrl}/message/sendText/${instanceName}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: evoKey },
+          body: JSON.stringify({ number: phone, text: replyText }),
         }).catch(() => {})
         break
       }
