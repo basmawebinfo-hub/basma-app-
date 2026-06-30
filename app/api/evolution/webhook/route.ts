@@ -165,6 +165,7 @@ export async function POST(request: NextRequest) {
         .select("*")
         .eq("user_id", instance.user_id)
         .eq("is_active", true)
+        .or(`instance_id.is.null,instance_id.eq.${instance.id}`)
 
       if (configs?.length) {
         // Accept any naming the UI may use for the "incoming message" event
