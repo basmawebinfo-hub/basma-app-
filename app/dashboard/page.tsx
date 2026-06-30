@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { MessageSquare, Users, CheckCircle2, Clock, Loader2, Plug, Webhook, Inbox, BookOpen } from "lucide-react"
+import { MessageSquare, Users, CheckCircle2, Clock, Loader2, Plug, Webhook, Inbox, BookOpen, FlaskConical, GraduationCap } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/lib/i18n"
+import { SmartChecklist } from "@/components/dashboard/smart-checklist"
 
 interface DashboardStats {
   messages_today: number
@@ -52,8 +53,10 @@ export default function DashboardOverview() {
 
   const QUICK = [
     { key: "dash.qaConnect", href: "/dashboard/connect", icon: Plug },
-    { key: "dash.qaWebhook", href: "/dashboard/webhooks", icon: Webhook },
     { key: "dash.qaInbox", href: "/dashboard/inbox", icon: Inbox },
+    { key: "dash.qaWebhook", href: "/dashboard/webhooks", icon: Webhook },
+    { key: "dash.qaLab", href: "/dashboard/lab", icon: FlaskConical },
+    { key: "dash.qaAcademy", href: "/dashboard/academy", icon: GraduationCap },
     { key: "dash.qaDocs", href: "/dashboard/docs", icon: BookOpen },
   ]
 
@@ -65,6 +68,9 @@ export default function DashboardOverview() {
         <h1 className="text-2xl font-bold text-foreground">{t("dash.welcome")} 👋</h1>
         <p className="text-sm text-muted-foreground mt-1">{t("dash.subtitle")}</p>
       </div>
+
+      {/* Onboarding — auto-hides once all 5 steps are complete */}
+      <SmartChecklist />
 
       {error && (<div className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3"><p className="text-xs text-destructive">{error}</p></div>)}
 
@@ -88,7 +94,7 @@ export default function DashboardOverview() {
       {/* Quick actions */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-3">{t("dash.quickActions")}</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {QUICK.map((q) => {
             const Icon = q.icon
             return (
