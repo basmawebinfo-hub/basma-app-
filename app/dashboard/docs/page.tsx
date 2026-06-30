@@ -1,209 +1,224 @@
 "use client"
-import Link from "next/link"
 import { useState } from "react"
-import { Copy, Check, ArrowRight, ArrowLeft, Webhook, Send, Image as ImageIcon, KeyRound } from "lucide-react"
-import { useI18n } from "@/lib/i18n"
+import { Copy, Check, Webhook, Send, Image as ImageIcon, KeyRound, MessageSquare, MapPin, Users, FileText, Mic, Sticker, Vote, Contact, Eye } from "lucide-react"
 
-function Code({ children }: { children: string }) {
+// ── reusable code block with copy ──
+function CodeBlock({ children }: { children: string }) {
   const [copied, setCopied] = useState(false)
   return (
-    <div className="relative group">
-      <pre className="bg-muted/40 border border-border rounded-lg p-4 text-xs overflow-x-auto font-mono leading-relaxed">{children}</pre>
-      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(()=>setCopied(false),1500) }}
+    <div className="relative group my-3">
+      <pre className="bg-black/60 border border-border rounded-lg p-4 text-[11px] overflow-x-auto font-mono leading-relaxed text-foreground whitespace-pre">{children}</pre>
+      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
         className="absolute top-2 right-2 p-1.5 rounded-md bg-card border border-border opacity-0 group-hover:opacity-100 transition">
-        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+        {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
       </button>
     </div>
   )
 }
 
-function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function Method({ m }: { m: string }) {
+  const colors: Record<string, string> = {
+    GET: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    POST: "bg-primary/15 text-primary border-primary/30",
+    PUT: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+    DELETE: "bg-red-500/15 text-red-400 border-red-500/30",
+  }
+  return <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono border ${colors[m] ?? "bg-muted"}`}>{m}</span>
+}
+
+function Endpoint({ id, method, path, title, desc, body, resp }: {
+  id: string; method: string; path: string; title: string; desc: string; body?: string; resp?: string
+}) {
   return (
-    <section className="mb-10">
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold">{title}</h2>
+    <div id={id} className="scroll-mt-20 border-b border-border py-6">
+      <h3 className="text-base font-bold text-foreground mb-1">{title}</h3>
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <Method m={method} />
+        <code className="text-xs font-mono text-muted-foreground bg-muted/40 px-2 py-1 rounded">{path}</code>
       </div>
-      <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">{children}</div>
-    </section>
+      <p className="text-sm text-muted-foreground mb-2">{desc}</p>
+      {body && (<><div className="text-[11px] font-semibold text-foreground mt-3">Request Body:</div><CodeBlock>{body}</CodeBlock></>)}
+      {resp && (<><div className="text-[11px] font-semibold text-foreground mt-3">Response:</div><CodeBlock>{resp}</CodeBlock></>)}
+    </div>
   )
 }
 
+const SECTIONS = [
+  { h: "البداية", items: [["intro", "مقدمة"], ["auth", "المصادقة"]] },
+  { h: "إرسال الرسائل", items: [["send-text", "إرسال نص"], ["send-image", "إرسال صورة"], ["send-video", "إرسال فيديو"], ["send-doc", "إرسال مستند"], ["send-audio", "إرسال صوت"], ["send-sticker", "إرسال ملصق"], ["send-location", "إرسال موقع"], ["send-contact", "إرسال جهة اتصال"], ["send-poll", "إرسال تصويت"]] },
+  { h: "الجودة", items: [["typing", "جاري الكتابة"], ["mark-read", "تحديد كمقروء"]] },
+  { h: "بيانات", items: [["me", "معلومات الحساب"], ["contacts", "جهات الاتصال"], ["groups", "المجموعات"]] },
+  { h: "الاستقبال", items: [["webhook", "Webhook (الرسائل الواردة)"]] },
+]
+
 export default function DocsPage() {
-  const { t } = useI18n()
+  const [active, setActive] = useState("intro")
+  const base = "https://www.basmaweb.com"
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">{t("doc.title")}</h1>
-      <p className="text-muted-foreground mb-8">{t("doc.subtitle")}</p>
+    <div className="flex gap-6 p-6 max-w-6xl mx-auto">
+      {/* Sidebar */}
+      <aside className="hidden md:block w-56 shrink-0 sticky top-6 self-start max-h-[85vh] overflow-y-auto">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-foreground">API Documentation</h2>
+          <p className="text-[11px] text-muted-foreground">BASMA WhatsApp API</p>
+        </div>
+        {SECTIONS.map((s) => (
+          <div key={s.h} className="mb-4">
+            <div className="text-[11px] font-bold text-muted-foreground uppercase mb-1">{s.h}</div>
+            {s.items.map(([id, label]) => (
+              <a key={id} href={`#${id}`} onClick={() => setActive(id)}
+                className={`block text-xs py-1 px-2 rounded transition ${active === id ? "bg-primary/15 text-primary font-semibold" : "text-muted-foreground hover:text-foreground"}`}>
+                {label}
+              </a>
+            ))}
+          </div>
+        ))}
+      </aside>
 
-      
+      {/* Content */}
+      <main className="flex-1 min-w-0">
+        <h1 className="text-3xl font-bold mb-2">توثيق واجهة برمجة تطبيقات BASMA</h1>
+        <p className="text-muted-foreground mb-8 text-sm">ابدأ الدمج مع BASMA في دقائق — أرسل رسائل واتساب، استقبل الأحداث، وأتمت أعمالك.</p>
 
-      <Section icon={ArrowLeft} title={t("doc.s1")}>
-        <p>Every incoming WhatsApp message can be forwarded to your automation platform in real time.</p>
-        <p><b>Setup:</b> Go to <b>Webhooks</b> in the dashboard, add a new config, paste your platform's webhook URL, and select the events you want.</p>
-        <p>BASMA will <b>POST</b> a JSON payload to your URL for each message. Example payload:</p>
-        <Code>{`{
-  "event": "messages.upsert",
-  "instance": "your_instance_name",
-  "data": {
-    "key": {
-      "id": "ABC123",
-      "remoteJid": "201234567890@s.whatsapp.net",
-      "fromMe": false
-    },
-    "message": { "conversation": "Hello!" },
-    "pushName": "John Doe",
-    "messageTimestamp": 1700000000,
-    "messageType": "TEXT"
-  }
-}`}</Code>
-        <p className="text-xs"><b>In n8n / Make, read fields like this:</b></p>
-        <Code>{`Message text:  $json.body.data.message.conversation
-Sender number: $json.body.data.key.remoteJid
-Sender name:   $json.body.data.pushName
-Message type:  $json.body.data.messageType   (TEXT / IMAGE / AUDIO / VIDEO / DOCUMENT)
-Is from me:    $json.body.data.key.fromMe     (filter out true to avoid loops)`}</Code>
-        <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700">
-          Important: always filter where <code>fromMe = false</code> so your bot does not reply to its own messages (infinite loop).
-        </p>
-      </Section>
+        <section id="intro" className="scroll-mt-20 mb-6">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Send className="w-5 h-5 text-primary" /> مقدمة</h2>
+          <p className="text-sm text-muted-foreground">تتيح BASMA API إرسال واستقبال رسائل واتساب بكل أنواعها (نص، صورة، فيديو، صوت، مستند، ملصق، موقع، جهة اتصال، تصويت) وأتمتة التفاعلات. كل الطلبات عبر HTTPS وتُرجع JSON.</p>
+        </section>
 
-      <Section icon={KeyRound} title={t("doc.s2")}>
-        <p>Sending messages requires your personal API key. Get it from <b>Settings → API Key</b>.</p>
-        <p>Pass it in the <code>Authorization</code> header on every request:</p>
-        <Code>{`Authorization: Bearer bsm_live_xxxxxxxxxxxxxxxxxxxx`}</Code>
-      </Section>
+        <section id="auth" className="scroll-mt-20 mb-8 rounded-xl border border-border bg-card p-5">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><KeyRound className="w-5 h-5 text-primary" /> المصادقة</h2>
+          <p className="text-sm text-muted-foreground mb-2">احصل على مفتاح API من <b>الإعدادات → API Key</b> (يبدأ بـ <code className="font-mono text-primary">bsm_live_</code>). أرسله في ترويسة كل طلب:</p>
+          <CodeBlock>{`Authorization: Bearer bsm_live_xxxxxxxxxxxx`}</CodeBlock>
+          <p className="text-[11px] text-muted-foreground">Base URL: <code className="font-mono text-primary">{base}</code></p>
+        </section>
 
-      <Section icon={Send} title={t("doc.s3")}>
-        <p><b>POST</b> to <code>https://www.basmaweb.com/api/send</code></p>
-        <Code>{`POST https://www.basmaweb.com/api/send
-Authorization: Bearer bsm_live_xxxxx
-Content-Type: application/json
+        <h2 className="text-xl font-bold mb-2 mt-8 flex items-center gap-2"><MessageSquare className="w-5 h-5 text-primary" /> إرسال الرسائل</h2>
 
-{
+        <Endpoint id="send-text" method="POST" path="/api/send" title="إرسال رسالة نصية"
+          desc="يرسل رسالة نصية لرقم واتساب."
+          body={`{
   "to": "201234567890",
-  "text": "Hello from automation"
-}`}</Code>
-        <p>If you have multiple numbers, add <code>"instance_id": "uuid"</code> to pick one. Otherwise it uses your first connected number.</p>
-      </Section>
+  "type": "text",
+  "text": "مرحباً من بصمة"
+}`}
+          resp={`{ "ok": true, "result": { "key": { "id": "..." }, "status": "PENDING" } }`} />
 
-      <Section icon={ImageIcon} title={t("doc.s4")}>
-        <p>Use the same endpoint with a <code>type</code> and <code>media</code> (URL or base64):</p>
-        <Code>{`// Image
-{ "to": "201234567890", "type": "image", "media": "https://example.com/pic.jpg", "caption": "Optional" }
+        <Endpoint id="send-image" method="POST" path="/api/send" title="إرسال صورة"
+          desc="يرسل صورة عبر رابط أو base64 مع caption اختياري."
+          body={`{
+  "to": "201234567890",
+  "type": "image",
+  "media": "https://.../image.jpg",
+  "caption": "وصف الصورة"
+}`} />
 
-// Video
-{ "to": "201234567890", "type": "video", "media": "https://example.com/clip.mp4" }
+        <Endpoint id="send-video" method="POST" path="/api/send" title="إرسال فيديو"
+          desc="يرسل فيديو عبر رابط أو base64 مع caption اختياري."
+          body={`{
+  "to": "201234567890",
+  "type": "video",
+  "media": "https://.../video.mp4",
+  "caption": "وصف الفيديو"
+}`} />
 
-// Audio / voice note
-{ "to": "201234567890", "type": "audio", "media": "https://example.com/voice.mp3" }
+        <Endpoint id="send-doc" method="POST" path="/api/send" title="إرسال مستند"
+          desc="يرسل مستند (PDF, Word...) مع اسم ملف اختياري."
+          body={`{
+  "to": "201234567890",
+  "type": "document",
+  "media": "https://.../file.pdf",
+  "fileName": "تقرير.pdf"
+}`} />
 
-// Document
-{ "to": "201234567890", "type": "document", "media": "https://example.com/file.pdf", "fileName": "report.pdf" }`}</Code>
-      </Section>
+        <Endpoint id="send-audio" method="POST" path="/api/send" title="إرسال رسالة صوتية"
+          desc="يرسل ملف صوتي عبر رابط أو base64."
+          body={`{
+  "to": "201234567890",
+  "type": "audio",
+  "media": "https://.../audio.mp3"
+}`} />
 
-      <Section icon={ArrowLeft} title={t("doc.s5")}>
-        <p>WhatsApp media is encrypted. To get the actual file bytes (e.g. to transcribe a voice note), call:</p>
-        <Code>{`POST https://www.basmaweb.com/api/media
-Authorization: Bearer bsm_live_xxxxx
-Content-Type: application/json
+        <Endpoint id="send-sticker" method="POST" path="/api/send" title="إرسال ملصق"
+          desc="يرسل ملصق (webp)."
+          body={`{
+  "to": "201234567890",
+  "type": "sticker",
+  "media": "https://.../sticker.webp"
+}`} />
 
-{ "message_id": "ABC123" }
+        <Endpoint id="send-location" method="POST" path="/api/send" title="إرسال موقع"
+          desc="يرسل موقع جغرافي (إحداثيات)."
+          body={`{
+  "to": "201234567890",
+  "type": "location",
+  "latitude": 30.0444,
+  "longitude": 31.2357,
+  "name": "القاهرة",
+  "address": "مصر"
+}`} />
 
-// Returns: { "base64": "...", "mimetype": "audio/ogg", "fileName": "...", "mediaType": "..." }`}</Code>
-      </Section>
+        <Endpoint id="send-contact" method="POST" path="/api/send" title="إرسال جهة اتصال"
+          desc="يرسل بطاقة جهة اتصال."
+          body={`{
+  "to": "201234567890",
+  "type": "contact",
+  "contact": { "fullName": "أحمد", "phoneNumber": "201111111111" }
+}`} />
 
-      <Section icon={Webhook} title={t("doc.s6")}>
-        <p>A simple AI auto-reply workflow:</p>
-        <Code>{`[Webhook Trigger]   <- incoming message from BASMA
-      |
-[IF fromMe = false] <- ignore your own messages
-      |
-[AI Agent / logic]  <- generate a reply
-      |
-[HTTP Request]      -> POST /api/send with the reply`}</Code>
-        <p>The HTTP Request node body:</p>
-        <Code>{`{
-  "to": "{{ $('Webhook').item.json.body.data.key.remoteJid }}",
-  "text": "{{ $json.output }}"
-}`}</Code>
-      </Section>
+        <Endpoint id="send-poll" method="POST" path="/api/send" title="إرسال تصويت"
+          desc="يرسل استطلاع رأي بخيارات متعددة."
+          body={`{
+  "to": "201234567890",
+  "type": "poll",
+  "question": "أنهي باقة تفضل؟",
+  "options": ["3 أرقام", "8 أرقام", "13 رقم"],
+  "selectableCount": 1
+}`} />
 
-      <Section icon={Send} title="8. Location, Contact, Poll & Sticker">
-        <p>Same <code>/api/send</code> endpoint, just change <code>type</code>:</p>
-        <Code>{`// Location
-{ "to": "201234567890", "type": "location", "latitude": 30.0444, "longitude": 31.2357, "name": "Cairo", "address": "Egypt" }
+        <h2 className="text-xl font-bold mb-2 mt-8 flex items-center gap-2"><Eye className="w-5 h-5 text-primary" /> الجودة (Anti-ban)</h2>
 
-// Contact card
-{ "to": "201234567890", "type": "contact", "contact": { "fullName": "Ahmed Ali", "phoneNumber": "201112223334" } }
+        <Endpoint id="typing" method="POST" path="/api/presence" title="جاري الكتابة"
+          desc="يُظهر 'جاري الكتابة...' للعميل قبل الرد (يحاكي البشر ويقلل الحظر)."
+          body={`{
+  "to": "201234567890",
+  "presence": "composing",
+  "delay": 3000
+}`} />
 
-// Poll
-{ "to": "201234567890", "type": "poll", "question": "Pick a time", "options": ["9 AM", "2 PM", "6 PM"], "selectableCount": 1 }
+        <Endpoint id="mark-read" method="POST" path="/api/mark-read" title="تحديد كمقروء"
+          desc="يحدّد رسالة واردة كمقروءة (الصح الأزرق)."
+          body={`{
+  "to": "201234567890",
+  "messageId": "ABC123..."
+}`} />
 
-// Sticker (.webp)
-{ "to": "201234567890", "type": "sticker", "media": "https://example.com/sticker.webp" }`}</Code>
-      </Section>
+        <h2 className="text-xl font-bold mb-2 mt-8 flex items-center gap-2"><Users className="w-5 h-5 text-primary" /> بيانات</h2>
 
-      <Section icon={ArrowRight} title="9. Quality: typing indicator & read receipts">
-        <p>Make your bot feel human. Show "typing…" before replying, and mark messages as read (blue ticks).</p>
-        <Code>{`// Show "typing…" for ~1.2s
-POST https://www.basmaweb.com/api/presence
-{ "to": "201234567890", "presence": "composing", "delay": 1200 }
+        <Endpoint id="me" method="GET" path="/api/me" title="معلومات الحساب"
+          desc="يرجّع معلومات الحساب والرقم المتصل." />
 
-// Mark a message as read (blue ticks)
-POST https://www.basmaweb.com/api/mark-read
-{ "remote_jid": "201234567890@s.whatsapp.net", "message_id": "ABC123" }`}</Code>
-        <p className="text-xs">Presence values: <code>composing</code> (typing), <code>recording</code> (voice), <code>available</code> (online), <code>paused</code>.</p>
-      </Section>
+        <Endpoint id="contacts" method="GET" path="/api/contacts" title="جهات الاتصال"
+          desc="يرجّع قائمة جهات الاتصال المتزامنة." />
 
-      <Section icon={Webhook} title="10. Groups">
-        <Code>{`// Create a group
-POST https://www.basmaweb.com/api/groups
-{ "subject": "My Team", "participants": ["201112223334", "201556667778"] }
+        <Endpoint id="groups" method="GET" path="/api/groups" title="المجموعات"
+          desc="يرجّع قائمة المجموعات التي ينتمي إليها الرقم." />
 
-// List all groups
-GET https://www.basmaweb.com/api/groups
+        <h2 className="text-xl font-bold mb-2 mt-8 flex items-center gap-2"><Webhook className="w-5 h-5 text-primary" /> استقبال الرسائل (Webhook)</h2>
 
-// Add / remove / promote / demote members
-POST https://www.basmaweb.com/api/groups/participants
-{ "group_jid": "12036...@g.us", "action": "add", "participants": ["201112223334"] }
-
-// Send to a group with @mentions
-POST https://www.basmaweb.com/api/send
-{ "to": "12036...@g.us", "text": "Hello @everyone", "mentions": ["201112223334"] }`}</Code>
-      </Section>
-
-      <Section icon={KeyRound} title="11. Contacts">
-        <Code>{`// List all contacts
-GET https://www.basmaweb.com/api/contacts
-
-// Get one contact's picture + WhatsApp status
-GET https://www.basmaweb.com/api/contacts?number=201112223334`}</Code>
-      </Section>
-
-      <Section icon={ArrowRight} title={t("doc.s7")}>
-        <Code>{`200  Success
-401  Missing or invalid API key
-403  Account suspended
-404  No matching instance
-429  Monthly message limit reached (paid plans are unlimited)
-502  WhatsApp/Evolution error`}</Code>
-      </Section>
-
-      <div className="grid sm:grid-cols-2 gap-3 mb-6">
-        <Link href="/dashboard/docs/sdk" className="rounded-xl border border-border bg-card/40 p-4 hover:border-primary/40 transition-colors">
-          <h3 className="font-semibold text-foreground mb-1">{t("sdk.link")}</h3>
-          <p className="text-xs text-muted-foreground">{t("sdk.desc")}</p>
-        </Link>
-        <Link href="/dashboard/docs/mcp" className="rounded-xl border border-border bg-card/40 p-4 hover:border-primary/40 transition-colors">
-          <h3 className="font-semibold text-foreground mb-1">{t("mcp.link")}</h3>
-          <p className="text-xs text-muted-foreground">{t("mcp.desc")}</p>
-        </Link>
-      </div>
-
-      <div className="rounded-xl border border-border bg-card/30 p-5 text-sm">
-        <b>{t("doc.help")}</b> {t("doc.helpDesc")}
-      </div>
+        <div id="webhook" className="scroll-mt-20 border-b border-border py-6">
+          <h3 className="text-base font-bold text-foreground mb-1">استقبال الأحداث الواردة</h3>
+          <p className="text-sm text-muted-foreground mb-2">اذهب إلى صفحة <b>Webhooks</b>، أضف رابط منصتك (n8n / Make / Zapier)، واختر الأحداث. سترسل BASMA كل رسالة واردة فوراً إلى الرابط بصيغة JSON:</p>
+          <CodeBlock>{`{
+  "event": "MESSAGE_RECEIVED",
+  "data": {
+    "key": { "remoteJid": "201234567890@s.whatsapp.net", "fromMe": false, "id": "..." },
+    "message": { "conversation": "نص الرسالة" },
+    "pushName": "اسم العميل"
+  }
+}`}</CodeBlock>
+          <p className="text-[11px] text-muted-foreground">في n8n استخدم <b>BASMA Trigger</b> — يطلّع حقول نظيفة: <code className="font-mono text-primary">from, text, pushName, messageType, mediaBase64, messageId</code></p>
+        </div>
+      </main>
     </div>
   )
 }
