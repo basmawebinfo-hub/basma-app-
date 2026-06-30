@@ -1,29 +1,37 @@
-# Supabase Setup Instructions
+# Supabase migrations
 
-## 1. Create a Supabase project
-Go to https://supabase.com → New Project → choose a name and password.
+A holding folder for SQL files that change the production schema.
 
-## 2. Get your API keys
-Dashboard → Settings → API
+Until we wire up the Supabase CLI to apply them automatically, you run each
+file manually from the SQL Editor in the Supabase Dashboard:
 
-Copy:
-- Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-- anon public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- service_role secret key → `SUPABASE_SERVICE_ROLE_KEY`
+1. Open https://supabase.com/dashboard/project/pclmudzbvybvqeczjxzv/sql/new
+2. Paste the entire file contents
+3. Click "Run"
+4. Check the Notices panel for the verification messages
+5. After it succeeds, move the file to a `_applied/` subfolder (manual) so it
+   is clear what is still pending
 
-Paste them into `.env.local`
+## Files
 
-## 3. Run the database schema
-Dashboard → SQL Editor → New Query
+| File | Status | Date | Purpose |
+|------|--------|------|---------|
+| `add_webhook_instance_id.sql` | applied | 2026-06 | Add instance_id to webhook_configs |
+| `2026_07_01_plans_tier_slug.sql` | PENDING | 2026-07-01 | Patch 13a — adds tier_slug + feature flags to plans |
+| `2026_07_01_plans_tier_slug_rollback.sql` | n/a | 2026-07-01 | Companion rollback for Patch 13a |
 
-Paste the full contents of `supabase/schema.sql` and click **Run**.
+## Running Patch 13a — Step by step
 
-## 4. Configure Auth settings
-Dashboard → Authentication → URL Configuration
-- Site URL: `http://localhost:3000` (change to your prod URL later)
-- Redirect URLs: `http://localhost:3000/**`
-
-## 5. (Optional) Disable email confirmation for dev
-Dashboard → Authentication → Providers → Email
-
-Turn off **Confirm email** so you can test login immediately without checking inbox.
+1. Open Supabase SQL Editor (link above).
+2. (Recommended) Take a snapshot of the `plans` table first:
+   ```sql
+   SELECT * FROM plans;
+   ```
+   Copy the result for safekeeping.
+3. Paste the entire contents of `2026_07_01_plans_tier_slug.sql`.
+4. Click "Run". You should see:
+   ```
+   NOTICE: Migration verification: PASSED. plans=6, subs all linked.
+   ```
+5. Sanity-check with the queries at the bottom of the migration file.
+6. If something looks wrong, run the rollback file immediately.
