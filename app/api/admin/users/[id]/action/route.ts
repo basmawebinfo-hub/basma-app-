@@ -24,7 +24,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     case "activate":
     case "approve": {
       const status = action === "suspend" ? "suspended" : "active"
-      await db.from("profiles").update({ status, updated_at: new Date().toISOString() }).eq("id", targetUserId)
+      const profileUpdate: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
+      // On approve/activate: (re)start the trial clock from the approval moment,
+      // so pending days waiting for admin approval don't count against the user.
+      if (action === "approve" || action === "activate") {
+        profileUpdate.created_at = new Date().toISOString()
+      }
+      await db.from("profiles").update(profileUpdate).eq("id", targetUserId)
       // notify the user (in-app + Telegram)
       const sTitle = action === "suspend" ? "تم إيقاف حسابك" : "تم تفعيل حسابك"
       const sBody = action === "suspend"
