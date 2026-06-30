@@ -587,6 +587,19 @@ export const translations: Record<string, { ar: string; en: string }> = {
 
   // Renamed: Recent Activity (was: Recent webhook events)
   "dash.activity.title":       { ar: "النشاط الأخير",               en: "Recent Activity" },
+  // Usage Widget (Patch 12 — live)
+  "usage.messages":     { ar: "الرسائل",         en: "Messages" },
+  "usage.numbers":      { ar: "الأرقام النشطة",  en: "Active numbers" },
+  "usage.apiToday":     { ar: "API اليوم",      en: "API today" },
+  "usage.unitMsg":      { ar: "مستخدمة هذا الشهر", en: "used this period" },
+  "usage.unitNum":      { ar: "متصلة الآن",     en: "connected now" },
+  "usage.unitApi":      { ar: "استدعاء API اليوم", en: "API calls today" },
+  "usage.untilLabel":   { ar: "حتى",            en: "until" },
+  "usage.unlimited":    { ar: "غير محدود",      en: "unlimited" },
+  "usage.viewPlans":    { ar: "عرض الباقات",    en: "View plans" },
+  "usage.errTitle":     { ar: "تعذّر جلب الاستخدام", en: "Could not load usage" },
+  "usage.errDesc":      { ar: "حاول تاني بعد لحظات", en: "Try again in a moment" },
+  "widget.retry":       { ar: "إعادة المحاولة", en: "Try again" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
