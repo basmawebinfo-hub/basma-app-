@@ -34,13 +34,23 @@ export async function GET(req: NextRequest) {
 
   let charged = 0, suspended = 0
   for (const sub of (due ?? []) as { user_id: string; plan_id: string; current_period_end: string }[]) {
-    const { data: plan } = await db.from("plans").select("name, price_monthly").eq("id", sub.plan_id).maybeSingle()
+    const { data: plan } = await db.from("plans").select("name, price_monthly, tier_slug").eq("id", sub.plan_id).maybeSingle()
     const cost = Number(plan?.price_monthly ?? 0)
     const { data: prof } = await db.from("profiles").select("balance, telegram_chat_id").eq("id", sub.user_id).maybeSingle()
     const balance = Number(prof?.balance ?? 0)
 
-    // free/trial plans: just extend, no charge
+    // Free tier: just extend, no charge. Tier-driven (post-2026-07-01 migration)
+    // so admins can\'t accidentally classify a charged plan as free by setting
+    // its price to 0. A zero-price custom/paid plan still falls through to the
+    // `cost <= 0` no-op guard below.
+    if (plan?.tier_slug === "free") {
+      const next = new Date(now.getTime() + 30 * 86400000).toISOString()
+      await db.from("subscriptions").update({ current_period_end: next }).eq("user_id", sub.user_id)
+      continue
+    }
     if (cost <= 0) {
+      // Nothing to charge — extend the period anyway so the cron does not
+      // re-process this subscription every day.
       const next = new Date(now.getTime() + 30 * 86400000).toISOString()
       await db.from("subscriptions").update({ current_period_end: next }).eq("user_id", sub.user_id)
       continue
