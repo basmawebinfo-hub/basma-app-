@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Copy, Check, Webhook, Send, Image as ImageIcon, KeyRound, MessageSquare, MapPin, Users, FileText, Mic, Sticker, Vote, Contact, Eye } from "lucide-react"
+import { Copy, Check, Webhook, Send, KeyRound, MessageSquare, Users, Eye } from "lucide-react"
 
 // ── reusable code block with copy ──
 function CodeBlock({ children }: { children: string }) {
