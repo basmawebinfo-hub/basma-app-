@@ -1,520 +1,190 @@
 "use client"
-
 import { useState, useEffect, useCallback } from "react"
-import { Eye, EyeOff, Send, Trash2, Loader2, Plus, ToggleLeft, ToggleRight , Copy, Check} from "lucide-react"
+import { Trash2, Loader2, Plus, ToggleLeft, ToggleRight, Webhook } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { useI18n } from "@/lib/i18n"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
+interface Instance { id: string; instance_name: string; status: string }
 interface WebhookConfig {
-  id: string
-  name: string
-  destination_type: string
-  destination_url: string | null
-  destination_email: string | null
-  events: string[]
-  is_active: boolean
-  secret: string | null
-  created_at: string
+  id: string; name: string; destination_url: string | null
+  events: string[]; is_active: boolean; instance_id: string | null; created_at: string
 }
 
-interface DeliveryLog {
-  id: string
-  status: string
-  attempts: number
-  last_attempt_at: string | null
-  response_status: number | null
-  error: string | null
-  created_at: string
-  webhook_configs: { name: string; destination_type: string; destination_url: string | null } | null
-  webhook_events: { event_type: string } | null
-}
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const EVENTS = [
-  // Core messaging events (most automations only need these)
-  { key: "MESSAGE_RECEIVED", labelKey: "wh.evMsgRecv" },
-  { key: "SEND_MESSAGE", labelKey: "wh.evMsgSent" },
-  { key: "MESSAGE_UPDATE", labelKey: "wh.evMsgStatus" },
-  // Connection & contacts
-  { key: "CONNECTION_UPDATE", labelKey: "wh.evConn" },
-  { key: "CONTACTS_UPSERT", labelKey: "wh.evContact" },
-  { key: "CHATS_UPSERT", labelKey: "wh.evChat" },
-  // Calls
-  { key: "CALL", labelKey: "wh.evCall" },
+const ALL_EVENTS = [
+  { key: "MESSAGE_RECEIVED", label: "رسالة واردة" },
+  { key: "SEND_MESSAGE", label: "رسالة صادرة" },
+  { key: "MESSAGE_UPDATE", label: "حالة الرسالة" },
+  { key: "CONNECTION_UPDATE", label: "حالة الاتصال" },
 ]
 
-const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
-  SUCCESS: "default",
-  FAILED: "destructive",
-  RETRYING: "secondary",
-  PENDING: "secondary",
-}
-
-const EMPTY_FORM = {
-  name: "",
-  destination_type: "",
-  destination_url: "",
-  destination_email: "",
-  secret: "",
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
-function UrlBox({ label, hint, accent }: { label: string; hint: string; accent: string }) {
-  const [val, setVal] = useState("")
-  const [copied, setCopied] = useState(false)
-  return (
-    <div className={`rounded-lg border p-4 space-y-2 ${accent}`}>
-      <span className="text-sm font-semibold">{label}</span>
-      <p className="text-[11px] text-muted-foreground">{hint}</p>
-      <div className="flex gap-2">
-        <input
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
-          placeholder="https://n8n.../webhook/.../basma"
-          className="flex-1 bg-muted/40 border border-border rounded-md px-3 py-2 text-xs font-mono text-foreground outline-none focus:border-primary"
-        />
-        <button
-          onClick={() => { if (val) { navigator.clipboard.writeText(val); setCopied(true); setTimeout(() => setCopied(false), 1500) } }}
-          className="p-2 rounded-md bg-card border border-border hover:bg-muted transition" aria-label="Copy"
-        >
-          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-        </button>
-      </div>
-    </div>
-  )
-}
-
 export default function WebhooksPage() {
-  const { t } = useI18n()
   const [configs, setConfigs] = useState<WebhookConfig[]>([])
-  const [logs, setLogs] = useState<DeliveryLog[]>([])
-  const [loadingConfigs, setLoadingConfigs] = useState(true)
-  const [loadingLogs, setLoadingLogs] = useState(true)
+  const [instances, setInstances] = useState<Instance[]>([])
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState("")
 
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [selectedEvents, setSelectedEvents] = useState<string[]>(["MESSAGE_RECEIVED"])
-  const [showSecret, setShowSecret] = useState(false)
+  // quick-add form: just URL + instance + events (no name)
+  const [url, setUrl] = useState("")
+  const [instanceId, setInstanceId] = useState("")
+  const [events, setEvents] = useState<string[]>(["MESSAGE_RECEIVED"])
 
-  // ─── Load data ───────────────────────────────────────────────────────────────
-  const loadConfigs = useCallback(async () => {
-    const res = await fetch("/api/webhooks")
-    if (res.ok) setConfigs(await res.json())
-    setLoadingConfigs(false)
-  }, [])
-
-  const loadLogs = useCallback(async () => {
-    const res = await fetch("/api/webhooks/logs")
-    if (res.ok) setLogs(await res.json())
-    setLoadingLogs(false)
-  }, [])
-
-  useEffect(() => { loadConfigs(); loadLogs() }, [loadConfigs, loadLogs])
-
-  // ─── Event toggles ────────────────────────────────────────────────────────────
-  const toggleEvent = (key: string) => {
-    setSelectedEvents((prev) =>
-      prev.includes(key) ? prev.filter((e) => e !== key) : [...prev, key]
-    )
-  }
-
-  const toggleAll = () => {
-    setSelectedEvents((prev) =>
-      prev.length === EVENTS.length ? [] : EVENTS.map((e) => e.key)
-    )
-  }
-
-  // ─── Save config ──────────────────────────────────────────────────────────────
-  const handleSave = async () => {
-    setSaving(true)
-    setSaveError("")
+  const load = useCallback(async () => {
+    setLoading(true)
     try {
-      const body: Record<string, unknown> = {
-        name: form.name,
-        destination_type: form.destination_type,
-        events: selectedEvents,
-        secret: form.secret || undefined,
-      }
-      if (form.destination_type === "EMAIL") {
-        body.destination_email = form.destination_email
-      } else {
-        body.destination_url = form.destination_url
-      }
+      const [wc, ins] = await Promise.all([
+        fetch("/api/webhooks").then((r) => r.json()).catch(() => ({ data: [] })),
+        fetch("/api/instances").then((r) => r.json()).catch(() => ({ data: [] })),
+      ])
+      setConfigs(Array.isArray(wc) ? wc : (wc.data ?? []))
+      const list = Array.isArray(ins) ? ins : (ins.data ?? ins.instances ?? [])
+      setInstances(list)
+      if (list.length === 1) setInstanceId(list[0].id)
+    } finally { setLoading(false) }
+  }, [])
+  useEffect(() => { load() }, [load])
 
+  const addWebhook = async () => {
+    if (!url.trim()) return
+    setSaving(true)
+    try {
       const res = await fetch("/api/webhooks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          destination_type: "N8N",
+          destination_url: url.trim(),
+          instance_id: instanceId || null,
+          events,
+        }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? t("wh.saveFail"))
-      setConfigs((prev) => [data, ...prev])
-      setForm(EMPTY_FORM)
-      setSelectedEvents(["MESSAGE_RECEIVED"])
-    } catch (e: unknown) {
-      setSaveError((e as Error).message)
-    } finally {
-      setSaving(false)
-    }
+      if (res.ok) {
+        setConfigs((prev) => [data, ...prev])
+        setUrl("")
+      }
+    } finally { setSaving(false) }
   }
 
-  // ─── Toggle active ────────────────────────────────────────────────────────────
-  const handleToggle = async (id: string, current: boolean) => {
-    const res = await fetch(`/api/webhooks?id=${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_active: !current }),
-    })
-    if (res.ok) {
-      setConfigs((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, is_active: !current } : c))
-      )
-    }
-  }
+  const toggleEvent = (k: string) =>
+    setEvents((prev) => prev.includes(k) ? prev.filter((e) => e !== k) : [...prev, k])
 
-  // ─── Delete ───────────────────────────────────────────────────────────────────
   const handleDelete = async (id: string) => {
-    await fetch(`/api/webhooks?id=${id}`, { method: "DELETE" })
+    await fetch(`/api/webhooks?id=${id}`, { method: "DELETE" }).catch(() => {})
     setConfigs((prev) => prev.filter((c) => c.id !== id))
   }
 
-  // ─── Send test ────────────────────────────────────────────────────────────────
-  const [testingId, setTestingId] = useState<string | null>(null)
-  const [testResult, setTestResult] = useState<{ id: string; ok: boolean; msg: string } | null>(null)
-
-  const handleTest = async (config: WebhookConfig) => {
-    if (!config.destination_url) return
-    setTestingId(config.id)
-    setTestResult(null)
-    // Replay the LAST REAL incoming WhatsApp message to this webhook (real data, full circle)
-    try {
-      const res = await fetch("/api/webhooks/replay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: config.destination_url, secret: config.secret }),
-      })
-      const d = await res.json().catch(() => ({}))
-      setTestResult({
-        id: config.id,
-        ok: res.ok && d.ok !== false,
-        msg: d.message || d.error || (res.ok ? "تم الإرسال!" : "فشل الإرسال"),
-      })
-    } catch {
-      setTestResult({ id: config.id, ok: false, msg: "تعذّر الوصول" })
-    } finally {
-      setTestingId(null)
-    }
+  const handleToggle = async (id: string, active: boolean) => {
+    await fetch("/api/webhooks", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, is_active: !active }),
+    }).catch(() => {})
+    setConfigs((prev) => prev.map((c) => c.id === id ? { ...c, is_active: !active } : c))
   }
 
-  const destIsUrl = form.destination_type !== "EMAIL"
+  const instName = (iid: string | null) =>
+    instances.find((i) => i.id === iid)?.instance_name?.split("_")[0] ?? "كل الأرقام"
 
   return (
-    <div className="p-6 space-y-8 max-w-4xl">
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{t("wh.title")}</h1>
-        <p className="text-sm text-muted-foreground mt-1">{t("wh.subtitle")}</p>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Webhook className="w-6 h-6 text-primary" /> Webhooks
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">اربط أرقامك بـ n8n / Make / Zapier لاستقبال الرسائل لحظياً.</p>
       </div>
 
-      {/* ─── Existing configs ─────────────────────────────────────────────────── */}
-      {!loadingConfigs && configs.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("wh.activeConfigs")}</h2>
-          <div className="space-y-2">
-            {configs.map((cfg) => (
-              <div
-                key={cfg.id}
-                className="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3 gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{cfg.name}</p>
-                    <Badge variant="outline" className="text-[10px] uppercase">{cfg.destination_type}</Badge>
-                    {!cfg.is_active && <Badge variant="secondary" className="text-[10px]">{t("wh.paused")}</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">
-                    {cfg.destination_url ?? cfg.destination_email ?? "—"}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    {cfg.events.length} event{cfg.events.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => handleToggle(cfg.id, cfg.is_active)}
-                    aria-label={cfg.is_active ? "Pause" : t("wh.resume")}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {cfg.is_active
-                      ? <ToggleRight className="w-5 h-5 text-primary" />
-                      : <ToggleLeft className="w-5 h-5" />
-                    }
-                  </button>
-                  {cfg.destination_url && (
-                    <Button variant="ghost" size="icon-sm" aria-label="Test" title="إرسال آخر رسالة حقيقية للاختبار" onClick={() => handleTest(cfg)} disabled={testingId === cfg.id}>
-                      {testingId === cfg.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                    </Button>
-                  )}
-                  {testResult && testResult.id === cfg.id && (
-                    <span className={cn("text-xs", testResult.ok ? "text-green-500" : "text-red-500")}>
-                      {testResult.msg}
-                    </span>
-                  )}
-                  <Button variant="ghost" size="icon-sm" aria-label={t("wh.delete")} onClick={() => handleDelete(cfg.id)}>
-                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── Quick add: URL + instance + events, added instantly ── */}
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-foreground">إضافة Webhook جديد</h2>
+
+        {/* رابط الوجهة */}
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">رابط الوجهة (من n8n)</label>
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://n8n.../webhook/.../basma"
+            className="w-full bg-muted/40 border border-border rounded-md px-3 py-2 text-sm font-mono text-foreground outline-none focus:border-primary"
+          />
+          {url.includes("webhook-test")
+            ? <span className="text-[11px] text-yellow-500">نوع: Test URL (للتجربة)</span>
+            : url && <span className="text-[11px] text-primary">نوع: Production URL (للتشغيل)</span>}
         </div>
-      )}
 
-      {/* ─── Create form ──────────────────────────────────────────────────────── */}
-      <div className="bg-card border border-border rounded-xl p-6 space-y-6">
-        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Plus className="w-4 h-4" /> {t("wh.newConfig")}
-        </h2>
+        {/* اختيار الرقم */}
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">الرقم المرتبط (يمنع التداخل بين أرقامك)</label>
+          <select
+            value={instanceId}
+            onChange={(e) => setInstanceId(e.target.value)}
+            className="w-full bg-muted/40 border border-border rounded-md px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+          >
+            <option value="">كل الأرقام</option>
+            {instances.map((i) => (
+              <option key={i.id} value={i.id}>{i.instance_name.split("_")[0]} ({i.status})</option>
+            ))}
+          </select>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div className="space-y-2">
-            <Label htmlFor="dest-name">Name</Label>
-            <Input
-              id="dest-name"
-              placeholder="e.g. My n8n Workflow"
-              value={form.name}
-              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t("wh.destType")}</Label>
-            <Select
-              value={form.destination_type}
-              onValueChange={(v) => setForm((p) => ({ ...p, destination_type: v }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("wh.selectType")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="URL">URL</SelectItem>
-                <SelectItem value="EMAIL">Email</SelectItem>
-                <SelectItem value="N8N">n8n</SelectItem>
-                <SelectItem value="ZAPIER">Zapier</SelectItem>
-                <SelectItem value="MAKE">Make</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="dest-url">{!destIsUrl ? t("wh.emailAddr") : t("wh.destUrl")}</Label>
-            <Input
-              id="dest-url"
-              placeholder={
-                !destIsUrl ? "notify@yourdomain.com"
-                  : form.destination_type === "N8N" ? "https://your-n8n.io/webhook/..."
-                  : form.destination_type === "ZAPIER" ? "https://hooks.zapier.com/hooks/catch/..."
-                  : "https://your-endpoint.com/webhook"
-              }
-              value={destIsUrl ? form.destination_url : form.destination_email}
-              onChange={(e) =>
-                setForm((p) =>
-                  destIsUrl
-                    ? { ...p, destination_url: e.target.value }
-                    : { ...p, destination_email: e.target.value }
-                )
-              }
-            />
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="secret">{t("wh.signingSecret")}</Label>
-            <div className="relative">
-              <Input
-                id="secret"
-                type={showSecret ? "text" : "password"}
-                placeholder="HMAC signing secret"
-                value={form.secret}
-                onChange={(e) => setForm((p) => ({ ...p, secret: e.target.value }))}
-                className="pr-10"
-              />
+        {/* الأحداث */}
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">الأحداث</label>
+          <div className="flex flex-wrap gap-2">
+            {ALL_EVENTS.map((ev) => (
               <button
-                type="button"
-                onClick={() => setShowSecret((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                aria-label={showSecret ? t("wh.hideSecret") : t("wh.showSecret")}
-              >
-                {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Events */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label>{t("wh.events")}</Label>
-            <button onClick={toggleAll} className="text-xs text-primary hover:underline">
-              {selectedEvents.length === EVENTS.length ? t("wh.deselectAll") : t("wh.selectAll")}
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {EVENTS.map((ev) => (
-              <label
                 key={ev.key}
-                className="flex items-start gap-2.5 p-2.5 rounded-lg border border-border/50 hover:bg-muted/20 cursor-pointer transition-colors"
+                onClick={() => toggleEvent(ev.key)}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs border transition",
+                  events.includes(ev.key)
+                    ? "bg-primary/15 text-primary border-primary/40"
+                    : "bg-muted/30 text-muted-foreground border-border"
+                )}
               >
-                <Checkbox
-                  checked={selectedEvents.includes(ev.key)}
-                  onCheckedChange={() => toggleEvent(ev.key)}
-                  className="mt-0.5 shrink-0"
-                />
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground">{t(ev.labelKey)}</p>
-                  <p className="text-[10px] font-mono text-muted-foreground">{ev.key}</p>
-                </div>
-              </label>
+                {ev.label}
+              </button>
             ))}
           </div>
         </div>
 
-        {saveError && <p className="text-xs text-destructive">{saveError}</p>}
-
-        <Button
-          className="gap-2"
-          onClick={handleSave}
-          disabled={!form.name || !form.destination_type || selectedEvents.length === 0 || saving}
-        >
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : t("wh.saveConfig")}
+        <Button onClick={addWebhook} disabled={saving || !url.trim()} className="w-full">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          إضافة فوراً
         </Button>
       </div>
 
-              {/* ─── n8n setup guide: Test & Production URLs + payload reference ─── */}
-        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            دليل الربط مع n8n
-          </h2>
-
-          {/* Empty input boxes — user pastes their n8n URLs and copies them */}
-          <UrlBox
-            label="Test URL (للتجربة)"
-            hint="انسخه من الـ BASMA Trigger في n8n (فيه webhook-test) واضغط Listen قبل الإرسال."
-            accent="border-yellow-500/30 bg-yellow-500/5"
-          />
-          <UrlBox
-            label="Production URL (للتشغيل)"
-            hint="انسخه من الـ BASMA Trigger (فيه webhook بدون test)، فعّل الـ workflow Active، ثم ضعه في الإعداد بالأعلى."
-            accent="border-primary/30 bg-primary/5"
-          />
-
-          {/* Test vs Production URLs */}
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3 space-y-1">
-              <div className="text-xs font-semibold text-yellow-500">Test URL (للتجربة)</div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                انسخه من الـ BASMA Trigger في n8n (فيه <span className="font-mono">webhook-test</span>) واضغط
-                &quot;Listen for test event&quot; قبل ما تبعت. يعمل لرسالة واحدة فقط لمعاينة البيانات أثناء البناء.
-              </p>
+      {/* ── Active webhooks ── */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-foreground">الإعدادات النشطة</h2>
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+        ) : configs.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">لا توجد webhooks بعد. أضف واحداً بالأعلى.</p>
+        ) : (
+          configs.map((cfg) => (
+            <div key={cfg.id} className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-semibold text-foreground">{cfg.name}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                    {instName(cfg.instance_id)}
+                  </span>
+                  {!cfg.is_active && <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">موقوف</span>}
+                </div>
+                <p className="text-[11px] text-muted-foreground font-mono truncate mt-1">{cfg.destination_url}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{cfg.events?.length ?? 0} حدث</p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => handleToggle(cfg.id, cfg.is_active)} className="text-muted-foreground hover:text-foreground transition" aria-label="toggle">
+                  {cfg.is_active ? <ToggleRight className="w-5 h-5 text-primary" /> : <ToggleLeft className="w-5 h-5" />}
+                </button>
+                <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(cfg.id)} aria-label="delete">
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
             </div>
-            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-1">
-              <div className="text-xs font-semibold text-primary">Production URL (للتشغيل)</div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                انسخه من الـ BASMA Trigger (فيه <span className="font-mono">webhook</span> بدون test)، فعّل الـ workflow
-                (Active)، ثم ضعه هنا. يعمل دائماً 24/7 لكل الرسائل.
-              </p>
-            </div>
-          </div>
-
-          {/* Base URL note for sending */}
-          <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
-            <div className="text-xs font-semibold text-foreground">عند الإرسال عبر الـ API (n8n BASMA node):</div>
-            <p className="text-[11px] text-muted-foreground">
-              في الـ Credential ضع <span className="font-mono text-primary">Base URL = https://www.basmaweb.com</span> فقط
-              (بدون أي مسار بعده). الـ node يضيف <span className="font-mono">/api/send</span> تلقائياً.
-            </p>
-          </div>
-
-          {/* Payload fields the user actually needs */}
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-foreground">الحقول المتاحة في الرسالة الواردة:</div>
-            <div className="rounded-lg border border-border bg-muted/30 p-3 font-mono text-[11px] text-muted-foreground space-y-1 leading-relaxed">
-              <div><span className="text-primary">from</span> — رقم المُرسِل (نظيف)</div>
-              <div><span className="text-primary">text</span> — نص الرسالة</div>
-              <div><span className="text-primary">pushName</span> — اسم المُرسِل</div>
-              <div><span className="text-primary">messageType</span> — نوع الرسالة (text / image / ...)</div>
-              <div><span className="text-primary">mediaBase64</span> — الوسائط (إن وُجدت)</div>
-              <div><span className="text-primary">messageId</span> — معرّف الرسالة</div>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              في الـ node استخدم مثلاً: <span className="font-mono text-primary">{`{{ $json.from }}`}</span> أو
-              <span className="font-mono text-primary"> {`{{ $json.text }}`}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* ─── Delivery log ─────────────────────────────────────────────────────── */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">{t("wh.deliveryLog")}</h2>
-        </div>
-        <div className="overflow-x-auto">
-          {loadingLogs ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : logs.length === 0 ? (
-            <p className="text-xs text-muted-foreground px-6 py-8">{t("wh.noLogs")}</p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  {["Event", t("wh.colDest"), "Status", t("wh.colSentAt"), "Code", t("wh.colAttempts")].map((h) => (
-                    <th key={h} className="text-left px-4 py-3 text-xs text-muted-foreground font-medium">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((row) => (
-                  <tr key={row.id} className="border-b border-border/40 hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-foreground">
-                      {row.webhook_events?.event_type ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground max-w-[160px] truncate">
-                      {row.webhook_configs?.destination_url ?? row.webhook_configs?.name ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge
-                        variant={statusVariant[row.status?.toUpperCase()] ?? "secondary"}
-                        className="text-[10px] uppercase tracking-wide"
-                      >
-                        {row.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {row.last_attempt_at
-                        ? new Date(row.last_attempt_at).toLocaleString("ar-EG", { timeZone: "Africa/Cairo", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                      {row.response_status ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{row.attempts}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+          ))
+        )}
       </div>
     </div>
   )
