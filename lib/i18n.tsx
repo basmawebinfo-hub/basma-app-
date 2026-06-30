@@ -544,6 +544,11 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Quick Actions — Phase 1 additions
   "dash.qaLab":       { ar: "جرّب المختبر", en: "Try the Lab" },
   "dash.qaAcademy":   { ar: "تصفّح الأكاديمية", en: "Browse Academy" },
+  // Sidebar polish — section headers + user card
+  "sb.sectionLearn":   { ar: "تعلّم وجرّب",     en: "Learn & Try" },
+  "sb.sectionAccount": { ar: "الحساب",          en: "Account" },
+  "sb.guest":          { ar: "ضيف",             en: "Guest" },
+  "sb.openAccount":    { ar: "افتح إعدادات الحساب", en: "Open account settings" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
