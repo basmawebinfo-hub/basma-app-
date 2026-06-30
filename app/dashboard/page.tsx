@@ -13,6 +13,7 @@ import { useI18n } from "@/lib/i18n"
 import { SmartChecklist } from "@/components/dashboard/smart-checklist"
 import { WidgetContainer } from "@/components/dashboard/widget-container"
 import { WidgetPlaceholder } from "@/components/dashboard/widget-placeholder"
+import { UsageWidget } from "@/components/dashboard/usage-widget"
 
 interface DashboardStats {
   messages_today: number
@@ -127,13 +128,7 @@ export default function DashboardOverview() {
 
         {/* Row 3 — Usage (7) + AI Agent Status (5, future) */}
         <div className="lg:col-span-7">
-          <WidgetPlaceholder
-            title={t("dash.usage.title")}
-            description={t("dash.usage.description")}
-            icon={Activity}
-            pitch={t("dash.usage.pitch")}
-            labels={placeholderLabels}
-          />
+          <UsageWidget />
         </div>
         <div className="lg:col-span-5">
           <WidgetPlaceholder
