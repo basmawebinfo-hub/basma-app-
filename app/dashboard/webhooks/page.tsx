@@ -405,6 +405,18 @@ export default function WebhooksPage() {
             دليل الربط مع n8n
           </h2>
 
+          {/* Empty input boxes — user pastes their n8n URLs and copies them */}
+          <UrlBox
+            label="Test URL (للتجربة)"
+            hint="انسخه من الـ BASMA Trigger في n8n (فيه webhook-test) واضغط Listen قبل الإرسال."
+            accent="border-yellow-500/30 bg-yellow-500/5"
+          />
+          <UrlBox
+            label="Production URL (للتشغيل)"
+            hint="انسخه من الـ BASMA Trigger (فيه webhook بدون test)، فعّل الـ workflow Active، ثم ضعه في الإعداد بالأعلى."
+            accent="border-primary/30 bg-primary/5"
+          />
+
           {/* Test vs Production URLs */}
           <div className="grid sm:grid-cols-2 gap-3">
             <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3 space-y-1">
