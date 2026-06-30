@@ -530,6 +530,20 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "sb.notifications": { ar: "الإشعارات", en: "Notifications" },
   "sb.soon": { ar: "قريباً", en: "Soon" },
   "sb.locked": { ar: "متاحة في باقة أعلى", en: "Available on a higher plan" },
+  // Smart Checklist (Milestone B)
+  "ck.title":         { ar: "ابدأ في أقل من 5 دقائق", en: "Get started in under 5 minutes" },
+  "ck.greeting":      { ar: "أهلاً بك في بصمة 👋", en: "Welcome to BASMA 👋" },
+  "ck.greetingNamed": { ar: "أهلاً يا {name} 👋", en: "Hi {name} 👋" },
+  "ck.subtitle":      { ar: "خلّص الخطوات دي عشان تستفيد بالكامل من المنصة", en: "Finish these to get the most out of the platform" },
+  "ck.dismiss":       { ar: "إخفاء مؤقت", en: "Hide for now" },
+  "ck.s1":            { ar: "أكمل بيانات حسابك", en: "Complete your profile" },
+  "ck.s2":            { ar: "شاهد فيديو البداية (3 دقائق)", en: "Watch the intro video (3 min)" },
+  "ck.s3":            { ar: "اربط أول رقم واتساب", en: "Connect your first WhatsApp number" },
+  "ck.s4":            { ar: "جرّب أول AI Demo", en: "Try your first AI demo" },
+  "ck.s5":            { ar: "افتح أول كورس", en: "Open your first course" },
+  // Quick Actions — Phase 1 additions
+  "dash.qaLab":       { ar: "جرّب المختبر", en: "Try the Lab" },
+  "dash.qaAcademy":   { ar: "تصفّح الأكاديمية", en: "Browse Academy" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
