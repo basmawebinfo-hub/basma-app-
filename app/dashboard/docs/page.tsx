@@ -29,12 +29,60 @@ function Section({ icon: Icon, title, children }: { icon: React.ElementType; tit
   )
 }
 
+function UrlBox({ label, hint, accent }: { label: string; hint: string; accent: string }) {
+  const [val, setVal] = useState("")
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className={`rounded-lg border p-4 space-y-2 ${accent}`}>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold">{label}</span>
+      </div>
+      <p className="text-[11px] text-muted-foreground">{hint}</p>
+      <div className="flex gap-2">
+        <input
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          placeholder="https://n8n.../webhook/.../basma"
+          className="flex-1 bg-muted/40 border border-border rounded-md px-3 py-2 text-xs font-mono text-foreground outline-none focus:border-primary"
+        />
+        <button
+          onClick={() => { if (val) { navigator.clipboard.writeText(val); setCopied(true); setTimeout(() => setCopied(false), 1500) } }}
+          className="p-2 rounded-md bg-card border border-border hover:bg-muted transition"
+          aria-label="Copy"
+        >
+          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function DocsPage() {
   const { t } = useI18n()
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">{t("doc.title")}</h1>
       <p className="text-muted-foreground mb-8">{t("doc.subtitle")}</p>
+
+      {/* ─── n8n Webhook URLs: paste Test & Production URLs from n8n ─── */}
+      <div className="rounded-xl border border-border bg-card p-5 mb-8 space-y-4">
+        <h2 className="text-lg font-bold flex items-center gap-2">
+          <Webhook className="w-5 h-5 text-primary" /> روابط n8n الخاصة بك
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          انسخ الرابط من الـ BASMA Trigger في n8n وضعه هنا للحفظ والرجوع إليه بسهولة.
+        </p>
+        <UrlBox
+          label="Test URL (للتجربة)"
+          hint="الرابط اللي فيه webhook-test — استخدمه أثناء البناء واضغط Listen في n8n قبل الإرسال."
+          accent="border-yellow-500/30 bg-yellow-500/5"
+        />
+        <UrlBox
+          label="Production URL (للتشغيل الفعلي)"
+          hint="الرابط اللي فيه webhook (بدون test) — فعّل الـ workflow Active، ثم ضعه في صفحة Webhooks."
+          accent="border-primary/30 bg-primary/5"
+        />
+      </div>
 
       <Section icon={ArrowLeft} title={t("doc.s1")}>
         <p>Every incoming WhatsApp message can be forwarded to your automation platform in real time.</p>
