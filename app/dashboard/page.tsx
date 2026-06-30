@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { MessageSquare, Users, CheckCircle2, Clock, Loader2, Plug, Webhook, Inbox, BookOpen, FlaskConical, GraduationCap } from "lucide-react"
+import {
+  MessageSquare, Users, CheckCircle2, Clock, Loader2,
+  Plug, Webhook, Inbox, BookOpen, FlaskConical, GraduationCap,
+  ArrowUpRight,
+} from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/lib/i18n"
@@ -52,93 +56,148 @@ export default function DashboardOverview() {
   ]
 
   const QUICK = [
-    { key: "dash.qaConnect", href: "/dashboard/connect", icon: Plug },
-    { key: "dash.qaInbox", href: "/dashboard/inbox", icon: Inbox },
-    { key: "dash.qaWebhook", href: "/dashboard/webhooks", icon: Webhook },
-    { key: "dash.qaLab", href: "/dashboard/lab", icon: FlaskConical },
-    { key: "dash.qaAcademy", href: "/dashboard/academy", icon: GraduationCap },
-    { key: "dash.qaDocs", href: "/dashboard/docs", icon: BookOpen },
+    { key: "dash.qaConnect",  href: "/dashboard/connect",  icon: Plug },
+    { key: "dash.qaInbox",    href: "/dashboard/inbox",    icon: Inbox },
+    { key: "dash.qaWebhook",  href: "/dashboard/webhooks", icon: Webhook },
+    { key: "dash.qaLab",      href: "/dashboard/lab",      icon: FlaskConical },
+    { key: "dash.qaAcademy",  href: "/dashboard/academy",  icon: GraduationCap },
+    { key: "dash.qaDocs",     href: "/dashboard/docs",     icon: BookOpen },
   ]
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
-    <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{t("dash.welcome")} 👋</h1>
-        <p className="text-sm text-muted-foreground mt-1">{t("dash.subtitle")}</p>
-      </div>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Page header */}
+      <header className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+          {t("dash.welcome")} 👋
+        </h1>
+        <p className="text-sm text-muted-foreground">{t("dash.subtitle")}</p>
+      </header>
 
       {/* Onboarding — auto-hides once all 5 steps are complete */}
       <SmartChecklist />
 
-      {error && (<div className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3"><p className="text-xs text-destructive">{error}</p></div>)}
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
+          <p className="text-xs text-destructive">{error}</p>
+        </div>
+      )}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STAT_CARDS.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.labelKey} className="bg-card border border-border rounded-2xl p-5 flex flex-col gap-3 hover:border-primary/30 transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{t(stat.labelKey)}</span>
-                <span className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center`}><Icon className={`w-4 h-4 ${stat.color}`} /></span>
+      <section aria-labelledby="stats-heading">
+        <h2 id="stats-heading" className="sr-only">{t("dash.welcome")}</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {STAT_CARDS.map((stat) => {
+            const Icon = stat.icon
+            return (
+              <div
+                key={stat.labelKey}
+                className="bg-card border border-border rounded-2xl p-5 flex flex-col gap-3 transition-all duration-150 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">{t(stat.labelKey)}</span>
+                  <span className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                    <Icon className={`w-4 h-4 ${stat.color}`} />
+                  </span>
+                </div>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight tabular-nums">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-muted-foreground">{t(stat.deltaKey)}</p>
               </div>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{t(stat.deltaKey)}</p>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      </section>
 
       {/* Quick actions */}
-      <div>
-        <h2 className="text-sm font-semibold text-foreground mb-3">{t("dash.quickActions")}</h2>
+      <section aria-labelledby="quick-actions-heading">
+        <h2 id="quick-actions-heading" className="text-sm font-semibold text-foreground mb-3">
+          {t("dash.quickActions")}
+        </h2>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {QUICK.map((q) => {
             const Icon = q.icon
             return (
-              <Link key={q.key} href={q.href} className="flex items-center gap-3 bg-card border border-border rounded-xl p-4 hover:border-primary/40 hover:bg-card/80 transition-all group">
-                <span className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors"><Icon className="w-4 h-4 text-primary" /></span>
-                <span className="text-sm font-medium text-foreground">{t(q.key)}</span>
+              <Link
+                key={q.key}
+                href={q.href}
+                className="flex items-center gap-3 bg-card border border-border rounded-xl p-4 transition-all duration-150 hover:border-primary/40 hover:bg-card/80 hover:-translate-y-px group"
+              >
+                <span className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-150">
+                  <Icon className="w-4 h-4 text-primary" />
+                </span>
+                <span className="text-sm font-medium text-foreground flex-1">{t(q.key)}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-150" />
               </Link>
             )
           })}
         </div>
-      </div>
+      </section>
 
       {/* Line chart */}
-      <div className="bg-card border border-border rounded-2xl p-6">
-        <h2 className="text-sm font-semibold text-foreground mb-4">{t("dash.chartTitle")}</h2>
+      <section className="bg-card border border-border rounded-2xl p-6">
+        <header className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-foreground">{t("dash.chartTitle")}</h2>
+        </header>
         {stats.messages_week.some((d) => d.messages > 0) ? (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={stats.messages_week} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.2 0 0)" />
               <XAxis dataKey="day" tick={{ fill: "oklch(0.6 0 0)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "oklch(0.6 0 0)", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: "oklch(0.11 0 0)", border: "1px solid oklch(0.2 0 0)", borderRadius: "8px", fontSize: "12px" }} labelStyle={{ color: "oklch(0.95 0 0)" }} itemStyle={{ color: "oklch(0.92 0.16 125)" }} />
-              <Line type="monotone" dataKey="messages" stroke="oklch(0.92 0.16 125)" strokeWidth={2} dot={{ fill: "oklch(0.92 0.16 125)", r: 3 }} activeDot={{ r: 5 }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "oklch(0.11 0 0)", border: "1px solid oklch(0.2 0 0)",
+                  borderRadius: "8px", fontSize: "12px",
+                }}
+                labelStyle={{ color: "oklch(0.95 0 0)" }}
+                itemStyle={{ color: "oklch(0.92 0.16 125)" }}
+              />
+              <Line
+                type="monotone" dataKey="messages"
+                stroke="oklch(0.92 0.16 125)" strokeWidth={2}
+                dot={{ fill: "oklch(0.92 0.16 125)", r: 3 }}
+                activeDot={{ r: 5 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         ) : (
           <div className="flex flex-col items-center justify-center h-[220px] gap-2 text-muted-foreground">
-            <MessageSquare className="w-10 h-10 opacity-20" />
-            <p className="text-sm">{t("dash.noMsg")}</p>
+            <div className="w-12 h-12 rounded-2xl bg-secondary/40 flex items-center justify-center">
+              <MessageSquare className="w-6 h-6 opacity-40" />
+            </div>
+            <p className="text-sm text-foreground/80">{t("dash.noMsg")}</p>
             <p className="text-xs">{t("dash.noMsgHint")}</p>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Recent webhook events */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border"><h2 className="text-sm font-semibold text-foreground">{t("dash.recentEvents")}</h2></div>
+      <section className="bg-card border border-border rounded-2xl overflow-hidden">
+        <header className="px-6 py-4 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground">{t("dash.recentEvents")}</h2>
+        </header>
         {!stats.recent_events.length ? (
-          <p className="text-xs text-muted-foreground px-6 py-8">{t("dash.noEvents")}</p>
+          <div className="flex flex-col items-center justify-center px-6 py-12 gap-2 text-muted-foreground">
+            <div className="w-12 h-12 rounded-2xl bg-secondary/40 flex items-center justify-center">
+              <Webhook className="w-6 h-6 opacity-40" />
+            </div>
+            <p className="text-sm">{t("dash.noEvents")}</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border bg-secondary/20">
                   <th className="text-start px-6 py-3 text-xs text-muted-foreground font-medium">{t("dash.colEvent")}</th>
                   <th className="text-start px-6 py-3 text-xs text-muted-foreground font-medium">{t("dash.colDest")}</th>
                   <th className="text-start px-6 py-3 text-xs text-muted-foreground font-medium">{t("dash.colStatus")}</th>
@@ -148,10 +207,14 @@ export default function DashboardOverview() {
               </thead>
               <tbody>
                 {stats.recent_events.map((ev, i) => (
-                  <tr key={i} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                  <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors duration-150">
                     <td className="px-6 py-3 font-mono text-xs text-foreground">{ev.event}</td>
                     <td className="px-6 py-3 text-xs text-muted-foreground max-w-[180px] truncate">{ev.dest}</td>
-                    <td className="px-6 py-3"><Badge variant={statusVariant[ev.status] ?? "secondary"} className="text-[10px] uppercase tracking-wide">{ev.status}</Badge></td>
+                    <td className="px-6 py-3">
+                      <Badge variant={statusVariant[ev.status] ?? "secondary"} className="text-[10px] uppercase tracking-wide">
+                        {ev.status}
+                      </Badge>
+                    </td>
                     <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{ev.code}</td>
                     <td className="px-6 py-3 text-xs text-muted-foreground">{ev.time}</td>
                   </tr>
@@ -160,7 +223,7 @@ export default function DashboardOverview() {
             </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   )
 }
