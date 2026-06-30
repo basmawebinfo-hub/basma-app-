@@ -122,6 +122,28 @@ export default function DocsPage() {
   "type": "text",
   "text": "مرحباً من بصمة"
 }`}
+          examples={{
+            curl: `curl -X POST https://www.basmaweb.com/api/send \\
+  -H "Authorization: Bearer bsm_live_xxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{"to":"201234567890","type":"text","text":"مرحباً"}'`,
+            js: `const res = await fetch("https://www.basmaweb.com/api/send", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer bsm_live_xxxx",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ to: "201234567890", type: "text", text: "مرحباً" }),
+});
+const data = await res.json();`,
+            py: `import requests
+res = requests.post(
+    "https://www.basmaweb.com/api/send",
+    headers={"Authorization": "Bearer bsm_live_xxxx"},
+    json={"to": "201234567890", "type": "text", "text": "مرحباً"},
+)
+print(res.json())`
+          }}
           resp={`{ "ok": true, "result": { "key": { "id": "..." }, "status": "PENDING" } }`} />
 
         <Endpoint id="send-image" method="POST" path="/api/send" title="إرسال صورة"
@@ -223,6 +245,16 @@ export default function DocsPage() {
 
         <Endpoint id="groups" method="GET" path="/api/groups" title="المجموعات"
           desc="يرجّع قائمة المجموعات التي ينتمي إليها الرقم." />
+
+        <Endpoint id="participants" method="GET" path="/api/groups/participants" title="أعضاء المجموعة"
+          desc="يرجّع قائمة أعضاء مجموعة معيّنة (GET)، أو يضيف/يحذف أعضاء (POST)." />
+
+        <Endpoint id="media" method="POST" path="/api/media" title="رفع ملف وسائط"
+          desc="يرفع ملف (صورة/فيديو/مستند) ويرجّع رابطاً تستخدمه في الإرسال."
+          body={`{
+  "file": "<base64 أو رابط>",
+  "fileName": "image.jpg"
+}`} />
 
         <h2 className="text-xl font-bold mb-2 mt-8 flex items-center gap-2"><Webhook className="w-5 h-5 text-primary" /> استقبال الرسائل (Webhook)</h2>
 
