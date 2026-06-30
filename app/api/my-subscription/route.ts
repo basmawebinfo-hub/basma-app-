@@ -42,6 +42,10 @@ export async function GET() {
   if (sub?.current_period_end) {
     periodEnd = sub.current_period_end
     daysLeft = Math.max(0, Math.ceil((new Date(sub.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  } else if (profile.status === "pending") {
+    // Account not approved yet — freeze the trial at full days; clock starts on approval
+    daysLeft = TRIAL_DAYS
+    periodEnd = null
   } else if (profile.created_at) {
     const end = new Date(profile.created_at).getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000
     periodEnd = new Date(end).toISOString()
