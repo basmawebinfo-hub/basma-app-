@@ -28,12 +28,23 @@ export async function GET() {
 
   let planName = profile.plan ?? null
   let maxInstances: number | null = null
+  // Trial flag now comes directly from the plans table (post-migration
+  // 2026-07-01 added the `is_trial` boolean). No more string-matching the
+  // plan name in Arabic — translations or renames will not break this.
+  let planIsTrial = false
   if (sub?.plan_id) {
-    const { data: plan } = await supabase.from("plans").select("name, price_monthly, max_instances").eq("id", sub.plan_id).maybeSingle()
-    if (plan) { planName = plan.name; maxInstances = plan.max_instances }
+    const { data: plan } = await supabase
+      .from("plans")
+      .select("name, max_instances, is_trial")
+      .eq("id", sub.plan_id)
+      .maybeSingle()
+    if (plan) {
+      planName = plan.name
+      maxInstances = plan.max_instances
+      planIsTrial = Boolean(plan.is_trial)
+    }
   }
 
-  const isTrial = (planName ?? "").toLowerCase().includes("trial") || (planName ?? "").includes("تجريبي") || (planName ?? "") === "" || Number((planName && sub?.plan_id) ? 1 : 0) === 0 && !sub
   const pastDue = sub?.status === "past_due"
 
   // Days left: prefer subscription period end; fall back to 7-day trial from signup
@@ -55,11 +66,17 @@ export async function GET() {
   // count current numbers
   const { count: numbersUsed } = await supabase.from("instances").select("id", { count: "exact", head: true }).eq("user_id", user.id)
 
+  // is_trial is true when:
+  //   - the user is on a plan whose is_trial flag is set, OR
+  //   - the user has no subscription row at all (fresh signup, still on the
+  //     7-day implicit trial counted from profile.created_at).
+  const isTrial = planIsTrial || !sub?.plan_id
+
   return NextResponse.json({
     plan: planName,
     days_left: daysLeft,
     trial_end: periodEnd,
-    is_trial: !sub?.plan_id,
+    is_trial: isTrial,
     past_due: pastDue,
     balance: profile.balance ?? 0,
     status: profile.status ?? null,

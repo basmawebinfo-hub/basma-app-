@@ -75,15 +75,20 @@ export async function GET(req: NextRequest) {
     .from("profiles")
     .select("id, balance, telegram_chat_id")
   const { data: allSubs } = await db.from("subscriptions").select("user_id, plan_id, status")
-  const { data: allPlans } = await db.from("plans").select("id, price_monthly, name")
-  const planMap = new Map((allPlans ?? []).map((p: { id: string; price_monthly: number; name: string }) => [p.id, p]))
+  const { data: allPlans } = await db.from("plans").select("id, price_monthly, name, tier_slug")
+  const planMap = new Map((allPlans ?? []).map((p: { id: string; price_monthly: number; name: string; tier_slug: string }) => [p.id, p]))
   const subMap = new Map((allSubs ?? []).map((s: { user_id: string; plan_id: string; status: string }) => [s.user_id, s]))
 
   for (const u of (paidProfiles ?? []) as { id: string; balance: number; telegram_chat_id: string | null }[]) {
     const sub = subMap.get(u.id)
     if (!sub || sub.status !== "active") continue
     const plan = planMap.get(sub.plan_id)
-    if (!plan || !plan.price_monthly || plan.price_monthly <= 0) continue  // free/custom skip
+    // Tier-driven skip: only the free tier is exempt from daily billing.
+    // Custom-plan users CAN be billed if the admin set a price_monthly > 0.
+    // (Pre-migration this used `price_monthly <= 0` which mis-skipped any
+    // custom plan with price=0 even when the user owed money — see PR #19.)
+    if (!plan || plan.tier_slug === "free") continue
+    if (!plan.price_monthly || plan.price_monthly <= 0) continue  // nothing to charge
 
     const dailyCost = Number((plan.price_monthly / 30).toFixed(2))
     const bal = Number(u.balance ?? 0)

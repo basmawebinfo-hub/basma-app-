@@ -71,10 +71,17 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 /**
  * Resolve the user's current tier from `subscriptions` + `plans`.
  *
- * Order of precedence:
- *   1. Active subscription → look up plan.tier_slug (post-migration)
- *      or fall back to plan.name mapping for legacy plans
- *   2. No subscription → "free"
+ * Post-migration (2026-07-01) every plan row has a `tier_slug` column. We
+ * read that column directly; there is no price-based heuristic any more.
+ *
+ * Returns "free" when:
+ *   - the user has no subscription row, or
+ *   - their subscription is cancelled, or
+ *   - the plan row is missing (data inconsistency).
+ *
+ * If a plan ever lands in DB without a tier_slug (which the CHECK constraint
+ * makes impossible, but defensive code is cheap), we log to stderr and fall
+ * back to "free" so the user is never silently promoted.
  */
 async function resolveTier(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -94,21 +101,18 @@ async function resolveTier(
 
   const { data: plan } = await supabase
     .from("plans")
-    .select("name, tier_slug, price_monthly")
+    .select("tier_slug")
     .eq("id", sub.plan_id)
-    .single<{ name: string; tier_slug?: string | null; price_monthly: number }>()
+    .single<{ tier_slug: string | null }>()
 
-  if (!plan) return "free"
-
-  // Post-migration: trust tier_slug directly.
-  if (plan.tier_slug) {
-    return getTier(plan.tier_slug).slug
+  if (!plan?.tier_slug) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `[resolveTier] plan ${sub.plan_id} has no tier_slug — falling back to "free"`,
+      )
+    }
+    return "free"
   }
 
-  // Legacy mapping — match by price tier until the migration lands.
-  // Source: DB_SCHEMA.md §"الـ Plans الحالية في DB"
-  if (plan.price_monthly === 0) return "free"
-  if (plan.price_monthly <= 25) return "starter"
-  if (plan.price_monthly <= 55) return "pro"
-  return "business"
+  return getTier(plan.tier_slug).slug
 }
