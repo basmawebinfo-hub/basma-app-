@@ -549,6 +549,44 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "sb.sectionAccount": { ar: "الحساب",          en: "Account" },
   "sb.guest":          { ar: "ضيف",             en: "Guest" },
   "sb.openAccount":    { ar: "افتح إعدادات الحساب", en: "Open account settings" },
+  // Dashboard widgets (locked layout — Patch 12 onwards)
+  "widget.phase2":             { ar: "قريباً في المرحلة الثانية", en: "Coming in Phase 2" },
+  "widget.phase3":             { ar: "قريباً في المرحلة الثالثة", en: "Coming in Phase 3" },
+  "widget.phase4":             { ar: "قريباً في المرحلة الرابعة", en: "Coming in Phase 4" },
+  "widget.tierPro":            { ar: "متاحة في باقة Pro",           en: "Available on Pro" },
+
+  // Usage widget (Patch 12 target)
+  "dash.usage.title":          { ar: "استخدامك",                    en: "Your Usage" },
+  "dash.usage.description":    { ar: "ملخّص استهلاكك هذا الشهر",     en: "Your consumption this month" },
+  "dash.usage.pitch":          { ar: "هتشوف هنا الرسائل، الأرقام النشطة، والـ API بسرعة", en: "Messages, active numbers, and API usage at a glance" },
+
+  // AI Agent Status (future widget)
+  "dash.aiStatus.title":       { ar: "حالة الـ AI Agent",            en: "AI Agent Status" },
+  "dash.aiStatus.description": { ar: "آخر تفاعلات الـ Bot وكفاءته",   en: "Recent bot interactions and health" },
+  "dash.aiStatus.pitch":       { ar: "ضامن إن الـ AI Agent بتاعك شغّال 24/7", en: "Make sure your AI Agent stays alive 24/7" },
+
+  // Continue Learning (Phase 2)
+  "dash.continueLearning.title":       { ar: "كمّل تعلّمك",          en: "Continue learning" },
+  "dash.continueLearning.description": { ar: "آخر درس فتحته",        en: "Where you left off" },
+  "dash.continueLearning.pitch":       { ar: "هنفتح أكاديمية بصمة بكورسات عربية مركّزة", en: "Arabic-first courses on AI automation" },
+
+  // Automation Health (Phase 3)
+  "dash.automation.title":       { ar: "صحة الأتمتة",              en: "Automation Health" },
+  "dash.automation.description": { ar: "أداء حملاتك وقواعد الرد",   en: "Campaign + auto-reply performance" },
+  "dash.automation.pitch":       { ar: "هتعرف بسرعة لو في rule واقفة أو حملة فيها مشكلة", en: "Spot stopped rules + failing campaigns instantly" },
+
+  // Recent Work (Phase 2)
+  "dash.recentWork.title":       { ar: "آخر شغل",                  en: "Recent Work" },
+  "dash.recentWork.description": { ar: "آخر workflows وdemos فتحتها", en: "Workflows + demos you opened recently" },
+  "dash.recentWork.pitch":       { ar: "ارجع لآخر workflow كنت بتشتغل عليه بضغطة", en: "Resume your last workflow in one click" },
+
+  // Featured This Week (Phase 2)
+  "dash.featured.title":       { ar: "مميّز هذا الأسبوع",            en: "Featured This Week" },
+  "dash.featured.description": { ar: "محتوى مختار من فريق بصمة",     en: "Hand-picked by BASMA team" },
+  "dash.featured.pitch":       { ar: "كل أسبوع كورس أو demo أو template يستاهل التجربة", en: "A course / demo / template worth your week" },
+
+  // Renamed: Recent Activity (was: Recent webhook events)
+  "dash.activity.title":       { ar: "النشاط الأخير",               en: "Recent Activity" },
 }
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string }
