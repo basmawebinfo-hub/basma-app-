@@ -26,8 +26,28 @@ function Method({ m }: { m: string }) {
   return <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono border ${colors[m] ?? "bg-muted"}`}>{m}</span>
 }
 
-function Endpoint({ id, method, path, title, desc, body, resp }: {
+function CodeTabs({ curl, js, py }: { curl: string; js: string; py: string }) {
+  const [tab, setTab] = useState<"curl" | "js" | "py">("curl")
+  const map = { curl, js, py }
+  const labels = { curl: "cURL", js: "JavaScript", py: "Python" }
+  return (
+    <div className="mt-3">
+      <div className="flex gap-1 mb-1">
+        {(["curl", "js", "py"] as const).map((k) => (
+          <button key={k} onClick={() => setTab(k)}
+            className={`px-3 py-1 text-[11px] rounded-t-md font-semibold transition ${tab === k ? "bg-black/60 text-primary border-b-2 border-primary" : "bg-muted/30 text-muted-foreground"}`}>
+            {labels[k]}
+          </button>
+        ))}
+      </div>
+      <CodeBlock>{map[tab]}</CodeBlock>
+    </div>
+  )
+}
+
+function Endpoint({ id, method, path, title, desc, body, resp, examples }: {
   id: string; method: string; path: string; title: string; desc: string; body?: string; resp?: string
+  examples?: { curl: string; js: string; py: string }
 }) {
   return (
     <div id={id} className="scroll-mt-20 border-b border-border py-6">
@@ -38,6 +58,7 @@ function Endpoint({ id, method, path, title, desc, body, resp }: {
       </div>
       <p className="text-sm text-muted-foreground mb-2">{desc}</p>
       {body && (<><div className="text-[11px] font-semibold text-foreground mt-3">Request Body:</div><CodeBlock>{body}</CodeBlock></>)}
+      {examples && (<><div className="text-[11px] font-semibold text-foreground mt-3">أمثلة الكود:</div><CodeTabs curl={examples.curl} js={examples.js} py={examples.py} /></>)}
       {resp && (<><div className="text-[11px] font-semibold text-foreground mt-3">Response:</div><CodeBlock>{resp}</CodeBlock></>)}
     </div>
   )
