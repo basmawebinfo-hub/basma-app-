@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Eye, EyeOff, Send, Trash2, Loader2, Plus, ToggleLeft, ToggleRight } from "lucide-react"
+import { Eye, EyeOff, Send, Trash2, Loader2, Plus, ToggleLeft, ToggleRight , Copy, Check} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -68,6 +68,31 @@ const EMPTY_FORM = {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
+function UrlBox({ label, hint, accent }: { label: string; hint: string; accent: string }) {
+  const [val, setVal] = useState("")
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className={`rounded-lg border p-4 space-y-2 ${accent}`}>
+      <span className="text-sm font-semibold">{label}</span>
+      <p className="text-[11px] text-muted-foreground">{hint}</p>
+      <div className="flex gap-2">
+        <input
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          placeholder="https://n8n.../webhook/.../basma"
+          className="flex-1 bg-muted/40 border border-border rounded-md px-3 py-2 text-xs font-mono text-foreground outline-none focus:border-primary"
+        />
+        <button
+          onClick={() => { if (val) { navigator.clipboard.writeText(val); setCopied(true); setTimeout(() => setCopied(false), 1500) } }}
+          className="p-2 rounded-md bg-card border border-border hover:bg-muted transition" aria-label="Copy"
+        >
+          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function WebhooksPage() {
   const { t } = useI18n()
