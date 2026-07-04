@@ -36,14 +36,14 @@ export async function GET() {
 
   // Plans + subscriptions (the real source of plan/limits)
   const { data: subs } = await db.from("subscriptions").select("user_id, plan_id, status, current_period_end, created_at")
-  const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo, price_monthly")
+  const { data: plansList } = await db.from("plans").select("id, name, max_instances, max_messages_mo, price_monthly, is_trial, tier_slug")
   // pending plan requests
   const { data: reqs } = await db.from("plan_requests").select("user_id, plan_id, created_at").eq("status", "pending").order("created_at", { ascending: false })
   const reqByUser = new Map<string, string>()
   for (const rq of (reqs ?? []) as { user_id: string; plan_id: string }[]) {
     if (!reqByUser.has(rq.user_id)) reqByUser.set(rq.user_id, rq.plan_id)
   }
-  const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number; price_monthly?: number }) => [p.id, p]))
+  const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number; price_monthly?: number; is_trial?: boolean; tier_slug?: string }) => [p.id, p]))
   const subByUser = new Map((subs ?? []).map((s: { user_id: string; plan_id: string; status: string; current_period_end: string|null }) => [s.user_id, s]))
 
   const instCount = new Map<string, number>()
@@ -73,8 +73,8 @@ export async function GET() {
       is_custom_limit: isCustom,
       days_left: daysLeft,
       avatar_url: (u as { avatar_url?: string }).avatar_url ?? null,
-      is_trial: monthly === 0,
-      trial_day: (monthly === 0 && sub && (sub as { created_at?: string }).created_at) ? Math.floor((Date.now() - new Date((sub as { created_at: string }).created_at).getTime()) / 86400000) + 1 : null,
+      is_trial: (plan as { is_trial?: boolean })?.is_trial === true,
+      trial_day: ((plan as { is_trial?: boolean })?.is_trial === true && sub && (sub as { created_at?: string }).created_at) ? Math.floor((Date.now() - new Date((sub as { created_at: string }).created_at).getTime()) / 86400000) + 1 : null,
       plan_max_instances: plan?.max_instances ?? 1,
       plan_max_messages: plan?.max_messages_mo ?? 500,
       sub_status: sub?.status ?? "none",

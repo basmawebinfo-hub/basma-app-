@@ -22,8 +22,8 @@ export async function GET() {
   {
     const { data: sub } = await supabase.from("subscriptions").select("plan_id, created_at, current_period_end").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single()
     if (sub) {
-      const { data: planRow } = await supabase.from("plans").select("price_monthly, name").eq("id", sub.plan_id).single()
-      isTrial = Number(planRow?.price_monthly ?? 0) === 0
+      const { data: planRow } = await supabase.from("plans").select("is_trial, tier_slug").eq("id", sub.plan_id).single()
+      isTrial = planRow?.is_trial === true
       if (isTrial && sub.created_at) {
         const start = new Date(sub.created_at)
         const days = Math.floor((Date.now() - start.getTime()) / 86400000) + 1  // Day 1 on first day

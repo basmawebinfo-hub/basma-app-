@@ -35,6 +35,7 @@ export type Plan = {
 
   // --- Phase 1 migration additions (optional until the migration lands) ---
   tier_slug?: TierSlug
+  is_trial?: boolean
   price_yearly?: Nullable<number>
   has_academy_access?: boolean
   has_lab_download?: boolean

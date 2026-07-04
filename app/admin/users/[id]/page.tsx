@@ -22,7 +22,7 @@ export default function UserDetailPage() {
   const [modal, setModal] = useState<string | null>(null)
   const [input, setInput] = useState("")
   const [input2, setInput2] = useState("")
-  const [plans, setPlans] = useState<{ id: string; name: string; max_instances: number; price_monthly: number }[]>([])
+  const [plans, setPlans] = useState<{ id: string; name: string; max_instances: number; price_monthly: number; tier_slug?: string }[]>([])
   const [selPlan, setSelPlan] = useState("")
   const [customNums, setCustomNums] = useState("")
 
@@ -154,14 +154,14 @@ export default function UserDetailPage() {
             </>)}
             {modal === "plan" && (() => {
               const selectedPlan = plans.find((pl) => pl.id === selPlan)
-              const isCustom = selectedPlan && (selectedPlan.name === "مخصص" || selectedPlan.name.toLowerCase() === "custom")
+              const isCustom = selectedPlan?.tier_slug === "custom"
               return (
                 <>
                   <label className="text-xs text-muted-foreground mb-2 block">Choose a plan to activate</label>
                   <div className="space-y-2 max-h-[260px] overflow-y-auto mb-3">
                     {plans.map((pl) => {
                       const selected = selPlan === pl.id
-                      const customPlan = pl.name === "مخصص" || pl.name.toLowerCase() === "custom"
+                      const customPlan = pl.tier_slug === "custom"
                       return (
                         <button key={pl.id} onClick={() => setSelPlan(pl.id)} className={"w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors " + (selected ? "border-primary bg-primary/10" : "border-border bg-muted/20 hover:bg-muted/40")}>
                           <div><div className="text-sm font-medium">{pl.name}</div><div className="text-xs text-muted-foreground">{customPlan ? "Set custom number of connections" : pl.max_instances + " connection" + (pl.max_instances > 1 ? "s" : "")}</div></div>
