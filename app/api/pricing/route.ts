@@ -9,7 +9,7 @@ export async function GET() {
   const supabase = await createClient()
   const { data: plans } = await supabase
     .from("plans")
-    .select("id, name, price_monthly, currency, max_instances, max_messages_mo, is_active")
+    .select("id, name, price_monthly, currency, max_instances, max_messages_mo, is_active, tier_slug, is_trial")
     .eq("is_active", true)
     .order("price_monthly")
 
