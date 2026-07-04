@@ -17,8 +17,9 @@ file manually from the SQL Editor in the Supabase Dashboard:
 | File | Status | Date | Purpose |
 |------|--------|------|---------|
 | `add_webhook_instance_id.sql` | applied | 2026-06 | Add instance_id to webhook_configs |
-| `2026_07_01_plans_tier_slug.sql` | PENDING | 2026-07-01 | Patch 13a — adds tier_slug + feature flags to plans |
+| `2026_07_01_plans_tier_slug.sql` | applied | 2026-07-01 | Patch 13a — adds tier_slug + feature flags to plans |
 | `2026_07_01_plans_tier_slug_rollback.sql` | n/a | 2026-07-01 | Companion rollback for Patch 13a |
+| `2026_07_04_enable_pgvector.sql` | PENDING | 2026-07-04 | PR #2 — enables pgvector extension (no schema change) |
 
 ## Running Patch 13a — Step by step
 
@@ -35,3 +36,34 @@ file manually from the SQL Editor in the Supabase Dashboard:
    ```
 5. Sanity-check with the queries at the bottom of the migration file.
 6. If something looks wrong, run the rollback file immediately.
+
+
+## Running PR #2 — Enable pgvector — Step by step
+
+1. Open Supabase SQL Editor:
+   https://supabase.com/dashboard/project/pclmudzbvybvqeczjxzv/sql/new
+2. Paste the entire contents of `2026_07_04_enable_pgvector.sql`.
+3. Click "Run". You should see:
+   ```
+   NOTICE: Migration verification: PASSED. pgvector extension is active.
+   ```
+4. Verify with the manual check at the bottom of the migration file:
+   ```sql
+   SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+   ```
+   Expected: one row with `extname = 'vector'`.
+5. Update this README: change the status of `2026_07_04_enable_pgvector.sql`
+   from `PENDING` to `applied`.
+
+### What this migration does NOT change
+
+- No existing table, column, row, index, function, trigger, or policy
+- No application behavior — the app doesn't call the extension yet
+- No downtime — extension creation is < 1 second and non-blocking
+
+### Why now (before Knowledge Base or Memory ship)
+
+Enabling the extension is Milestone A'-1 groundwork. The KB module and Agent
+Memory tiers will use `vector`-typed columns when they ship (Milestones C/D).
+By enabling pgvector now, those milestones don't need to schedule a
+separate Supabase step.
