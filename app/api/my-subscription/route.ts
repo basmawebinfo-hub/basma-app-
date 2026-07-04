@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import * as Sentry from "@sentry/nextjs"
 import { createClient } from "@/lib/supabase/server"
+import { logger } from "@/lib/logger"
+import { extractOrCreateRequestId } from "@/lib/request-id"
 
 const TRIAL_DAYS = 7
 
 // GET /api/my-subscription — current user's plan, days left, balance, renewal status
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const requestId = extractOrCreateRequestId(req)
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -86,9 +90,15 @@ export async function GET() {
       numbers_used: numbersUsed ?? 0,
     })
   } catch (err) {
-    // Any thrown error lands here. Log to Vercel console and return a safe
-    // fallback so the dashboard trial banner + upgrade widgets can render.
-    console.error("[/api/my-subscription] handler error:", err)
+    // Any thrown error lands here. Log via the structured logger and return
+    // a safe fallback so the dashboard trial banner + upgrade widgets can render.
+    logger.error("api_error", {
+      route: "/api/my-subscription",
+      request_id: requestId,
+      status: 503,
+      message: (err instanceof Error ? err.message : String(err)).slice(0, 200),
+    })
+    Sentry.captureException(err, { tags: { request_id: requestId, route: "/api/my-subscription" } })
     return NextResponse.json(
       { error: "Failed to load subscription", degraded: true },
       { status: 503 },

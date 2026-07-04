@@ -8,7 +8,9 @@
  */
 
 import { useEffect } from "react"
+import * as Sentry from "@sentry/nextjs"
 import { useI18n } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 export default function DashboardError({
   error,
@@ -21,9 +23,12 @@ export default function DashboardError({
   const t = (b: { ar: string; en: string }) => (lang === "ar" ? b.ar : b.en)
 
   useEffect(() => {
-    if (typeof console !== "undefined") {
-      console.error("[dashboard/error] uncaught:", error)
-    }
+    logger.error("unexpected_exception", {
+      boundary: "dashboard/error",
+      digest: error.digest ?? null,
+      message: error.message.slice(0, 200),
+    })
+    Sentry.captureException(error, { tags: { boundary: "dashboard/error", digest: error.digest ?? "" } })
   }, [error])
 
   return (

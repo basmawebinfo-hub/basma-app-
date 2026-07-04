@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import * as Sentry from "@sentry/nextjs"
 import { createClient } from "@/lib/supabase/server"
 import { getUserPlan } from "@/lib/plan"
+import { logger } from "@/lib/logger"
+import { extractOrCreateRequestId } from "@/lib/request-id"
 
 // GET /api/me — current user's balance, plan, and credit history
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const requestId = extractOrCreateRequestId(req)
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -65,9 +69,15 @@ export async function GET() {
     })
   } catch (err) {
     // Any thrown error (network, Supabase 5xx, malformed row) lands here.
-    // We log to Vercel console and return a safe payload so the dashboard
-    // widgets can render with sensible defaults instead of a raw 500.
-    console.error("[/api/me] handler error:", err)
+    // We log via the structured logger and return a safe payload so the
+    // dashboard widgets can render with sensible defaults instead of a raw 500.
+    logger.error("api_error", {
+      route: "/api/me",
+      request_id: requestId,
+      status: 503,
+      message: (err instanceof Error ? err.message : String(err)).slice(0, 200),
+    })
+    Sentry.captureException(err, { tags: { request_id: requestId, route: "/api/me" } })
     return NextResponse.json(
       { error: "Failed to load account", degraded: true },
       { status: 503 },

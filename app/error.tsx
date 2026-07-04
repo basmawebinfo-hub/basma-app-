@@ -11,7 +11,9 @@
  */
 
 import { useEffect } from "react"
+import * as Sentry from "@sentry/nextjs"
 import { useI18n } from "@/lib/i18n"
+import { logger } from "@/lib/logger"
 
 export default function GlobalError({
   error,
@@ -24,11 +26,14 @@ export default function GlobalError({
   const t = (b: { ar: string; en: string }) => (lang === "ar" ? b.ar : b.en)
 
   useEffect(() => {
-    // Best-effort console log so the error is visible in Vercel logs;
-    // we do not send this to any external analytics service (no PII risk).
-    if (typeof console !== "undefined") {
-      console.error("[app/error] uncaught:", error)
-    }
+    // Structured log so the error is visible in Vercel logs; also forwarded
+    // to Sentry when SENTRY_DSN is configured (no-op otherwise).
+    logger.error("unexpected_exception", {
+      boundary: "app/error",
+      digest: error.digest ?? null,
+      message: error.message.slice(0, 200),
+    })
+    Sentry.captureException(error, { tags: { boundary: "app/error", digest: error.digest ?? "" } })
   }, [error])
 
   return (

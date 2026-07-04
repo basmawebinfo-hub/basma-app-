@@ -17,6 +17,7 @@ import "server-only"
 import { createClient } from "@/lib/supabase/server"
 import { getTier, type TierSlug } from "@/config/tiers"
 import { normalizeRole } from "@/config/permissions"
+import { logger } from "@/lib/logger"
 import type { AuthUser, CurrentUser, Profile } from "@/types/auth"
 
 /**
@@ -106,11 +107,10 @@ async function resolveTier(
     .single<{ tier_slug: string | null }>()
 
   if (!plan?.tier_slug) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        `[resolveTier] plan ${sub.plan_id} has no tier_slug — falling back to "free"`,
-      )
-    }
+    logger.warn("plan_tier_missing", {
+      plan_id: sub.plan_id,
+      fallback: "free",
+    })
     return "free"
   }
 
