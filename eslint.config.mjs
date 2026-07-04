@@ -22,18 +22,22 @@ export default [
   // (wrapping a flat config in FlatCompat creates circular refs at runtime).
   ...nextCoreWebVitals,
 
-  // Downgrades: rules from the Next.js 16 preset that fire against
-  // pre-existing code we haven't refactored yet. Keep as `warn` so they
-  // surface in CI output without failing the gate. To be re-enabled at
-  // `error` in a follow-up milestone once the codebase is cleaned up.
-  // These are unrelated to PR-B0b's scope (ESLint setup + logger discipline).
+  // Downgrades: two rules that are GENUINELY NEW in eslint-plugin-react-hooks
+  // v6/v7 (shipped bundled with eslint-config-next 16). These rules did not
+  // exist in the react-hooks 4.x/5.x line that Next 15 pinned. They fire
+  // against pre-existing Basma code that predates any lint gate. Keep as
+  // `warn` so they surface in CI output for follow-up cleanup without
+  // failing the gate today.
+  //
+  // Only NEW-in-Next-16 rules are downgraded here — long-standing rules
+  // like `no-html-link-for-pages` and `no-unescaped-entities` are left at
+  // their preset severity ('error'). The two source-code violations they
+  // surfaced were fixed in this same PR.
   {
     files: ["**/*.{ts,tsx,js,jsx}"],
     rules: {
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/static-components": "warn",
-      "@next/next/no-html-link-for-pages": "warn",
-      "react/no-unescaped-entities": "warn",
     },
   },
 

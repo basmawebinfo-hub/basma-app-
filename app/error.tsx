@@ -11,6 +11,7 @@
  */
 
 import { useEffect } from "react"
+import Link from "next/link"
 import { useI18n } from "@/lib/i18n"
 import { logger } from "@/lib/logger"
 
@@ -63,12 +64,12 @@ export default function GlobalError({
           >
             {t({ ar: "حاول مرة أخرى", en: "Try again" })}
           </button>
-          <a
+          <Link
             href="/"
             className="px-5 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/30 transition"
           >
             {t({ ar: "الرئيسية", en: "Home" })}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

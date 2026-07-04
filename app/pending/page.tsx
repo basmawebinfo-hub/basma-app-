@@ -7,7 +7,7 @@ export default function PendingPage() {
           <Clock className="w-8 h-8 text-amber-500" />
         </div>
         <h1 className="text-2xl font-bold mb-2">Account pending approval</h1>
-        <p className="text-muted-foreground">Your account is under review. You'll get access once an admin approves it. This usually takes a short time.</p>
+        <p className="text-muted-foreground">Your account is under review. You&apos;ll get access once an admin approves it. This usually takes a short time.</p>
         <form action="/api/auth/signout" method="post"></form>
       </div>
     </div>
