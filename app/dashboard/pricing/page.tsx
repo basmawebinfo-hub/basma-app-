@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Loader2, Check } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
-interface Plan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number }
+interface Plan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number; tier_slug?: string; is_trial?: boolean }
 
 export default function PricingPage() {
   const { t } = useI18n()
@@ -77,11 +77,27 @@ export default function PricingPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {plans.filter((p) => p.name !== "مخصص" && p.name !== "Custom").map((p) => {
+        {plans.filter((p) => p.tier_slug !== "custom").map((p) => {
           const converted = p.price_monthly * (rates[currency] ?? rate)
           const convStr = currency === "USD" ? converted.toFixed(2) : Math.round(converted).toLocaleString()
           return (
-            <div key={p.id} className="rounded-2xl border border-border bg-card/50 p-6 flex flex-col">
+            <div key={p.id} className={"relative rounded-2xl border p-6 flex flex-col transition-all " + (
+              (sub?.plan && sub.plan === p.name)
+                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                : p.tier_slug === "pro"
+                  ? "border-primary/60 bg-card/70 shadow-md"
+                  : "border-border bg-card/50"
+            )}>
+              {sub?.plan && sub.plan === p.name && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-semibold shadow">
+                  {t("dp.current")}
+                </span>
+              )}
+              {p.tier_slug === "pro" && !(sub?.plan && sub.plan === p.name) && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[11px] font-semibold shadow">
+                  Recommended
+                </span>
+              )}
               <h3 className="text-lg font-semibold">{p.name}</h3>
               <div className="mt-3">
                 <span className="text-3xl font-bold">${p.price_monthly}</span>
@@ -96,10 +112,10 @@ export default function PricingPage() {
               </ul>
               <button
                 onClick={() => choose(p.id, p.name)}
-                disabled={requesting === p.id}
+                disabled={requesting === p.id || p.is_trial === true || (sub?.plan != null && sub.plan === p.name)}
                 className="mt-5 w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
               >
-                {p.price_monthly === 0 ? t("dp.current") : requesting === p.id ? t("dp.sending") : t("dp.choose")}
+                {p.is_trial === true || (sub?.plan && sub.plan === p.name) ? t("dp.current") : requesting === p.id ? t("dp.sending") : t("dp.choose")}
               </button>
             </div>
           )

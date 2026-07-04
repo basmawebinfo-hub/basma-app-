@@ -6,27 +6,33 @@ import { Check, ArrowRight } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
 
-interface ApiPlan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number }
+interface ApiPlan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number; tier_slug?: string; is_trial?: boolean }
 
 export function Pricing() {
   const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
   const [plans, setPlans] = useState<ApiPlan[]>([])
-  const [rate, setRate] = useState(50)
+  const [rates, setRates] = useState<Record<string, number>>({ USD: 1, EGP: 50 })
+  const [currencies, setCurrencies] = useState<string[]>(["USD", "EGP"])
+  const [currency, setCurrency] = useState<string>("USD")
 
   useEffect(() => {
     fetch("/api/pricing")
       .then((r) => r.json())
-      .then((d) => { setPlans(d.plans ?? []); setRate(d.usd_to_egp ?? 50) })
+      .then((d) => {
+        setPlans(d.plans ?? [])
+        setRates(d.rates ?? { USD: 1, EGP: d.usd_to_egp ?? 50 })
+        setCurrencies(d.currencies ?? ["USD", "EGP"])
+      })
       .catch(() => {})
   }, [])
 
   // Build display cards from real plans (skip the custom plan; it has its own CTA)
-  const regular = plans.filter((p) => p.name !== "مخصص" && p.name.toLowerCase() !== "custom")
-  const customPlan = plans.find((p) => p.name === "مخصص" || p.name.toLowerCase() === "custom")
+  const regular = plans.filter((p) => p.tier_slug !== "custom")
+  const customPlan = plans.find((p) => p.tier_slug === "custom")
 
   const display = regular.map((p, i, arr) => {
-    const isFree = p.price_monthly === 0
+    const isFree = p.is_trial === true
     const featured = arr.length > 2 ? i === 2 : i === arr.length - 1
     const features = [
       `${p.max_instances} WhatsApp number${p.max_instances > 1 ? "s" : ""}`,
@@ -36,12 +42,15 @@ export function Pricing() {
       "Inbox",
     ]
     if (featured) { features.push("Priority support"); features.push("HMAC signing") }
+    const rate = rates[currency] ?? 1
+    const converted = p.price_monthly * rate
+    const convStr = currency === "USD" ? "" : (currency === "EGP" ? `~ ${Math.round(converted).toLocaleString()} ${currency}/mo` : `~ ${converted.toFixed(2)} ${currency}/mo`)
     return {
       id: p.id,
       name: p.name,
       price: isFree ? "Free" : `$${p.price_monthly}`,
       period: isFree ? "" : "/mo",
-      egp: isFree ? "" : `~ ${Math.round(p.price_monthly * rate)} EGP/mo`,
+      egp: isFree ? "" : convStr,
       description: isFree ? "Try the platform" : `${p.max_instances} connections`,
       features,
       cta: isFree ? "Start Free Trial" : "Choose Plan",
@@ -79,6 +88,20 @@ export function Pricing() {
             <span className="text-gradient-lime">{t("pricing.title")}</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">{t("pricing.subtitle")}</p>
+          {currencies.length > 1 && (
+            <div className="mt-5 inline-flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Currency</span>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium"
+              >
+                {currencies.map((cur) => (
+                  <option key={cur} value={cur}>{cur}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-4">
