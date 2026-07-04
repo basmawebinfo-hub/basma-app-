@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
+import { logger } from "@/lib/logger"
+import { extractOrCreateRequestId } from "@/lib/request-id"
 
 function getServiceClient() {
   return createServiceClient(
@@ -9,6 +11,7 @@ function getServiceClient() {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = extractOrCreateRequestId(request)
   try {
     // ── Security guard: if EVOLUTION_WEBHOOK_SECRET is set, require it ──
     // Evolution must call the webhook with ?key=<secret> (or x-webhook-key header).
@@ -233,7 +236,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error("[basma] webhook error:", err)
+    logger.error("webhook_error", {
+      route: "/api/evolution/webhook",
+      request_id: requestId,
+      message: (err instanceof Error ? err.message : String(err)).slice(0, 200),
+    })
     return NextResponse.json({ ok: true })
   }
 }

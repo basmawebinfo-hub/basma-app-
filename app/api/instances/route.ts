@@ -3,6 +3,8 @@ import { notifyUser } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 import { createInstance, deleteInstance, setInstanceWebhook , listEvolutionInstances } from "@/lib/evolution"
 import { getUserPlan } from "@/lib/plan"
+import { logger } from "@/lib/logger"
+import { extractOrCreateRequestId } from "@/lib/request-id"
 
 const WEBHOOK_EVENTS = [
   "MESSAGES_UPSERT",
@@ -117,7 +119,11 @@ export async function POST(req: NextRequest) {
       WEBHOOK_EVENTS
     )
   } catch (e) {
-    console.error("[basma] Failed to set webhook:", e)
+    logger.warn("instance_webhook_setup_failure", {
+      route: "/api/instances",
+      request_id: extractOrCreateRequestId(req),
+      message: (e instanceof Error ? e.message : String(e)).slice(0, 200),
+    })
     // Continue even if webhook setup fails — global webhook will handle it
   }
 

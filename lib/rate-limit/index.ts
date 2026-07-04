@@ -11,7 +11,7 @@
 //     caller passed in.
 //
 // Fail-open: if the limiter throws for any reason (memory corruption,
-// programming bug, whatever), we log a JSON warning and return null so
+// programming bug, whatever), we log a warning and return null so
 // the request proceeds. Rate-limiting is a defence layer, not a hard
 // dependency of the API.
 
@@ -21,6 +21,7 @@ import crypto from "crypto"
 
 import { RATE_LIMIT_DISABLED, RATE_LIMITS, type RateLimitTarget } from "./config"
 import { limiter } from "./memory-limiter"
+import { logger } from "@/lib/logger"
 
 export { extractClientIp } from "./identifier"
 
@@ -73,13 +74,11 @@ export function enforceRateLimit(
     decision = limiter.hit(`${target}:${identifier}`, cfg.windowMs, cfg.max)
   } catch (err) {
     // Fail open. The limiter must never take down the API.
-    console.warn(JSON.stringify({
-      level: "warn",
-      event: "rate_limit_error",
+    logger.warn("rate_limit_error", {
       endpoint: target,
       identifier: anonymize(identifier),
       message: (err instanceof Error ? err.message : String(err)).slice(0, 200),
-    }))
+    })
     return null
   }
 
@@ -89,14 +88,12 @@ export function enforceRateLimit(
   }
 
   // Blocked. Emit one JSON warning line with anonymized identifier only.
-  console.warn(JSON.stringify({
-    level: "warn",
-    event: "rate_limit_hit",
+  logger.warn("rate_limit_hit", {
     endpoint: target,
     identifier: anonymize(identifier),
     limit: decision.limit,
     resetAt: decision.resetAt,
-  }))
+  })
 
   const retryAfterSeconds = Math.max(1, Math.ceil(decision.retryAfterMs / 1000))
   const headers: Record<string, string> = { ...(corsHeaders ?? {}) }
