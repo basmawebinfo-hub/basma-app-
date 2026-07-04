@@ -8,6 +8,7 @@
  */
 
 import { useEffect } from "react"
+import { logger } from "@/lib/logger"
 
 export default function GlobalError({
   error,
@@ -17,9 +18,11 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    if (typeof console !== "undefined") {
-      console.error("[global-error] uncaught:", error)
-    }
+    logger.error("unexpected_exception", {
+      boundary: "global-error",
+      digest: error.digest ?? null,
+      message: error.message.slice(0, 200),
+    })
   }, [error])
 
   return (
