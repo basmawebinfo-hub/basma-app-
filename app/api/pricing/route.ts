@@ -1,11 +1,16 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { enforceRateLimit, extractClientIp } from "@/lib/rate-limit"
 
 // Currencies we let the user pick from at checkout
 const SUPPORTED = ["USD", "EGP", "SAR", "AED", "KWD", "QAR", "JOD", "EUR", "GBP"]
 
 // GET /api/pricing — public plans (USD) + live exchange rates for checkout estimate
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rateHeaders: Record<string, string> = {}
+  const blocked = enforceRateLimit("pricing", extractClientIp(req), req, rateHeaders)
+  if (blocked) return blocked
+
   const supabase = await createClient()
   const { data: plans } = await supabase
     .from("plans")
@@ -35,5 +40,5 @@ export async function GET() {
     rates,
     currencies: SUPPORTED,
     support_telegram: supportLink,
-  })
+  }, { headers: rateHeaders })
 }

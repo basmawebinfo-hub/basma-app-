@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { sendText, sendMedia, sendAudio, sendLocation, sendContact, sendPoll, sendSticker, sendPresence } from "@/lib/evolution"
+import { enforceRateLimit } from "@/lib/rate-limit"
 import { checkWarmupGate, typingDuration, sleep } from "@/lib/anti-ban"
 import { getUserPlan } from "@/lib/plan"
 import crypto from "crypto"
@@ -50,6 +51,14 @@ export async function POST(req: NextRequest) {
 
   // 2. Hash and look it up
   const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex")
+
+  // Rate limit by API-key hash (per key, per window). Applied before the DB
+  // lookup so an abusive caller doesn't burn Supabase read quota.
+  const rateHeaders: Record<string, string> = {}
+  const blocked = enforceRateLimit("send", keyHash, req, rateHeaders, CORS)
+  if (blocked) return blocked
+  const sendHeaders = { ...CORS, ...rateHeaders }
+
   const db = service()
   const { data: keyRow } = await db
     .from("api_keys")
@@ -58,7 +67,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (!keyRow || !keyRow.is_active) {
-    return NextResponse.json({ error: "Invalid or revoked API key" }, { status: 401, headers: CORS })
+    return NextResponse.json({ error: "Invalid or revoked API key" }, { status: 401, headers: sendHeaders })
   }
 
   // ── Account status + monthly message limit checks ──
@@ -69,13 +78,13 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (ownerProfile?.status === "suspended") {
-    return NextResponse.json({ error: "Account suspended" }, { status: 403, headers: CORS })
+    return NextResponse.json({ error: "Account suspended" }, { status: 403, headers: sendHeaders })
   }
 
   // ── Block sending when subscription is past_due (balance ran out, needs renewal) ──
   const { data: subRow } = await db.from("subscriptions").select("status").eq("user_id", keyRow.user_id).maybeSingle()
   if (subRow?.status === "past_due") {
-    return NextResponse.json({ error: "اشتراكك يحتاج تجديد. يرجى تجديد رصيدك لإعادة التفعيل.", needs_renewal: true }, { status: 402, headers: CORS })
+    return NextResponse.json({ error: "اشتراكك يحتاج تجديد. يرجى تجديد رصيدك لإعادة التفعيل.", needs_renewal: true }, { status: 402, headers: sendHeaders })
   }
 
   // Count outgoing messages this calendar month (limit from real plan; 0 = unlimited)
@@ -92,7 +101,7 @@ export async function POST(req: NextRequest) {
         .eq("from_me", true)
         .gte("timestamp", monthStart.toISOString())
       if ((count ?? 0) >= maxMessages) {
-        return NextResponse.json({ error: "Monthly message limit reached (" + maxMessages + ")" }, { status: 429, headers: CORS })
+        return NextResponse.json({ error: "Monthly message limit reached (" + maxMessages + ")" }, { status: 429, headers: sendHeaders })
       }
     }
   }
@@ -118,7 +127,7 @@ export async function POST(req: NextRequest) {
     options?: string[]
     selectableCount?: number
   }
-  try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: CORS }) }
+  try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: sendHeaders }) }
 
   const to = (body.to ?? "").trim()
   const type = (body.type ?? "text").toLowerCase()
@@ -126,14 +135,14 @@ export async function POST(req: NextRequest) {
   const media = (body.media ?? "").trim()
 
   if (!to) {
-    return NextResponse.json({ error: "'to' is required" }, { status: 400, headers: CORS })
+    return NextResponse.json({ error: "'to' is required" }, { status: 400, headers: sendHeaders })
   }
   if (type === "text" && !text) {
-    return NextResponse.json({ error: "'text' is required for text messages" }, { status: 400, headers: CORS })
+    return NextResponse.json({ error: "'text' is required for text messages" }, { status: 400, headers: sendHeaders })
   }
   const mediaTypes = ["image", "video", "audio", "document", "sticker"]
   if (mediaTypes.includes(type) && !media) {
-    return NextResponse.json({ error: "'media' (URL or base64) is required for " + type + " messages" }, { status: 400, headers: CORS })
+    return NextResponse.json({ error: "'media' (URL or base64) is required for " + type + " messages" }, { status: 400, headers: sendHeaders })
   }
 
   // 4. Resolve the instance (must belong to this user)
@@ -152,10 +161,10 @@ export async function POST(req: NextRequest) {
   const inst = instances?.[0]
 
   if (!inst) {
-    return NextResponse.json({ error: "No matching instance for this user" }, { status: 404, headers: CORS })
+    return NextResponse.json({ error: "No matching instance for this user" }, { status: 404, headers: sendHeaders })
   }
   if (inst.status !== "CONNECTED") {
-    return NextResponse.json({ error: "Instance is not connected" }, { status: 400, headers: CORS })
+    return NextResponse.json({ error: "Instance is not connected" }, { status: 400, headers: sendHeaders })
   }
 
   // ── Anti-ban: enforce daily warmup limit based on the number's age ──
@@ -165,7 +174,7 @@ export async function POST(req: NextRequest) {
       error: "Daily safe-send limit reached for this number",
       warmup: { sent_today: gate.sentToday, daily_limit: gate.limit, account_age_days: gate.ageDays },
       hint: "New WhatsApp numbers must warm up gradually to avoid bans. The limit increases as the number ages.",
-    }, { status: 429, headers: CORS })
+    }, { status: 429, headers: sendHeaders })
   }
 
   // 5. Send via Evolution (pick the right method based on type)
@@ -193,24 +202,24 @@ export async function POST(req: NextRequest) {
       storedType = "STICKER"; storedText = "[sticker]"
     } else if (type === "location") {
       if (body.latitude == null || body.longitude == null) {
-        return NextResponse.json({ error: "'latitude' and 'longitude' are required for location" }, { status: 400, headers: CORS })
+        return NextResponse.json({ error: "'latitude' and 'longitude' are required for location" }, { status: 400, headers: sendHeaders })
       }
       result = await sendLocation(inst.instance_name, to, body.latitude, body.longitude, body.name, body.address)
       storedType = "LOCATION"; storedText = body.name || "[location]"
     } else if (type === "contact") {
       if (!body.contact?.fullName || !body.contact?.phoneNumber) {
-        return NextResponse.json({ error: "'contact' with fullName and phoneNumber is required" }, { status: 400, headers: CORS })
+        return NextResponse.json({ error: "'contact' with fullName and phoneNumber is required" }, { status: 400, headers: sendHeaders })
       }
       result = await sendContact(inst.instance_name, to, body.contact)
       storedType = "CONTACT"; storedText = body.contact.fullName
     } else if (type === "poll") {
       if (!body.question || !Array.isArray(body.options) || body.options.length < 2) {
-        return NextResponse.json({ error: "'question' and at least 2 'options' are required for poll" }, { status: 400, headers: CORS })
+        return NextResponse.json({ error: "'question' and at least 2 'options' are required for poll" }, { status: 400, headers: sendHeaders })
       }
       result = await sendPoll(inst.instance_name, to, body.question, body.options, body.selectableCount ?? 1)
       storedType = "POLL"; storedText = body.question
     } else {
-      return NextResponse.json({ error: "Unsupported type: " + type }, { status: 400, headers: CORS })
+      return NextResponse.json({ error: "Unsupported type: " + type }, { status: 400, headers: sendHeaders })
     }
 
     // Persist the outgoing message so it shows in the inbox
@@ -250,8 +259,8 @@ export async function POST(req: NextRequest) {
       detail: `${type} -> ${remoteJid}`,
     }).then(() => {})
 
-    return NextResponse.json({ ok: true, instance: inst.instance_name, to: remoteJid, result }, { headers: CORS })
+    return NextResponse.json({ ok: true, instance: inst.instance_name, to: remoteJid, result }, { headers: sendHeaders })
   } catch (e: unknown) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502, headers: CORS })
+    return NextResponse.json({ error: (e as Error).message }, { status: 502, headers: sendHeaders })
   }
 }
