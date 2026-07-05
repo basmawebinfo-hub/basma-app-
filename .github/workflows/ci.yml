@@ -1,0 +1,56 @@
+# Continuous Integration for Basma.
+#
+# Triggered on every pull request against main and every push to main.
+# Enforces the same quality gates that developers run locally, so nothing
+# merges without passing them.
+#
+# Steps:
+#   1. checkout the code
+#   2. install pnpm (via corepack, pinned via packageManager in package.json
+#      if present; otherwise latest stable)
+#   3. install Node 20 (LTS; matches Vercel's default runtime)
+#   4. cache and install dependencies with --frozen-lockfile so the lockfile
+#      is authoritative (a drifted lockfile = build failure, not a silent
+#      resolve)
+#   5. run `pnpm lint` — enforces the ESLint gate from PR-B0b
+#   6. run `pnpm test` — runs the Vitest suite once, non-interactive
+#
+# Kept intentionally minimal. `pnpm build` is NOT run here — Vercel already
+# runs `next build` on every commit and reports back via commit status.
+# Duplicating it in Actions would burn CI minutes without adding coverage.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
