@@ -63,25 +63,6 @@ export default [
     },
   },
 
-  // TEMPORARY allowlist (FOLLOW-UP CLEANUP PR):
-  // `app/api/campaigns/[id]/run/route.ts` contains an inline
-  // `.catch(console.error)` from before PR #5a. Removing it correctly
-  // requires a small refactor (proper error boundary + logger call) that
-  // is out of scope for PR-B0b (ESLint infrastructure setup). Tracked as
-  // a follow-up cleanup PR after PR-B0b merges. Do NOT extend this
-  // allowlist to any other file — every new file that needs to write to
-  // stdout must use `lib/logger.ts` from day one.
-  //
-  // Note: pattern uses `**` in the `[id]` position because ESLint's flat-config
-  // matcher parses square brackets as a character class. `**` is narrow enough
-  // here — there is exactly one route at `app/api/campaigns/*/run/route.ts`.
-  {
-    files: ["app/api/campaigns/**/run/route.ts"],
-    rules: {
-      "no-console": "off",
-    },
-  },
-
   // Ignore build outputs, dependency trees, static assets, and generated files.
   // `components/ui/**` is shadcn-vendored code copied from an external source;
   // linting it would flag issues we don't own and can't fix without diverging

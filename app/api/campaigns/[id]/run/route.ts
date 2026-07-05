@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { sendText, sendPresence } from "@/lib/evolution"
 import { humanDelay, typingDuration, spinMessage, isQuietHour, shouldTakeBreak, breakDuration, sleep } from "@/lib/anti-ban"
+import { logger } from "@/lib/logger"
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -30,7 +31,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ ok: true, sent: 0 })
   }
 
-  runCampaign(id, inst.instance_name, campaign.message_text, contacts, campaign.delay_seconds).catch(console.error)
+  runCampaign(id, inst.instance_name, campaign.message_text, contacts, campaign.delay_seconds).catch((err) => {
+    logger.error("campaign_run_background_failed", {
+      campaign_id: id,
+      instance: inst.instance_name,
+      message: err instanceof Error ? err.message.slice(0, 200) : String(err).slice(0, 200),
+    })
+  })
   return NextResponse.json({ ok: true, total: contacts.length })
 }
 

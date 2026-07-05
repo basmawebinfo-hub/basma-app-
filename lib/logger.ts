@@ -29,6 +29,8 @@ export type LogEvent =
   | "instance_webhook_setup_failure"
   // Plan / subscription resolution
   | "plan_tier_missing"
+  // Campaigns
+  | "campaign_run_background_failed"
 
 type Primitive = string | number | boolean | null | undefined
 type LogFields = Record<string, Primitive>
