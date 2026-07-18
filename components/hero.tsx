@@ -173,23 +173,11 @@ export function Hero() {
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <p className="text-lg sm:text-xl text-muted-foreground">
-              {t("hero.intgDesc")}
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Designed with official API integrations for your business tools. Flexible workflows. Enterprise security. Privacy-first development.
             </p>
-          </motion.div>
-
-          <motion.div
-            initial={shouldReduceMotion ? {} : fadeUp.initial}
-            animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mb-6"
-          >
-            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-              <span className="text-gradient-lime">200+</span> {t("hero.intg")}
-            </p>
-            <p className="text-muted-foreground text-xs sm:text-sm">{t("hero.intgDesc")}</p>
           </motion.div>
 
           <motion.div

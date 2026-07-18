@@ -1,6 +1,8 @@
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
-import { VideoGallery } from "@/components/video-gallery"
+import { ValueProposition } from "@/components/value-proposition"
+import { TrustSection } from "@/components/trust-section"
+import { TransparencySection } from "@/components/transparency-section"
 import { HowItWorks } from "@/components/how-it-works"
 import { Stats } from "@/components/stats"
 import { Pricing } from "@/components/pricing"
@@ -23,7 +25,9 @@ export default function Home() {
       <Navbar />
 
       <Hero />
-      <VideoGallery />
+      <ValueProposition />
+      <TrustSection />
+      <TransparencySection />
       <HowItWorks />
       <Stats />
       <Pricing />
