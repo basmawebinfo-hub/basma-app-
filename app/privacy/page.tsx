@@ -18,39 +18,57 @@ export default function PrivacyPage() {
         <div className="space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "1. البيانات التي نجمعها" : "1. Data We Collect"}</h2>
-            <p>{ar
-              ? "نجمع البيانات التي تقدّمها عند التسجيل (الاسم، البريد الإلكتروني، رقم الهاتف)، وبيانات استخدامك للمنصة، ورسائل واتساب التي تمر عبر حسابك لغرض التوصيل والأتمتة فقط."
-              : "We collect the information you provide at sign-up (name, email, phone), your usage data, and the WhatsApp messages that pass through your account solely for delivery and automation purposes."}</p>
+            <p className="mb-3">{ar
+              ? "نجمع البيانات التالية:"
+              : "We collect the following data:"}</p>
+            <ul className="list-disc ps-5 space-y-1">
+              <li>{ar ? "بيانات التسجيل: الاسم، البريد الإلكتروني، رقم الهاتف" : "Account registration: name, email, phone number"}</li>
+              <li>{ar ? "بيانات الاستخدام: السجلات، الأنشطة، المعالجات" : "Usage data: logs, activities, actions"}</li>
+              <li>{ar ? "محتوى الرسائل: رسائل WhatsApp التي تمر عبر حسابك (فقط للتوصيل والأتمتة)" : "Message content: WhatsApp messages passing through your account (solely for delivery and automation)"}</li>
+              <li>{ar ? "البيانات الوصفية: IP، المتصفح، الجهاز" : "Metadata: IP address, browser, device information"}</li>
+            </ul>
           </section>
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "2. كيف نستخدم بياناتك" : "2. How We Use Your Data"}</h2>
             <p>{ar
-              ? "نستخدم بياناتك لتشغيل المنصة، توصيل الرسائل، إرسال التنبيهات، وتحسين الخدمة. لا نبيع بياناتك لأي طرف ثالث."
-              : "We use your data to operate the platform, deliver messages, send notifications, and improve the service. We never sell your data to third parties."}</p>
+              ? "نستخدم بياناتك لتشغيل BASMA AI، توصيل الرسائل، الأتمتة، إرسال التنبيهات، والامتثال للأنظمة القانونية. لا نبيع بياناتك لأي جهة ثالثة تسويقية."
+              : "We use your data to operate BASMA AI, deliver messages, enable automation, send notifications, and comply with legal requirements. We never sell your data to marketing third parties."}</p>
           </section>
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "3. مشاركة البيانات" : "3. Data Sharing"}</h2>
             <p>{ar
-              ? "نشارك البيانات فقط مع مزوّدي الخدمات الأساسيين (مثل مزوّد البنية التحتية وواتساب) ووفقاً للأنظمة المعمول بها."
-              : "We share data only with essential service providers (such as our infrastructure and WhatsApp providers) and as required by applicable law."}</p>
+              ? "نشارك البيانات مع: (أ) مزوّدي البنية التحتية (Vercel، Neon)، (ب) WhatsApp/Meta حسب السياسات الرسمية، (ج) سلطات قانونية إذا لزم الأمر."
+              : "We share data with: (a) infrastructure providers (Vercel, Neon), (b) WhatsApp/Meta per official policies, (c) legal authorities if required by law."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "4. الأمان" : "4. Security"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "4. الأمان والتشفير" : "4. Security & Encryption"}</h2>
             <p>{ar
-              ? "نستخدم تشفيراً وإجراءات حماية صارمة لتأمين بياناتك. ومع ذلك، لا يمكن ضمان أمان مطلق لأي نظام عبر الإنترنت."
-              : "We use encryption and strict safeguards to protect your data. However, no internet system can guarantee absolute security."}</p>
+              ? "نستخدم TLS 1.3+ للنقل و AES-256 للتخزين. جميع الاتصالات مشفرة. لا يمكن ضمان أمان مطلق لأي نظام عبر الإنترنت."
+              : "We use TLS 1.3+ for transport and AES-256 for storage. All connections are encrypted. No system can guarantee absolute security."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "5. حقوقك" : "5. Your Rights"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "5. احتفاظ البيانات" : "5. Data Retention"}</h2>
             <p>{ar
-              ? "يمكنك طلب الوصول إلى بياناتك أو تعديلها أو حذفها في أي وقت عبر التواصل معنا."
-              : "You may request access to, correction of, or deletion of your data at any time by contacting us."}</p>
+              ? "نحتفظ برسائل WhatsApp طالما حسابك نشط. بعد حذف الحساب، يتم حذف البيانات خلال 30 يوماً. البيانات المطلوبة قانونياً قد تُحتفظ بها لفترة أطول."
+              : "We retain WhatsApp messages while your account is active. Upon account deletion, data is removed within 30 days. Legally required data may be retained longer."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "6. التواصل" : "6. Contact"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "6. حقوقك (GDPR/CCPA)" : "6. Your Rights"}</h2>
+            <p className="mb-3">{ar
+              ? "لديك حق في:"
+              : "You have the right to:"}</p>
+            <ul className="list-disc ps-5 space-y-1">
+              <li>{ar ? "الوصول لبياناتك الشخصية" : "Access your personal data"}</li>
+              <li>{ar ? "تصحيح البيانات غير الدقيقة" : "Correct inaccurate data"}</li>
+              <li>{ar ? "حذف بياناتك (حق النسيان)" : "Delete your data (right to be forgotten)"}</li>
+              <li>{ar ? "نقل البيانات إلى جهة أخرى" : "Data portability"}</li>
+            </ul>
+          </section>
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "7. التواصل" : "7. Contact"}</h2>
             <p>{ar
-              ? "لأي استفسار حول الخصوصية، تواصل معنا عبر: admin@basmaweb.com"
-              : "For any privacy inquiry, contact us at: admin@basmaweb.com"}</p>
+              ? "لأي استفسار خصوصية أو طلب حذف: privacy@basmaweb.com"
+              : "For privacy inquiries or data deletion requests: privacy@basmaweb.com"}</p>
           </section>
         </div>
       </div>

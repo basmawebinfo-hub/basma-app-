@@ -45,13 +45,13 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Final CTA
   "cta.title1": { ar: "ابدأ أتمتة أعمالك", en: "Start connecting WhatsApp" },
   "cta.title2": { ar: "على واتساب اليوم.", en: "to your business today." },
-  "cta.subtitle": { ar: "انضم إلى مئات الأعمال التي تدير عملاءها مع بصمة.", en: "Join hundreds of businesses managing their customers with Basma." },
+  "cta.subtitle": { ar: "جرّب BASMA AI مجاناً وبدون بطاقة ائتمان.", en: "Try BASMA AI for free with no credit card required." },
   "cta.join": { ar: "انضم لقائمة الانتظار", en: "Join Waitlist" },
   "cta.dashboard": { ar: "اذهب للوحة", en: "View Dashboard" },
   // Stats
-  "stats.s1": { ar: "تكامل مدعوم", en: "integrations supported" },
-  "stats.s2": { ar: "وقت تشغيل المنصة", en: "platform uptime" },
-  "stats.s3": { ar: "زمن تسليم الـ Webhook", en: "webhook delivery latency" },
+  "stats.s1": { ar: "ربط في أقل من 30 ثانية", en: "Connect in under 30 seconds" },
+  "stats.s2": { ar: "تسليم فوري", en: "Real-time delivery" },
+  "stats.s3": { ar: "توقيع HMAC آمن", en: "HMAC signed webhooks" },
   // Footer
   "footer.tagline": { ar: "أول منصة عربية لأتمتة واتساب وإدارة أعمالك بذكاء.", en: "The first Arabic platform to automate WhatsApp and grow your business." },
   "footer.product": { ar: "المنتج", en: "Product" },
@@ -93,9 +93,9 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "faq.q5": { ar: "كيف يتم تأمين تسليم الـ webhook؟", en: "How are webhook deliveries secured?" },
   "faq.a5": { ar: "تدعم الباقات المدفوعة توقيع الطلبات بـ HMAC-SHA256. كل تسليم يتضمّن توقيعاً ليتحقق منه الخادم، والتسليمات الفاشلة تُعاد تلقائياً.", en: "Paid plans support HMAC-SHA256 request signing. Each delivery includes a signature header, and failed deliveries are retried automatically." },
   // Testimonials
-  "test.title1": { ar: "موثوق من", en: "Loved by" },
+  "test.title1": { ar: "يستخدمه", en: "Used by" },
   "test.title2": { ar: "الشركات", en: "businesses" },
-  "test.subtitle": { ar: "انضم إلى مئات الأعمال التي تستخدم بصمة بالفعل", en: "Join hundreds of businesses already using Basma" },
+  "test.subtitle": { ar: "اكتشف كيف تستخدم الشركات BASMA AI لأتمتة سير العمل.", en: "Discover how businesses use BASMA AI to automate their workflows." },
   "test.q1": { ar: "بصمة تربط واتساب مباشرة بـ n8n. كل رسالة عميل تشغّل أتمتة فوراً — بدون كود ولا تعقيد.", en: "Basma connects our WhatsApp directly to n8n. Every customer message triggers an automation instantly — no code, no hassle." },
   "test.q2": { ar: "انتقلنا من متابعة واتساب يدوياً طوال اليوم إلى توجيه كل رسالة للفريق المناسب تلقائياً. نقلة نوعية.", en: "We went from manually checking WhatsApp all day to routing every message to the right team automatically. Game changer." },
   "test.q3": { ar: "الإعداد استغرق أقل من 30 ثانية. مسحنا الكود، ربطنا الرقم، وبدأت الـ webhooks تعمل مع Zapier فوراً.", en: "Setup took under 30 seconds. Scanned the QR, linked our number, and webhooks started firing into Zapier immediately." },
@@ -140,7 +140,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "auth.b4": { ar: "تم إرسال Webhook ⚡", en: "Webhook sent ⚡" },
   "forgot.title": { ar: "إعادة تعيين كلمة المرور", en: "Reset your password" },
   "forgot.subtitle": { ar: "أدخل بريدك وسنرسل لك رابط إعادة التعيين.", en: "Enter your email and we'll send you a reset link." },
-  "forgot.send": { ar: "إرسال رابط التعيين", en: "Send reset link" },
+  "forgot.send": { ar: "إرسا�� رابط التعيين", en: "Send reset link" },
   "forgot.sending": { ar: "جارٍ الإرسال...", en: "Sending..." },
   "forgot.sent": { ar: "تم! تفقّد بريدك الإلكتروني لرابط إعادة التعيين.", en: "Done! Check your email for the reset link." },
   "forgot.backLogin": { ar: "العودة لتسجيل الدخول", en: "Back to login" },
@@ -403,7 +403,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "adm.msgWeek": { ar: "الرسائل — آخر 7 أيام", en: "Messages — Last 7 days" },
   // Admin layout
   "adm.panel": { ar: "لوحة تحكم المالك", en: "Owner control panel" },
-  "adm.navOverview": { ar: "نظرة عامة", en: "Overview" },
+  "adm.navOverview": { ar: "��ظرة عامة", en: "Overview" },
   "adm.navUsers": { ar: "المستخدمون", en: "Users" },
   "adm.navConnections": { ar: "الاتصالات", en: "Connections" },
   "adm.navBilling": { ar: "الفوترة", en: "Billing" },
@@ -589,7 +589,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "dash.activity.title":       { ar: "النشاط الأخير",               en: "Recent Activity" },
   // Usage Widget (Patch 12 — live)
   "usage.messages":     { ar: "الرسائل",         en: "Messages" },
-  "usage.numbers":      { ar: "الأرقام النشطة",  en: "Active numbers" },
+  "usage.numbers":      { ar: "الأ��قام النشطة",  en: "Active numbers" },
   "usage.apiToday":     { ar: "API اليوم",      en: "API today" },
   "usage.unitMsg":      { ar: "مستخدمة هذا الشهر", en: "used this period" },
   "usage.unitNum":      { ar: "متصلة الآن",     en: "connected now" },

@@ -19,38 +19,50 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "1. قبول الشروط" : "1. Acceptance of Terms"}</h2>
             <p>{ar
-              ? "باستخدامك منصة بصمة، فإنك توافق على هذه الشروط بالكامل. إذا لم توافق، يُرجى عدم استخدام المنصة."
-              : "By using the Basma platform, you agree to these terms in full. If you do not agree, please do not use the platform."}</p>
+              ? "باستخدامك منصة BASMA AI، فإنك توافق على هذه الشروط بالكامل. إذا لم توافق، يُرجى عدم استخدام المنصة."
+              : "By using the BASMA AI platform, you agree to these terms in full. If you do not agree, please do not use the platform."}</p>
           </section>
           <section>
             <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "2. استخدام الخدمة" : "2. Use of Service"}</h2>
             <p>{ar
-              ? "تلتزم باستخدام المنصة لأغراض مشروعة فقط، ووفقاً لسياسات واتساب. يُمنع استخدام المنصة في إرسال رسائل مزعجة (spam) أو محتوى مخالف."
-              : "You agree to use the platform for lawful purposes only and in compliance with WhatsApp policies. Spam or unlawful content is strictly prohibited."}</p>
+              ? "تلتزم باستخدام BASMA AI لأغراض مشروعة فقط، ووفقاً لسياسات WhatsApp الرسمية. يُمنع استخدام الخدمة لإرسال رسائل مزعجة (Spam)، محتوى غير قانوني، أو انتهاك سياسات WhatsApp."
+              : "You agree to use BASMA AI for lawful purposes only and in accordance with WhatsApp's official policies. The service cannot be used for spam, unlawful content, or any violation of WhatsApp's terms."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "3. الاشتراكات والرصيد" : "3. Subscriptions & Credit"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "3. الفواتير والدفع" : "3. Billing & Payment"}</h2>
             <p>{ar
-              ? "تُخصم رسوم الاشتراك يومياً من رصيدك حسب الباقة المختارة. أنت مسؤول عن الحفاظ على رصيد كافٍ لاستمرار الخدمة."
-              : "Subscription fees are deducted daily from your balance based on your chosen plan. You are responsible for maintaining sufficient balance to keep the service active."}</p>
+              ? "يتم تحصيل رسوم الاشتراك شهرياً بناءً على الخطة المختارة. أنت مسؤول عن الحفاظ على بيانات دفع صحيحة. نحتفظ بحق تعليق الخدمة في حالة عدم الدفع."
+              : "Subscription fees are billed monthly according to your selected plan. You are responsible for keeping your billing information current. We reserve the right to suspend service if payment fails."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "4. إيقاف الحساب" : "4. Account Suspension"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "4. تعليق الحساب" : "4. Account Suspension"}</h2>
             <p>{ar
-              ? "نحتفظ بحق إيقاف أو إنهاء أي حساب يخالف هذه الشروط أو سياسات واتساب دون إشعار مسبق."
-              : "We reserve the right to suspend or terminate any account that violates these terms or WhatsApp policies without prior notice."}</p>
+              ? "نحتفظ بحق تعليق أو حذف أي حساب يخالف هذه الشروط أو سياسات WhatsApp. قد يكون التعليق فوري في حالات انتهاكات جسيمة."
+              : "We reserve the right to suspend or terminate any account that violates these terms or WhatsApp's policies. Immediate suspension may occur in cases of serious violations."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "5. حدود المسؤولية" : "5. Limitation of Liability"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "5. التكامل مع WhatsApp" : "5. WhatsApp Integration"}</h2>
             <p>{ar
-              ? "تُقدّم الخدمة \"كما هي\". لا نتحمّل المسؤولية عن أي أضرار غير مباشرة ناتجة عن انقطاع الخدمة أو فقدان البيانات."
-              : "The service is provided \"as is\". We are not liable for any indirect damages resulting from service interruption or data loss."}</p>
+              ? "BASMA AI يتكامل مع WhatsApp من خلال واجهات برمجية رسمية. نحن لسنا جهة معتمدة أو شريكة رسمية من Meta/WhatsApp. استخدام الخدمة يجب أن يكون متوافقاً مع شروط خدمة WhatsApp."
+              : "BASMA AI integrates with WhatsApp through official APIs. We are not an official partner or certified provider of Meta/WhatsApp. Your use must comply with WhatsApp's Terms of Service."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "6. التواصل" : "6. Contact"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "6. حدود المسؤولية" : "6. Limitation of Liability"}</h2>
             <p>{ar
-              ? "لأي استفسار حول الشروط، تواصل معنا عبر: admin@basmaweb.com"
-              : "For any inquiry about these terms, contact us at: admin@basmaweb.com"}</p>
+              ? "تُقدّم الخدمة \"كما هي\". BASMA AI غير مسؤول عن أضرار غير مباشرة (خسارة بيانات، خسارة أرباح) الناتجة عن انقطاع الخدمة، أخطاء المستخدم، أو قيود WhatsApp."
+              : "The service is provided \"as is\". BASMA AI is not liable for indirect damages (data loss, lost profits) resulting from service interruption, user error, or WhatsApp limitations."}</p>
+          </section>
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "7. تعديلات الشروط" : "7. Amendments"}</h2>
+            <p>{ar
+              ? "نحتفظ بحق تعديل هذه الشروط في أي وقت. استمرارك في استخدام الخدمة يعني قبولك للشروط المعدّلة."
+              : "We reserve the right to modify these terms at any time. Your continued use of the service constitutes acceptance of any amendments."}</p>
+          </section>
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "8. التواصل" : "8. Contact"}</h2>
+            <p>{ar
+              ? "لأي استفسار حول الشروط، تواصل معنا عبر: legal@basmaweb.com"
+              : "For questions about these terms, contact us at: legal@basmaweb.com"}</p>
           </section>
         </div>
       </div>

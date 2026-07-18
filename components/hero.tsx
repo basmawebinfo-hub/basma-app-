@@ -157,8 +157,8 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={shouldReduceMotion ? {} : fadeUp.initial}
+            animate={fadeUp.animate}
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex items-center justify-center gap-2 text-muted-foreground/40 mb-6 pointer-events-none select-none"
             aria-hidden="true"
@@ -167,6 +167,17 @@ export function Hero() {
             <span>◇</span>
             <span>✕</span>
             <span>◇</span>
+          </motion.div>
+
+          <motion.div
+            initial={shouldReduceMotion ? {} : fadeUp.initial}
+            animate={fadeUp.animate}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mb-6"
+          >
+            <p className="text-lg sm:text-xl text-muted-foreground">
+              {t("hero.intgDesc")}
+            </p>
           </motion.div>
 
           <motion.div

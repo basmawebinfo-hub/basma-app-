@@ -8,9 +8,9 @@ export function Stats() {
   const { t } = useI18n()
 
   const stats = [
-    { value: "200+", key: "stats.s1" },
-    { value: "99.9%", key: "stats.s2" },
-    { value: "<200ms", key: "stats.s3" },
+    { value: "<30s", key: "stats.s1" },
+    { value: "Real-time", key: "stats.s2" },
+    { value: "HMAC", key: "stats.s3" },
   ]
 
   return (

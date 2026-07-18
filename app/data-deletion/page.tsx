@@ -17,34 +17,63 @@ export default function DataDeletionPage() {
 
         <div className="space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "حقك في حذف بياناتك" : "Your Right to Data Deletion"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "حقك في حذف البيانات (GDPR/CCPA)" : "Your Right to Data Deletion (GDPR/CCPA)"}</h2>
             <p>{ar
-              ? "في بصمة، يحق لك طلب حذف جميع بياناتك الشخصية وبيانات حساباتك المرتبطة (بما في ذلك حسابات واتساب وإنستغرام المربوطة) في أي وقت."
-              : "At BASMA, you have the right to request deletion of all your personal data and connected account data (including linked WhatsApp and Instagram accounts) at any time."}</p>
+              ? "وفقاً لـ GDPR وCCPA، يحق لك طلب حذف جميع بياناتك الشخصية من BASMA AI في أي وقت. هذا يشمل ملفك الشخصي، الرسائل، البيانات الوصفية، والسجلات."
+              : "Under GDPR and CCPA, you have the right to request deletion of all your personal data from BASMA AI at any time. This includes your profile, messages, metadata, and logs."}</p>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "كيف تطلب الحذف" : "How to Request Deletion"}</h2>
-            <p className="mb-2">{ar ? "لديك طريقتان:" : "You have two options:"}</p>
-            <ol className="list-decimal ps-5 space-y-2">
-              <li>{ar
-                ? "من داخل حسابك: افتح الإعدادات واطلب حذف الحساب — تُحذف كل بياناتك خلال 30 يوماً."
-                : "From your account: open Settings and request account deletion — all your data is removed within 30 days."}</li>
-              <li>{ar
-                ? "عبر البريد: أرسل طلباً إلى admin@basmaweb.com من البريد المسجّل في حسابك، وسنؤكّد الحذف خلال 30 يوماً."
-                : "By email: send a request to admin@basmaweb.com from your registered email, and we will confirm deletion within 30 days."}</li>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "طلب الحذف" : "How to Request Deletion"}</h2>
+            <p className="mb-3">{ar ? "اختر إحدى الطرق التالية:" : "Choose one of the following methods:"}</p>
+            <ol className="list-decimal ps-5 space-y-3">
+              <li>
+                <strong>{ar ? "من داخل حسابك:" : "From your account:"}</strong>
+                <p className="mt-1">{ar
+                  ? "افتح الإعدادات → حذف الحساب. ستطلب تأكيد البريد. بعد التأكيد، سيتم حذف بياناتك خلال 30 يوماً."
+                  : "Go to Settings → Delete Account. Confirm via email. Your data will be deleted within 30 days."}</p>
+              </li>
+              <li>
+                <strong>{ar ? "عبر البريد الإلكتروني:" : "By email:"}</strong>
+                <p className="mt-1">{ar
+                  ? "أرسل بريداً إلى privacy@basmaweb.com من بريدك المسجّل. اذكر: \"أطلب حذف حسابي وكل بياناتي\". سنرسل تأكيد خلال 7 أيام."
+                  : "Send an email to privacy@basmaweb.com from your registered address. Include: \"I request deletion of my account and all my data.\" We will confirm within 7 days."}</p>
+              </li>
+              <li>
+                <strong>{ar ? "نموذج طلب GDPR:" : "GDPR Request Form:"}</strong>
+                <p className="mt-1">{ar
+                  ? "ملئ نموذج طلب Data Subject Access Request (DSAR) وإرساله إلى legal@basmaweb.com"
+                  : "Complete a Data Subject Access Request (DSAR) form and submit to legal@basmaweb.com"}</p>
+              </li>
             </ol>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "ماذا يُحذف" : "What Gets Deleted"}</h2>
-            <p>{ar
-              ? "ملفك الشخصي، أرقام واتساب المربوطة، حسابات إنستغرام المربوطة، رسائلك، قواعد الأتمتة، وسجلّات النشاط. لا نحتفظ بأي بيانات بعد الحذف إلا ما يفرضه القانون."
-              : "Your profile, linked WhatsApp numbers, linked Instagram accounts, your messages, automation rules, and activity logs. We retain no data after deletion except where required by law."}</p>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "ماذا يتم حذفه" : "What Gets Deleted"}</h2>
+            <ul className="list-disc ps-5 space-y-1">
+              <li>{ar ? "ملف المستخدم الشخصي" : "Your user profile"}</li>
+              <li>{ar ? "جميع أرقام واتساب المربوطة" : "All linked WhatsApp numbers"}</li>
+              <li>{ar ? "كل الرسائل والمحادثات" : "All messages and conversations"}</li>
+              <li>{ar ? "قواعد الأتمتة والـ Webhooks" : "Automation rules and webhooks"}</li>
+              <li>{ar ? "سجلات النشاط والإحصائيات" : "Activity logs and analytics"}</li>
+              <li>{ar ? "بيانات الفواتير والدفع" : "Billing and payment history"}</li>
+            </ul>
           </section>
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "بيانات Meta / إنستغرام" : "Meta / Instagram Data"}</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "استثناءات قانونية" : "Legal Exceptions"}</h2>
             <p>{ar
-              ? "عند فصل حساب إنستغرام، نحذف رموز الوصول (tokens) وكل البيانات المرتبطة فوراً من خوادمنا."
-              : "When you disconnect an Instagram account, we immediately delete the access tokens and all associated data from our servers."}</p>
+              ? "قد نحتفظ ببعض البيانات إذا فرضت القانون ذلك (مثل السجلات الضريبية لمدة 7 سنوات). سنخطرك بأي بيانات محتفظ بها."
+              : "We may retain some data if required by law (such as tax records for 7 years). We will notify you of any retained data."}</p>
+          </section>
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "المدة الزمنية" : "Timeline"}</h2>
+            <p>{ar
+              ? "• تأكيد الطلب: 7 أيام\n• حذف الBيانات: 30 يوماً من التأكيد\n• تأكيد النهائي: 5 أيام"
+              : "• Request confirmation: 7 days\n• Data deletion: 30 days from confirmation\n• Final confirmation: 5 days"}</p>
+          </section>
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-2">{ar ? "أسئلة إضافية" : "More Questions?"}</h2>
+            <p>{ar
+              ? "تواصل معنا: privacy@basmaweb.com"
+              : "Contact us: privacy@basmaweb.com"}</p>
           </section>
         </div>
       </div>
