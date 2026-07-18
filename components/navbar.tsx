@@ -42,8 +42,8 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8 py-4" aria-label="Main navigation">
         <div className="flex h-14 items-center justify-between bg-background/60 backdrop-blur-xl border border-border/50 rounded-full px-4 sm:px-6">
-          <Link href="/" className="flex items-center shrink-0 me-6 lg:me-10" aria-label="Basma Web home">
-            <img src="/basma-logo.png" alt="BASMA" className="h-8 sm:h-9 w-auto object-contain" />
+          <Link href="/" className="flex items-center shrink-0 me-6 lg:me-10" aria-label="BASMA AI home">
+            <img src="/basma-logo.png" alt="BASMA AI" className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation - hidden below lg */}

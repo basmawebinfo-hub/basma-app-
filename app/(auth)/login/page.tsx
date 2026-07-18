@@ -32,8 +32,8 @@ export default function LoginPage() {
     { top: "62%", left: "38%", delay: 1.2, key: "auth.b4" },
   ]
   const stats = [
-    { value: "200+", key: "auth.statIntegrations" },
-    { value: "99.9%", key: "auth.statUptime" },
+    { value: "<30s", key: "auth.statIntegrations" },
+    { value: "24/7", key: "auth.statUptime" },
     { value: t("hero.cta") === "Start Free" ? "Free" : "مجاناً", key: "auth.statFree" },
   ]
 
