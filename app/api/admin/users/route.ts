@@ -44,7 +44,7 @@ export async function GET() {
     if (!reqByUser.has(rq.user_id)) reqByUser.set(rq.user_id, rq.plan_id)
   }
   const planById = new Map((plansList ?? []).map((p: { id: string; name: string; max_instances: number; max_messages_mo: number; price_monthly?: number; is_trial?: boolean; tier_slug?: string }) => [p.id, p]))
-  const subByUser = new Map((subs ?? []).map((s: { user_id: string; plan_id: string; status: string; current_period_end: string|null }) => [s.user_id, s]))
+  const subByUser = new Map((subs ?? []).map((s: any) => [s.user_id, s]))
 
   const instCount = new Map<string, number>()
   const instConnected = new Map<string, number>()

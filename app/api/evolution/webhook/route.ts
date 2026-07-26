@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { logger } from "@/lib/logger"
 import { extractOrCreateRequestId } from "@/lib/request-id"
+import { isSafeUrl } from "@/lib/security"
 
 function getServiceClient() {
   return createServiceClient(
@@ -309,6 +310,9 @@ async function deliverToDestination(
   payload: unknown,
   secret?: string
 ): Promise<{ ok: boolean; status: number; attempts: number; error?: string }> {
+  if (!isSafeUrl(url)) {
+    return { ok: false, status: 400, attempts: 0, error: "SSRF prevention: unsafe destination URL" }
+  }
   // More retries for n8n test URLs (webhook-test) so the user has time to click "Listen"
   const isTestUrl = url.includes("/webhook-test/")
   const maxAttempts = isTestUrl ? 8 : 3

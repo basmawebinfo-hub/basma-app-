@@ -77,8 +77,8 @@ export async function GET() {
     .limit(10)
 
   const recentEvents = (recentDeliveries ?? []).map((d) => {
-    const cfg = d.webhook_configs as { name: string; destination_url: string | null } | null
-    const evt = d.webhook_events as { event_type: string } | null
+    const cfg = (d.webhook_configs as any) as { name: string; destination_url: string | null } | null
+    const evt = (d.webhook_events as any) as { event_type: string } | null
     const diffMin = Math.round((Date.now() - new Date(d.created_at).getTime()) / 60000)
     const timeStr = diffMin < 1 ? "Just now" : diffMin < 60 ? diffMin + "m ago" : Math.round(diffMin / 60) + "h ago"
     return {

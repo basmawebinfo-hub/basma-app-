@@ -7,9 +7,9 @@ export async function GET() {
   if (!gate.ok) return NextResponse.json({ error: gate.error }, { status: gate.status })
 
   const db = adminService()
-  const count = async (table: string, filter?: (q: ReturnType<typeof db.from>) => unknown) => {
-    let q = db.from(table).select("id", { count: "exact", head: true })
-    if (filter) q = filter(q) as typeof q
+  const count = async (table: string, filter?: (q: any) => any) => {
+    let q: any = db.from(table).select("id", { count: "exact", head: true })
+    if (filter) q = filter(q)
     const { count: c } = await q
     return c ?? 0
   }
