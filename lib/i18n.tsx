@@ -18,7 +18,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "nav.contact": { ar: "تواصل معنا", en: "Contact" },
 
   // Hero
-  "hero.badge": { ar: "أول منصة عربية لأتمتة واتساب والأعمال", en: "The first Arabic WhatsApp automation platform" },
+  "hero.badge": { ar: "منصة ذكية لأتمتة واتساب والأعمال", en: "A smart WhatsApp automation and business platform" },
   "hero.title": { ar: "منصة واتساب الذكية لأعمالك", en: "The smart WhatsApp platform for your business" },
   "hero.subtitle": { ar: "استقبل وأرسل رسائل واتساب، تابع عملاءك، وأتمت ردودك — واربطها بـ n8n وMake.", en: "Send and receive WhatsApp messages, track customers, and automate your replies — connect with n8n and Make." },
   "hero.cta": { ar: "ابدأ مجاناً", en: "Start Free" },
@@ -45,7 +45,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Final CTA
   "cta.title1": { ar: "ابدأ أتمتة أعمالك", en: "Start connecting WhatsApp" },
   "cta.title2": { ar: "على واتساب اليوم.", en: "to your business today." },
-  "cta.subtitle": { ar: "انضم إلى مئات الأعمال التي تدير عملاءها مع بصمة.", en: "Join hundreds of businesses managing their customers with Basma." },
+  "cta.subtitle": { ar: "انضم إلى الأعمال المتميزة التي تدير عملاءها مع بصمة.", en: "Join leading businesses managing their customers with Basma." },
   "cta.join": { ar: "انضم لقائمة الانتظار", en: "Join Waitlist" },
   "cta.dashboard": { ar: "اذهب للوحة", en: "View Dashboard" },
   // Stats
@@ -53,7 +53,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "stats.s2": { ar: "وقت تشغيل المنصة", en: "platform uptime" },
   "stats.s3": { ar: "زمن تسليم الـ Webhook", en: "webhook delivery latency" },
   // Footer
-  "footer.tagline": { ar: "أول منصة عربية لأتمتة واتساب وإدارة أعمالك بذكاء.", en: "The first Arabic platform to automate WhatsApp and grow your business." },
+  "footer.tagline": { ar: "منصة ذكية لأتمتة واتساب وإدارة أعمالك بذكاء.", en: "A smart platform to automate WhatsApp and grow your business." },
   "footer.product": { ar: "المنتج", en: "Product" },
   "footer.company": { ar: "الشركة", en: "Company" },
   "footer.legal": { ar: "قانوني", en: "Legal" },
@@ -95,7 +95,7 @@ export const translations: Record<string, { ar: string; en: string }> = {
   // Testimonials
   "test.title1": { ar: "موثوق من", en: "Loved by" },
   "test.title2": { ar: "الشركات", en: "businesses" },
-  "test.subtitle": { ar: "انضم إلى مئات الأعمال التي تستخدم بصمة بالفعل", en: "Join hundreds of businesses already using Basma" },
+  "test.subtitle": { ar: "انضم إلى الأعمال المتميزة التي تستخدم بصمة بالفعل", en: "Join leading businesses already using Basma" },
   "test.q1": { ar: "بصمة تربط واتساب مباشرة بـ n8n. كل رسالة عميل تشغّل أتمتة فوراً — بدون كود ولا تعقيد.", en: "Basma connects our WhatsApp directly to n8n. Every customer message triggers an automation instantly — no code, no hassle." },
   "test.q2": { ar: "انتقلنا من متابعة واتساب يدوياً طوال اليوم إلى توجيه كل رسالة للفريق المناسب تلقائياً. نقلة نوعية.", en: "We went from manually checking WhatsApp all day to routing every message to the right team automatically. Game changer." },
   "test.q3": { ar: "الإعداد استغرق أقل من 30 ثانية. مسحنا الكود، ربطنا الرقم، وبدأت الـ webhooks تعمل مع Zapier فوراً.", en: "Setup took under 30 seconds. Scanned the QR, linked our number, and webhooks started firing into Zapier immediately." },

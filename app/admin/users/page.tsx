@@ -47,7 +47,7 @@ export default function AdminUsers() {
 
   function exportCSV() {
     const headers = ["email", "full_name", "whatsapp", "role", "status", "plan_name", "balance", "instances_total", "messages_sent", "messages_received"]
-    const rows = filtered.map((u) => headers.map((h) => JSON.stringify((u as Record<string, unknown>)[h] ?? "")).join(","))
+    const rows = filtered.map((u) => headers.map((h) => JSON.stringify((u as any)[h] ?? "")).join(","))
     const csv = [headers.join(","), ...rows].join("\n")
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)

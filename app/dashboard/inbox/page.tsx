@@ -80,7 +80,6 @@ function MediaMessage({ msg, instanceId }: { msg: EvoMessage; instanceId: string
     return (
       <div className="space-y-1">
         {src ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt="image" onClick={loadMedia} className="rounded-lg max-w-[240px] max-h-[300px] object-cover cursor-pointer" />
         ) : (
           <button onClick={loadMedia} className="flex items-center gap-2 text-sm underline">{loading ? "..." : "عرض الصورة"}</button>

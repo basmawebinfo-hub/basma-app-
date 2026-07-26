@@ -147,7 +147,7 @@ export function Navbar() {
                     className="block px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/10"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 ))}
               </div>

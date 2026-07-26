@@ -35,6 +35,7 @@ export default function UserDetailPage() {
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [id])
   useEffect(() => { fetch("/api/admin/plans").then((r) => r.json()).then((d) => setPlans(d.plans ?? [])).catch(() => {}) }, [])
 

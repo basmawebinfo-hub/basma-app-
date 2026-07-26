@@ -1,15 +1,12 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono, PT_Mono, Cairo, Rubik } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
-const _ptMono = PT_Mono({ weight: "400", subsets: ["latin"], variable: "--font-pt-mono" })
-const _cairo = Cairo({ subsets: ["arabic", "latin"], variable: "--font-cairo" })
-const _rubik = Rubik({ subsets: ["arabic", "latin"], variable: "--font-rubik" })
+const _ptMono = { variable: "font-mono" }
+const _cairo = { variable: "font-sans" }
+const _rubik = { variable: "font-sans" }
 
 const SITE = "https://www.basmaweb.com"
 

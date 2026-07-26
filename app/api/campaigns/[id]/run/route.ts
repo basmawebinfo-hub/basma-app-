@@ -5,12 +5,12 @@ import { sendText, sendPresence } from "@/lib/evolution"
 import { humanDelay, typingDuration, spinMessage, isQuietHour, shouldTakeBreak, breakDuration, sleep } from "@/lib/anti-ban"
 import { logger } from "@/lib/logger"
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { id } = params
+  const { id } = await params
   const { data: campaign } = await supabase.from("campaigns")
     .select("*, instances ( instance_name, status )")
     .eq("id", id).eq("user_id", user.id).single()

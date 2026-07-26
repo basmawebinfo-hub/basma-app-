@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
 import crypto from "crypto"
+import { isSafeUrl } from "@/lib/security"
 
 function getService() {
   return createServiceClient(
@@ -18,9 +19,9 @@ function verifyHmac(body: string, secret: string, signature: string): boolean {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = params
+  const { token } = await params
   const rawBody = await request.text()
   const service = getService()
 
@@ -32,8 +33,11 @@ export async function POST(
 
   if (!wt || !wt.is_active) return NextResponse.json({ error: "Invalid token" }, { status: 401 })
 
-  const sig = request.headers.get("x-evolution-signature") ?? ""
-  if (sig && !verifyHmac(rawBody, wt.hmac_secret, sig)) {
+  const sig = request.headers.get("x-evolution-signature")
+  if (!sig) {
+    return NextResponse.json({ error: "Missing signature header" }, { status: 401 })
+  }
+  if (!verifyHmac(rawBody, wt.hmac_secret, sig)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
   }
 
@@ -128,7 +132,7 @@ export async function POST(
 }
 
 async function processAutoReply(
-  service: ReturnType<typeof createServiceClient>,
+  service: any,
   userId: string,
   instanceName: string,
   instanceId: string,
@@ -148,7 +152,7 @@ async function processAutoReply(
     const msgContent = msg.message as Record<string, unknown> ?? {}
     const text = ((msgContent.conversation as string) ?? ((msgContent.extendedTextMessage as Record<string, unknown>)?.text as string) ?? "").toLowerCase()
 
-    for (const rule of rules) {
+    for (const rule of rules as any[]) {
       let shouldReply = false
       if (rule.trigger_type === "any") shouldReply = true
       else if (rule.trigger_type === "welcome") shouldReply = true
@@ -195,10 +199,14 @@ async function processAutoReply(
 }
 
 async function deliverWebhook(cfg: Record<string, unknown>, payload: unknown) {
+  const url = cfg.destination_url as string
+  if (!url || !isSafeUrl(url)) {
+    return
+  }
   const maxAttempts = (cfg.retry_count as number) ?? 3
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const res = await fetch(cfg.destination_url as string, {
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Basma-Secret": (cfg.secret as string) ?? "", "X-Basma-Attempt": String(attempt) },
         body: JSON.stringify(payload),
