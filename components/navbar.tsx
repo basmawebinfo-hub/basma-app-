@@ -30,6 +30,16 @@ export function Navbar() {
     }
   }, [mobileMenuOpen])
 
+  // Close the mobile menu with Escape for keyboard users
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false)
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [mobileMenuOpen])
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="container-site max-w-6xl py-4" aria-label="Main navigation">
@@ -71,7 +81,7 @@ export function Navbar() {
           {/* Mobile Menu Button - visible below lg */}
           <button
             type="button"
-            className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
+            className="lg:hidden flex items-center justify-center min-h-11 min-w-11 -me-2 p-2 rounded-lg text-muted-foreground hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
@@ -105,7 +115,7 @@ export function Navbar() {
                 </Link>
                 <button
                   type="button"
-                  className="p-2 text-foreground hover:text-primary transition-colors"
+                  className="flex items-center justify-center min-h-11 min-w-11 p-2 rounded-lg text-foreground hover:text-primary transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close menu"
                 >
@@ -129,7 +139,7 @@ export function Navbar() {
 
               <div className="px-6 py-4 border-t border-border/50 bg-background flex flex-col gap-3">
                 <Button rounded="full" className="py-6 text-base w-full" asChild>
-                  <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>Get Started Free</Link>
+                  <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>{t("nav.getStarted")}</Link>
                 </Button>
               </div>
             </motion.div>
