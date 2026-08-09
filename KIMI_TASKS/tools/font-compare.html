@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Cairo"; src: url("node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Cairo"; src: url("node_modules/@fontsource/cairo/files/cairo-arabic-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Cairo"; src: url("node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Cairo"; src: url("node_modules/@fontsource/cairo/files/cairo-arabic-800-normal.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "Plex"; src: url("node_modules/@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Plex"; src: url("node_modules/@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Plex"; src: url("node_modules/@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-700-normal.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "SG"; src: url("node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "SG"; src: url("node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+* { margin: 0; box-sizing: border-box; }
+body { background: #0d0d0d; color: #f2f2f2; font-size: 16px; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.col { min-width: 0; }
+.sample { min-width: 0; overflow-wrap: break-word; }
+.col h2 { color: #ABE707; font-size: 20px; margin-bottom: 24px; font-family: "SG", sans-serif; }
+.cairo .sample { font-family: "Cairo", sans-serif; }
+.plex .sample { font-family: "Plex", sans-serif; }
+.display { font-size: 44px; font-weight: 800; line-height: 1.25; margin-bottom: 24px; }
+.display .accent { color: #ABE707; }
+.h3 { font-size: 28px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; }
+.body { font-size: 17px; font-weight: 400; line-height: 1.9; color: #c9c9c9; margin-bottom: 20px; max-width: 62ch; }
+.small { font-size: 13.5px; font-weight: 500; line-height: 1.7; color: #8a8a8a; margin-bottom: 24px; }
+.latin { font-family: "SG", sans-serif; font-size: 18px; font-weight: 500; color: #e5e5e5; margin-bottom: 8px; }
+.mixed { font-size: 16px; line-height: 1.8; color: #c9c9c9; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="col cairo">
+  <h2>Cairo</h2>
+  <div class="sample">
+    <div class="display">أتمت أعمالك على واتساب <span class="accent">بدون أي كود.</span></div>
+    <div class="h3">اتعلم إزاي تفكّر قبل ما تبدأ تبني</div>
+    <div class="body">في نهاية المستوى ده هتكون قادر تاخد مشكلة حقيقية من أي Business، تحللها، وتحدد إزاي ممكن تحولها إلى نظام Automation أو AI Solution — يعني بتتعلم "التفكير" قبل "التنفيذ"، وده أهم حاجة بتتجاهلها غالبية الناس.</div>
+    <div class="small">استقبل وأرسل رسائل واتساب، تابع عملاءك، وأتمت ردودك — واربطها بـ n8n وMake. · 14 مستوى · مجاني بالكامل</div>
+    <div class="latin">BASMA — AI Automation Engineer</div>
+    <div class="mixed">اربط أرقامك مع n8n وZapier وMake وابدأ الأتمتة في دقائق. LEVEL 01 — AI Problem Solver</div>
+  </div>
+</div>
+<div class="col plex">
+  <h2>IBM Plex Sans Arabic</h2>
+  <div class="sample">
+    <div class="display">أتمت أعمالك على واتساب <span class="accent">بدون أي كود.</span></div>
+    <div class="h3">اتعلم إزاي تفكّر قبل ما تبدأ تبني</div>
+    <div class="body">في نهاية المستوى ده هتكون قادر تاخد مشكلة حقيقية من أي Business، تحللها، وتحدد إزاي ممكن تحولها إلى نظام Automation أو AI Solution — يعني بتتعلم "التفكير" قبل "التنفيذ"، وده أهم حاجة بتتجاهلها غالبية الناس.</div>
+    <div class="small">استقبل وأرسل رسائل واتساب، تابع عملاءك، وأتمت ردودك — واربطها بـ n8n وMake. · 14 مستوى · مجاني بالكامل</div>
+    <div class="latin">BASMA — AI Automation Engineer</div>
+    <div class="mixed">اربط أرقامك مع n8n وZapier وMake وابدأ الأتمتة في دقائق. LEVEL 01 — AI Problem Solver</div>
+  </div>
+</div>
+</div></body>
+</html>

@@ -1,12 +1,45 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Analytics } from "@vercel/analytics/next"
+import localFont from "next/font/local"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n"
 
-const _ptMono = { variable: "font-mono" }
-const _cairo = { variable: "font-sans" }
-const _rubik = { variable: "font-sans" }
+// Self-hosted fonts (OFL-1.1) — no build-time network dependency.
+// Arabic: IBM Plex Sans Arabic (technical tone, pairs with Plex Mono).
+// Latin: Space Grotesk (BASMA wordmark, English UI, inline Latin in Arabic copy).
+// Mono: IBM Plex Mono (code blocks / workflow diagrams).
+const plexArabic = localFont({
+  src: [
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-plex-arabic",
+  display: "swap",
+  preload: true,
+})
+
+const spaceGrotesk = localFont({
+  src: [
+    { path: "./fonts/space-grotesk-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/space-grotesk-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/space-grotesk-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-space-grotesk",
+  display: "swap",
+  preload: true,
+})
+
+const plexMono = localFont({
+  src: [
+    { path: "./fonts/ibm-plex-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/ibm-plex-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
+  ],
+  variable: "--font-plex-mono",
+  display: "swap",
+  preload: false,
+})
 
 const SITE = "https://www.basmaweb.com"
 
@@ -64,8 +97,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`dark ${_ptMono.variable} ${_cairo.variable} ${_rubik.variable}`}>
+    <html
+      lang="ar"
+      dir="rtl"
+      suppressHydrationWarning
+      className={`dark ${plexArabic.variable} ${spaceGrotesk.variable} ${plexMono.variable}`}
+    >
       <head>
+        {/* Restore the saved locale before first paint so lang/dir match the
+            user's choice without a flash of the wrong direction. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var l=localStorage.getItem("basma_lang");if(l==="en"||l==="ar"){document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr"}}catch(e){}`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
