@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import Image from "next/image"
 import { useI18n } from "@/lib/i18n"
 
 export function Footer() {
@@ -25,7 +26,7 @@ export function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center mb-4">
-              <img src="/basma-logo.png" alt="BASMA" className="h-8 w-auto object-contain" />
+              <Image src="/basma-logo.png" alt="BASMA" width={1005} height={280} className="h-8 w-auto object-contain" />
             </Link>
             <p className="text-xs sm:text-sm text-muted-foreground">{t("footer.tagline")}</p>
           </div>

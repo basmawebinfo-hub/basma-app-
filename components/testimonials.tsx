@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Star } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
@@ -37,7 +38,7 @@ export function Testimonials() {
                 {t(testimonial.quoteKey)}
               </blockquote>
               <div className="flex items-center gap-3">
-                <img src={testimonial.avatar} alt="" aria-hidden="true" className="w-9 sm:w-10 h-9 sm:h-10 rounded-full object-cover bg-muted" />
+                <Image src={testimonial.avatar} alt="" aria-hidden="true" width={40} height={40} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full object-cover bg-muted" />
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-foreground">{testimonial.author}</p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground">{t(testimonial.roleKey)}</p>

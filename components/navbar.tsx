@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { LangToggle } from "@/components/lang-toggle"
 import { Menu, X, ArrowRight } from "lucide-react"
@@ -45,7 +46,7 @@ export function Navbar() {
       <nav className="container-site max-w-6xl py-4" aria-label="Main navigation">
         <div className="flex h-14 items-center justify-between bg-background/60 backdrop-blur-xl border border-border/50 rounded-full px-4 sm:px-6">
           <Link href="/" className="flex items-center shrink-0 me-6 lg:me-10" aria-label="Basma Web home">
-            <img src="/basma-logo.png" alt="BASMA" className="h-8 sm:h-9 w-auto object-contain" />
+            <Image src="/basma-logo.png" alt="BASMA" width={1005} height={280} priority className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation - hidden below lg */}
@@ -111,7 +112,7 @@ export function Navbar() {
             >
               <div className="flex items-center justify-between px-6 py-4 bg-background border-b border-border/50">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <img src="/basma-logo.png" alt="BASMA" className="h-8 w-auto object-contain" />
+                  <Image src="/basma-logo.png" alt="BASMA" width={1005} height={280} className="h-8 w-auto object-contain" />
                 </Link>
                 <button
                   type="button"
