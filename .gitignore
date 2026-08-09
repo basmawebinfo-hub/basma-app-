@@ -28,3 +28,6 @@ next-env.d.ts
 
 # claude local
 .claude/
+
+# phase tooling deps
+KIMI_TASKS/tools/node_modules/
