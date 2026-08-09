@@ -27,7 +27,7 @@ it dies with the code it describes.
 | # | Phase | What | Status | Depends on |
 |---|-------|------|--------|------------|
 | **A** | Demolition & clean slate | Delete backend, DB, WhatsApp, Telegram, billing. Site stays visually identical. | ✅ **Approved** 2026-08-08 | — |
-| **B** | Design system | Fonts (currently fake), brand color system, spacing, motion, RTL, a11y — driven by **Impeccable** | 🟦 **Ready — start here** | A ✅ |
+| **B** | Design system | Fonts (currently fake), brand color system, spacing, motion, RTL, a11y — driven by **Impeccable** | 🟨 **Awaiting review** — `reports/PHASE-B-REPORT.md` | A ✅ |
 | **C** | Academy | 14 levels: content pipeline from markdown, level pages, navigation, **Vimeo** embeds | ⬜ | B |
 | **D** | Services | Single "الخدمات" page — **coming soon placeholder**, no detail yet | ⬜ | B |
 | **E** | SEO & performance | Metadata rewrite, structured data, i18n/hreflang, CSP enforce, LCP | ⬜ | C, D |
@@ -140,6 +140,7 @@ blanks.
 | 2026-08-08 | 0 | ✅ Approved w/ 1 fix | Schema rebuild verified independently: 23/23 tables, 0 column mismatches. Found privilege escalation in `rls.sql` (T0.9). **Now moot — `supabase/` is deleted in Phase A.** |
 | 2026-08-08 | — | 🔄 Plan replaced | Product pivot to academy + services. Phases 0–6 archived; A–F defined. |
 | 2026-08-08 | A | ✅ Approved, no rework | Independently verified: **157 files deleted**, zero dangling imports, zero links to dead routes, removed deps confirmed unimported. Build output is **8 routes, all `○ Static`** — no middleware, no dynamic routes, no server. Pixel-diffed all 5153px of `/` against production: max band delta **0.22/255**. Pricing section renders all six plans from static data. All four gates re-run by Claude. |
+| 2026-08-10 | B | 🟨 Submitted for review | Kimi: all 9 tasks done. Fonts self-hosted (Plex Arabic + Space Grotesk + Plex Mono, OFL-1.1); full OKLCH token system, 18/18 WCAG AA; shared spacing conventions; motion tokens + reveals removed + reduced-motion; logical props + RTL icon flips; skip link / 44px targets / focus rings; next/image restored; PRODUCT.md + DESIGN.md written. Detector **1 → 0**. Gates: build/lint/tsc/vitest all PASS. See `reports/PHASE-B-REPORT.md`. |
 
 ---
 

@@ -57,8 +57,8 @@ export function UseCases() {
       <div
         className="absolute inset-0 -z-10 bg-primary/25"
         style={{
-          maskImage: "radial-gradient(ellipse 55% 55%, rgb(0 0 0 / 0.75), transparent)",
-          WebkitMaskImage: "radial-gradient(ellipse 55% 55%, rgb(0 0 0 / 0.75), transparent)",
+          maskImage: "radial-gradient(ellipse 55% 55%, var(--mask-shade), transparent)",
+          WebkitMaskImage: "radial-gradient(ellipse 55% 55%, var(--mask-shade), transparent)",
         }}
       >
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/grade.png')" }} />

@@ -65,6 +65,8 @@ const eslintConfig = [
   // linting it would flag issues we don't own and can't fix without diverging
   // from upstream. `.github/**` holds external skill/tooling scripts (not app
   // code); they are CLI scripts where console output is their interface.
+  // `KIMI_TASKS/**` is phase tooling (snapshot/contrast CLI scripts and
+  // generated reports) — not application code; console output is its interface.
   {
     ignores: [
       ".next/**",
@@ -73,6 +75,7 @@ const eslintConfig = [
       "next-env.d.ts",
       "components/ui/**",
       ".github/**",
+      "KIMI_TASKS/**",
     ],
   },
 ]

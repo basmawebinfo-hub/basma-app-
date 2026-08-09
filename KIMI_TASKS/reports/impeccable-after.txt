@@ -1,0 +1,15 @@
+
+Next.js project detected (next.config.mjs).
+Start the dev server and scan via URL for best results:
+  npx impeccable detect http://localhost:3000
+
+
+0 anti-patterns found.
+
+── Advisory (not counted as failures) ──
+
+D:\Basma agancy\Basmaweb\KIMI_TASKS\tools\font-compare.html
+  [em-dash-overuse] 8 em-dashes in body text
+    → Em-dash saturation in body copy is an AI cadence tell. Advisory only: humans use em-dashes legitimately, so this fires only on saturation — at least 8 em-dashes (— or --) at a density near one per 500 characters of body text — never on a long article that uses a few. Prefer commas, colons, periods, or parentheses.
+
+1 advisory note. Suppress with --no-advisory.

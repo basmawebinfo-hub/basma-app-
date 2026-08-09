@@ -27,23 +27,23 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui, -apple-system, sans-serif", background: "#0a0a0a", color: "#fafafa", minHeight: "100vh" }}>
+      <body style={{ margin: 0, fontFamily: "system-ui, -apple-system, sans-serif", background: "oklch(0.14 0.006 130)", color: "oklch(0.96 0.005 130)", minHeight: "100vh" }}>
         <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
           <div style={{ maxWidth: "28rem", width: "100%", textAlign: "center" }}>
-            <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+            <h1 style={{ fontSize: "1.375rem", fontWeight: 700, marginBottom: "0.5rem" }}>
               Application error
             </h1>
-            <p style={{ fontSize: "0.875rem", color: "#a1a1aa", marginBottom: "1.5rem" }}>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.71 0.01 130)", marginBottom: "1.5rem" }}>
               A critical error occurred. Please try again.
             </p>
             {error.digest && (
-              <p style={{ fontSize: "0.6875rem", color: "#71717a", fontFamily: "monospace", marginBottom: "1.5rem" }}>
+              <p style={{ fontSize: "0.6875rem", color: "oklch(0.71 0.01 130)", fontFamily: "monospace", marginBottom: "1.5rem" }}>
                 Incident ID: {error.digest}
               </p>
             )}
             <button
               onClick={() => reset()}
-              style={{ padding: "0.625rem 1.25rem", borderRadius: "0.5rem", background: "#fafafa", color: "#0a0a0a", fontSize: "0.875rem", fontWeight: 500, border: "none", cursor: "pointer" }}
+              style={{ padding: "0.625rem 1.25rem", borderRadius: "0.5rem", background: "oklch(0.855 0.218 126.3)", color: "oklch(0.17 0.02 130)", fontSize: "0.875rem", fontWeight: 500, border: "none", cursor: "pointer" }}
             >
               Try again
             </button>

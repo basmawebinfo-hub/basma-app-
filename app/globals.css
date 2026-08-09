@@ -44,6 +44,8 @@
   --border-strong: oklch(0.35 0.01 130);
   --input: oklch(0.24 0.01 130);
   --ring: oklch(0.855 0.218 126.3);
+  /* alpha channel for decorative mask gradients (hero glow, use-cases) */
+  --mask-shade: rgb(0 0 0 / 0.75);
   /* data ramp derived from the brand hue, lightness-separated */
   --chart-1: oklch(0.855 0.218 126.3);
   --chart-2: oklch(0.75 0.16 150);

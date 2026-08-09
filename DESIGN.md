@@ -53,6 +53,9 @@ typography:
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.6
+  scale:
+    micro: "10px"
+    label: "11px"
 rounded:
   sm: "4px"
   md: "8px"
@@ -159,6 +162,8 @@ and self-hosted as woff2 via `next/font/local`.
 - **Lead** (400, `clamp(1.0625rem → 1.25rem)`, 1.8): section intros.
 - **Body** (400, 1rem, 1.85): Arabic prose needs more air than Latin at the same size —
   `--leading-prose: 1.85` is the default reading rhythm.
+- **Label** (500, 11px): badges, plan captions, incident IDs — the smallest readable step.
+- **Micro** (400, 10px): roles/footnotes under cards; never below 10px anywhere.
 
 ### Named Rules
 **The No-Tracking Rule.** Letter-spacing is never applied to Arabic letterforms
