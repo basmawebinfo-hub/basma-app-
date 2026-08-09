@@ -195,6 +195,15 @@
   animation-play-state: paused;
 }
 
+/* Reduced motion: stop infinite/looping CSS animations entirely */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-pulse,
+  .animate-spin {
+    animation: none;
+  }
+}
+
 /* Smooth scroll — disabled when the user prefers reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   html {

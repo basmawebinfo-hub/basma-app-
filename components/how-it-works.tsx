@@ -1,11 +1,9 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { QrCode, Webhook, Zap } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 export function HowItWorks() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   const steps = [
@@ -17,26 +15,17 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="section-shell">
       <div className="container-site max-w-5xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
             {t("how.title1")} <span className="text-primary">{t("how.title2")}</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">{t("how.subtitle")}</p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">
           {steps.map((step, index) => (
-            <motion.div
+            <div
               key={step.titleKey}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
               className="relative text-center"
             >
               <div className="relative inline-block mb-6">
@@ -49,7 +38,7 @@ export function HowItWorks() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">{t(step.titleKey)}</h3>
               <p className="text-sm text-muted-foreground">{t(step.descKey)}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

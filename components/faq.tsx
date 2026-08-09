@@ -1,11 +1,9 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useI18n } from "@/lib/i18n"
 
 export function FAQ() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   const faqs = [
@@ -19,24 +17,14 @@ export function FAQ() {
   return (
     <section id="faq" className="section-shell">
       <div className="container-site max-w-3xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
             {t("faq.title1")} <span className="text-primary">{t("faq.title2")}</span>
           </h2>
           <p className="text-muted-foreground">{t("faq.subtitle")}</p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        <div>
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border border-border rounded-xl px-6 bg-card/30">
@@ -47,7 +35,7 @@ export function FAQ() {
               </AccordionItem>
             ))}
           </Accordion>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

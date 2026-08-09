@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion, useReducedMotion } from "framer-motion"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -75,7 +74,6 @@ const tabs = Object.keys(codeExamples) as (keyof typeof codeExamples)[]
 export function QuickStart() {
   const [activeTab, setActiveTab] = useState<keyof typeof codeExamples>("Webhook")
   const [copied, setCopied] = useState(false)
-  const shouldReduceMotion = useReducedMotion()
 
   const handleCopy = () => {
     navigator.clipboard.writeText(codeExamples[activeTab])
@@ -109,13 +107,7 @@ export function QuickStart() {
   return (
     <section id="inbox" className="section-shell">
       <div className="container-site max-w-4xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="rounded-xl overflow-hidden border border-primary/30 bg-black glow-primary"
-        >
+        <div className="rounded-xl overflow-hidden border border-primary/30 bg-black glow-primary">
           <div className="flex items-center gap-2 px-3 sm:px-4 py-3 bg-primary/15 border-b border-primary/20">
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-red-500" />
@@ -157,7 +149,7 @@ export function QuickStart() {
               <code>{codeExamples[activeTab].split("\n").map((line, i) => renderCodeLine(line, i))}</code>
             </pre>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

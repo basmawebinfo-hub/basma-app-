@@ -1,10 +1,8 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
 export function Stats() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   const stats = [
@@ -17,18 +15,11 @@ export function Stats() {
     <section className="section-shell">
       <div className="container-site max-w-6xl">
         <div className="grid md:grid-cols-3 gap-12 md:gap-8">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.value}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
-            >
+          {stats.map((stat) => (
+            <div key={stat.value} className="text-center">
               <p className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary mb-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground max-w-50 mx-auto">{t(stat.key)}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

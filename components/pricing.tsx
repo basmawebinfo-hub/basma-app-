@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion, useReducedMotion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
@@ -26,7 +25,6 @@ const STATIC_RATES: Record<string, number> = { USD: 1, EGP: 50 }
 const STATIC_CURRENCIES = ["USD", "EGP"]
 
 export function Pricing() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
   const [plans] = useState<ApiPlan[]>(STATIC_PLANS)
   const [rates] = useState<Record<string, number>>(STATIC_RATES)
@@ -83,13 +81,7 @@ export function Pricing() {
   return (
     <section id="pricing" className="section-shell">
       <div className="container-site max-w-7xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-16"
-        >
+        <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
             <span className="text-primary">{t("pricing.title")}</span>
           </h2>
@@ -108,16 +100,12 @@ export function Pricing() {
               </select>
             </div>
           )}
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-4">
-          {display.map((plan, index) => (
-            <motion.div
+          {display.map((plan) => (
+            <div
               key={plan.id}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`relative flex flex-col p-5 rounded-2xl border transition-all ${plan.featured ? "bg-card border-2 border-primary ring-2 ring-primary/20 shadow-lg" : "bg-card/50 border border-border"}`}
             >
               {plan.featured && (
@@ -151,7 +139,7 @@ export function Pricing() {
               >
                 {plan.cta} <ArrowRight className="w-4 h-4" />
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
 

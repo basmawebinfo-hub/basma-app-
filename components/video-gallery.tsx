@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
 function LiveChatIllustration() {
@@ -322,33 +322,23 @@ const demos = [
 
 export function VideoGallery() {
   const { t } = useI18n()
-  const shouldReduceMotion = useReducedMotion()
 
   return (
     <section className="section-shell">
       <div className="container-site max-w-6xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 sm:mb-16"
-        >
+        <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4" id="platform">
             {t("vg.title1")} <span className="text-primary">{t("vg.title2")}</span> {t("vg.title3")}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
             {t("vg.subtitle")}
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {demos.map((demo, index) => (
-            <motion.div
+          {demos.map((demo) => (
+            <div
               key={demo.titleKey}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group relative rounded-xl overflow-hidden border border-border bg-card"
             >
               <div className="aspect-video relative overflow-hidden">
@@ -358,7 +348,7 @@ export function VideoGallery() {
                 <h3 className="font-semibold text-foreground mb-1">{t(demo.titleKey)}</h3>
                 <p className="text-sm text-muted-foreground">{t(demo.descKey)}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

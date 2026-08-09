@@ -1,11 +1,9 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { Star } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 export function Testimonials() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   const testimonials = [
@@ -17,26 +15,17 @@ export function Testimonials() {
   return (
     <section className="section-shell">
       <div className="container-site max-w-6xl">
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 sm:mb-16"
-        >
+        <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-display mb-4">
             {t("test.title1")} <span className="text-primary">{t("test.title2")}</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">{t("test.subtitle")}</p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
+          {testimonials.map((testimonial) => (
+            <div
               key={testimonial.author}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="p-4 sm:p-6 rounded-xl border border-border bg-card/50 text-start"
             >
               <div className="flex gap-1 mb-3 sm:mb-4" aria-label="5 out of 5 stars">
@@ -54,7 +43,7 @@ export function Testimonials() {
                   <p className="text-[10px] sm:text-xs text-muted-foreground">{t(testimonial.roleKey)}</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

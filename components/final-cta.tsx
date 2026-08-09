@@ -1,27 +1,20 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n"
 
 export function FinalCTA() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   return (
     <section className="section-shell px-4 sm:px-6 lg:px-8">
       <div
-        className="relative max-w-5xl mx-auto bg-background rounded-3xl overflow-hidden py-16 lg:py-24 px-6 sm:px-12"
-        style={{ border: "1px dashed oklch(0.92 0.16 130 / 0.4)" }}
+        className="relative max-w-5xl mx-auto bg-background rounded-3xl overflow-hidden py-16 lg:py-24 px-6 sm:px-12 border border-dashed border-primary/40"
       >
         <div className="relative max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-display mb-6 text-foreground">
               {t("cta.title1")}
               <br />
@@ -41,7 +34,7 @@ export function FinalCTA() {
                 <Link href="#footer">{t("cta.dashboard")}</Link>
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

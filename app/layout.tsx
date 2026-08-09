@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import localFont from "next/font/local"
 import "./globals.css"
 import { I18nProvider } from "@/lib/i18n"
+import { MotionProvider } from "@/components/motion-provider"
 
 // Self-hosted fonts (OFL-1.1) — no build-time network dependency.
 // Arabic: IBM Plex Sans Arabic (technical tone, pairs with Plex Mono).
@@ -126,7 +127,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased min-h-screen">
         <I18nProvider>
-          {children}
+          <MotionProvider>{children}</MotionProvider>
         </I18nProvider>
         <Analytics />
       </body>

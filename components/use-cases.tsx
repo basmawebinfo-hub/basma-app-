@@ -1,6 +1,5 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
 import { Webhook, MessageSquare, BarChart3, Plug, Zap, ShieldCheck, Clock, Globe } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
@@ -51,7 +50,6 @@ const useCases = [
 const allUseCases = [...useCases, ...useCases]
 
 export function UseCases() {
-  const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
 
   return (
@@ -67,24 +65,12 @@ export function UseCases() {
       </div>
 
       <div id="integrations" className="text-center mb-8 sm:mb-12 px-4">
-        <motion.h2
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
-        >
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
           {t("uc.title")}
-        </motion.h2>
-        <motion.p
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto"
-        >
+        </h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
           {t("uc.subtitle")}
-        </motion.p>
+        </p>
       </div>
 
       <div className="relative">
@@ -93,25 +79,19 @@ export function UseCases() {
 
         {/* First row - scrolls left */}
         <div className="mb-4">
-          <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+          <div
             className="flex gap-3 sm:gap-4 animate-marquee"
             style={{ width: "fit-content" }}
           >
             {allUseCases.map((useCase, i) => (
               <UseCaseCard key={`row1-${i}`} useCase={useCase} />
             ))}
-          </motion.div>
+          </div>
         </div>
 
         {/* Second row - scrolls right (reversed) */}
         <div>
-          <motion.div
-            initial={shouldReduceMotion ? {} : { opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+          <div
             className="flex gap-3 sm:gap-4 animate-marquee"
             style={{
               width: "fit-content",
@@ -122,7 +102,7 @@ export function UseCases() {
             {[...allUseCases].reverse().map((useCase, i) => (
               <UseCaseCard key={`row2-${i}`} useCase={useCase} />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

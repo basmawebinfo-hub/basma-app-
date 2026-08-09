@@ -5,6 +5,7 @@ import { ArrowRight, Command, CornerDownLeft } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useI18n } from "@/lib/i18n"
+import { EASE_OUT, DURATION } from "@/lib/motion"
 import Link from "next/link"
 
 const examplePrompts = [
@@ -75,10 +76,12 @@ export function Hero() {
     return () => clearInterval(timeout)
   }, [promptIndex, isTyping, prompt, isFocused, shouldReduceMotion])
 
+  // One authored focal entrance — fast, subtle, shared tokens.
   const fadeUp = {
-    initial: { opacity: 0, y: 20 },
+    initial: { opacity: 0, y: 12 },
     animate: { opacity: 1, y: 0 },
   }
+  const enter = (delay: number) => ({ duration: DURATION.focal, delay, ease: EASE_OUT })
 
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
@@ -87,7 +90,7 @@ export function Hero() {
           <motion.div
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.05 }}
+            transition={enter(0)}
             className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -97,8 +100,8 @@ export function Hero() {
           <motion.h1
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-display text-balance mb-6 leading-[1.1]"
+            transition={enter(0.06)}
+            className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-display text-balance mb-6 leading-[1.25]"
           >
             <span className="text-primary">{t("hero.title1")}</span>
             <br />
@@ -108,7 +111,7 @@ export function Hero() {
           <motion.p
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={enter(0.12)}
             className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 text-pretty leading-relaxed px-2"
           >
             {t("hero.desc")}
@@ -117,7 +120,7 @@ export function Hero() {
           <motion.div
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={enter(0.18)}
             className="max-w-2xl mx-auto mb-6"
           >
             <div className="relative bg-card border border-border rounded-xl overflow-hidden glow-primary">
@@ -140,7 +143,7 @@ export function Hero() {
                 )}
                 {!prompt && isFocused && (
                   <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground/50">
-                    Simulate a WhatsApp message...
+                    {t("hero.simulate")}
                   </div>
                 )}
               </div>
@@ -150,7 +153,7 @@ export function Hero() {
                   <CornerDownLeft className="w-3 h-3" />
                 </div>
                 <Button size="sm" rounded="lg">
-                  Try it
+                  {t("hero.tryIt")}
                 </Button>
               </div>
             </div>
@@ -159,7 +162,7 @@ export function Hero() {
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={enter(0.24)}
             className="flex items-center justify-center gap-2 text-muted-foreground/40 mb-6 pointer-events-none select-none"
             aria-hidden="true"
           >
@@ -172,7 +175,7 @@ export function Hero() {
           <motion.div
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            transition={enter(0.3)}
             className="mb-6"
           >
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
@@ -184,7 +187,7 @@ export function Hero() {
           <motion.div
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            transition={enter(0.36)}
             className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
@@ -206,7 +209,7 @@ export function Hero() {
       <motion.div
         initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
+        transition={enter(0.42)}
         className="absolute bottom-0 left-0 right-0 py-6 sm:py-8 border-t border-border/30 bg-background/80 backdrop-blur-sm"
       >
         <div className="container-site max-w-5xl">
