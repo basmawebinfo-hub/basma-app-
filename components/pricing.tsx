@@ -81,8 +81,8 @@ export function Pricing() {
   }
 
   return (
-    <section id="pricing" className="relative py-16 sm:py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="pricing" className="section-shell">
+      <div className="container-site max-w-7xl">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -100,7 +100,7 @@ export function Pricing() {
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium"
+                className="rounded-lg border border-border bg-elevated px-2.5 py-1 text-xs font-medium"
               >
                 {currencies.map((cur) => (
                   <option key={cur} value={cur}>{cur}</option>

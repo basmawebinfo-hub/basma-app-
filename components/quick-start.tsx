@@ -107,14 +107,14 @@ export function QuickStart() {
   }
 
   return (
-    <section id="inbox" className="relative py-16 sm:py-24 lg:py-32">
-      <div className="max-w-4xl mx-auto px-2 sm:px-4 lg:px-8">
+    <section id="inbox" className="section-shell">
+      <div className="container-site max-w-4xl">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="rounded-xl overflow-hidden border border-primary/30 bg-black shadow-[0_0_30px_rgba(217,249,157,0.1)]"
+          className="rounded-xl overflow-hidden border border-primary/30 bg-black glow-primary"
         >
           <div className="flex items-center gap-2 px-3 sm:px-4 py-3 bg-primary/15 border-b border-primary/20">
             <div className="flex items-center gap-1.5">

@@ -11,7 +11,7 @@ export function FinalCTA() {
   const { t } = useI18n()
 
   return (
-    <section className="py-16 lg:py-24 px-4 sm:px-6 lg:px-8">
+    <section className="section-shell px-4 sm:px-6 lg:px-8">
       <div
         className="relative max-w-5xl mx-auto bg-background rounded-3xl overflow-hidden py-16 lg:py-24 px-6 sm:px-12"
         style={{ border: "1px dashed oklch(0.92 0.16 130 / 0.4)" }}
@@ -31,13 +31,13 @@ export function FinalCTA() {
               {t("cta.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="xl" rounded="full" className="gap-2 min-w-[200px]" asChild>
+              <Button size="xl" rounded="full" className="gap-2 min-w-50" asChild>
                 <Link href="#pricing">
                   {t("cta.join")}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-[200px] bg-transparent" asChild>
+              <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-50 bg-transparent" asChild>
                 <Link href="#footer">{t("cta.dashboard")}</Link>
               </Button>
             </div>

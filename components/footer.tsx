@@ -21,7 +21,7 @@ export function Footer() {
   ]
   return (
     <footer id="footer" className="relative border-t border-border">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="container-site max-w-6xl py-8 sm:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center mb-4">

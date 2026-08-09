@@ -83,7 +83,7 @@ export function Hero() {
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
       <div className="flex-1 flex items-center justify-center pt-28 lg:pt-32 pb-40 sm:pb-32">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-10 container-site max-w-4xl text-center">
           <motion.div
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
@@ -120,7 +120,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="max-w-2xl mx-auto mb-6"
           >
-            <div className="relative bg-card border border-border rounded-xl overflow-hidden shadow-[0_0_30px_rgba(206,255,0,0.15),0_0_60px_rgba(206,255,0,0.08)]">
+            <div className="relative bg-card border border-border rounded-xl overflow-hidden glow-primary">
               <div className="relative">
                 <input
                   type="text"
@@ -209,7 +209,7 @@ export function Hero() {
         transition={{ duration: 0.5, delay: 0.7 }}
         className="absolute bottom-0 left-0 right-0 py-6 sm:py-8 border-t border-border/30 bg-background/80 backdrop-blur-sm"
       >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-site max-w-5xl">
           <p className="text-xs sm:text-sm text-muted-foreground/60 mb-4 sm:mb-6 text-center">
             {t("hero.integrates")}
           </p>

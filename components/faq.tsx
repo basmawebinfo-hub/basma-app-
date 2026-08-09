@@ -17,8 +17,8 @@ export function FAQ() {
   ]
 
   return (
-    <section id="faq" className="relative py-24 lg:py-32 border-t border-border">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="section-shell">
+      <div className="container-site max-w-3xl">
         <motion.div
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

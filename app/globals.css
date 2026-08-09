@@ -140,6 +140,27 @@
   }
 }
 
+/* Layout conventions — one gutter, two section rhythms, token-based glow.
+   Marketing sections compose these instead of per-component padding.
+   Width roles (6xl default / 7xl wide grids / 3xl narrow reading / 4xl hero)
+   stay as explicit max-w-* next to container-site. */
+@layer components {
+  .container-site {
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+  }
+  .section-shell {
+    @apply relative py-16 sm:py-24 lg:py-32;
+  }
+  .section-strip {
+    @apply relative py-12 lg:py-16;
+  }
+  .glow-primary {
+    box-shadow:
+      0 0 30px color-mix(in oklch, var(--primary) 15%, transparent),
+      0 0 60px color-mix(in oklch, var(--primary) 8%, transparent);
+  }
+}
+
 .hero-glow {
   background: radial-gradient(
     ellipse 60% 40% at 50% 40%,

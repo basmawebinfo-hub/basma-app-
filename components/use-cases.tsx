@@ -55,7 +55,7 @@ export function UseCases() {
   const { t } = useI18n()
 
   return (
-    <section id="features" className="relative py-12 sm:py-20 overflow-hidden">
+    <section id="features" className="section-shell overflow-hidden">
       <div
         className="absolute inset-0 -z-10 bg-primary/25"
         style={{

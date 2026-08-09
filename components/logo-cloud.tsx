@@ -16,8 +16,8 @@ export function LogoCloud() {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <section className="relative py-12 lg:py-16 border-t border-border" aria-label="Featured in">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section-strip" aria-label="Featured in">
+      <div className="container-site max-w-6xl">
         <motion.p
           initial={shouldReduceMotion ? {} : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
