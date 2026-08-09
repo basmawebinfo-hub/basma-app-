@@ -26,7 +26,7 @@ export function FAQ() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
-            {t("faq.title1")} <span className="text-gradient-lime">{t("faq.title2")}</span>
+            {t("faq.title1")} <span className="text-primary">{t("faq.title2")}</span>
           </h2>
           <p className="text-muted-foreground">{t("faq.subtitle")}</p>
         </motion.div>

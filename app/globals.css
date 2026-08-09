@@ -3,44 +3,62 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Electric Lime theme - #d9f99d accent with #bef264 hover */
+/* BASMA color system — brand lime #ABE707 (oklch 0.855 0.218 126.3) as a
+   disciplined accent on near-black. Every foreground/background pair in this
+   block is WCAG AA verified — see KIMI_TASKS/reports/contrast-table.txt.
+   Dark is the only shipped theme; --primary-on-light is the derived darkened
+   variant (4.86:1 on white) reserved for any future light surface. */
 :root {
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.11 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.11 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  /* Primary is electric lime #d9f99d */
-  --primary: oklch(0.92 0.16 125);
-  --primary-foreground: oklch(0.08 0 0);
-  --secondary: oklch(0.14 0 0);
-  --secondary-foreground: oklch(0.85 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  /* Accent matches primary lime */
-  --accent: oklch(0.92 0.16 125);
-  --accent-foreground: oklch(0.08 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  /* Border matches #262626 */
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.14 0 0);
-  --ring: oklch(0.92 0.16 125);
-  --chart-1: oklch(0.92 0.16 125);
-  --chart-2: oklch(0.8 0.14 125);
-  --chart-3: oklch(0.65 0.1 125);
-  --chart-4: oklch(0.5 0.06 125);
-  --chart-5: oklch(0.4 0.02 125);
+  /* surfaces: page → card → elevated → overlay */
+  --background: oklch(0.14 0.006 130);
+  --foreground: oklch(0.96 0.005 130);
+  --card: oklch(0.17 0.008 130);
+  --card-foreground: oklch(0.96 0.005 130);
+  --elevated: oklch(0.2 0.009 130);
+  --overlay: oklch(0.24 0.01 130);
+  --popover: oklch(0.17 0.008 130);
+  --popover-foreground: oklch(0.96 0.005 130);
+  /* brand accent + states — accent only, never body text */
+  --primary: oklch(0.855 0.218 126.3);
+  --primary-foreground: oklch(0.17 0.02 130);
+  --primary-hover: oklch(0.9 0.2 126.3);
+  --primary-active: oklch(0.795 0.198 126.3);
+  --primary-disabled: oklch(0.45 0.05 126.3);
+  --primary-on-light: oklch(0.54 0.135 126.3);
+  /* secondary surfaces + foreground ramp */
+  --secondary: oklch(0.2 0.009 130);
+  --secondary-foreground: oklch(0.82 0.008 130);
+  --muted: oklch(0.2 0.009 130);
+  --muted-foreground: oklch(0.71 0.01 130);
+  /* interactive accent surfaces (hover fills, selected rows) */
+  --accent: oklch(0.22 0.02 126.3);
+  --accent-foreground: oklch(0.96 0.005 130);
+  /* semantic hues deliberately clear of the brand lime (hue 126) */
+  --success: oklch(0.82 0.15 160);
+  --warning: oklch(0.83 0.15 85);
+  --info: oklch(0.8 0.1 245);
+  --destructive: oklch(0.7 0.18 25);
+  --destructive-foreground: oklch(0.17 0.02 130);
+  /* borders and focus */
+  --border: oklch(0.26 0.008 130);
+  --border-strong: oklch(0.35 0.01 130);
+  --input: oklch(0.24 0.01 130);
+  --ring: oklch(0.855 0.218 126.3);
+  /* data ramp derived from the brand hue, lightness-separated */
+  --chart-1: oklch(0.855 0.218 126.3);
+  --chart-2: oklch(0.75 0.16 150);
+  --chart-3: oklch(0.7 0.14 190);
+  --chart-4: oklch(0.72 0.12 245);
+  --chart-5: oklch(0.75 0.13 85);
   --radius: 0.5rem;
-  --sidebar: oklch(0.1 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.92 0.16 125);
-  --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent: oklch(0.14 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.2 0 0);
-  --sidebar-ring: oklch(0.92 0.16 125);
+  --sidebar: oklch(0.155 0.007 130);
+  --sidebar-foreground: oklch(0.96 0.005 130);
+  --sidebar-primary: oklch(0.855 0.218 126.3);
+  --sidebar-primary-foreground: oklch(0.17 0.02 130);
+  --sidebar-accent: oklch(0.2 0.009 130);
+  --sidebar-accent-foreground: oklch(0.96 0.005 130);
+  --sidebar-border: oklch(0.26 0.008 130);
+  --sidebar-ring: oklch(0.855 0.218 126.3);
 }
 
 @theme inline {
@@ -69,19 +87,29 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-elevated: var(--elevated);
+  --color-overlay: var(--overlay);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-disabled: var(--primary-disabled);
+  --color-primary-on-light: var(--primary-on-light);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
@@ -112,28 +140,19 @@
   }
 }
 
-/* Updated glow to use electric lime instead of teal */
 .hero-glow {
   background: radial-gradient(
     ellipse 60% 40% at 50% 40%,
-    oklch(0.85 0.16 125 / 0.25) 0%,
-    oklch(0.75 0.12 125 / 0.1) 40%,
+    oklch(0.855 0.218 126.3 / 0.22) 0%,
+    oklch(0.75 0.15 126.3 / 0.09) 40%,
     transparent 70%
   );
 }
 
-/* Updated gradient text to lime */
-.text-gradient-lime {
-  background: linear-gradient(135deg, oklch(0.92 0.18 125) 0%, oklch(0.8 0.14 130) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 /* Terminal window styling */
 .terminal-window {
-  background: oklch(0.1 0 0);
-  border: 1px solid oklch(0.25 0 0);
+  background: var(--card);
+  border: 1px solid var(--border-strong);
 }
 
 /* Marquee animation */
@@ -155,15 +174,17 @@
   animation-play-state: paused;
 }
 
-/* Smooth scroll */
-html {
-  scroll-behavior: smooth;
+/* Smooth scroll — disabled when the user prefers reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-/* Fixed selection - solid color without opacity for vibrant appearance */
+/* Selection uses the brand accent with its dark foreground pair */
 ::selection {
-  background: oklch(0.85 0.2 125);
-  color: oklch(0.08 0 0);
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 /* Letter spacing is Latin-only — Arabic letterforms must never be tracked. */

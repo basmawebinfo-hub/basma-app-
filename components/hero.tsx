@@ -100,7 +100,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-display text-balance mb-6 leading-[1.1]"
           >
-            <span className="text-gradient-lime">{t("hero.title1")}</span>
+            <span className="text-primary">{t("hero.title1")}</span>
             <br />
             <span className="text-foreground">{t("hero.title2")}</span>
           </motion.h1>
@@ -176,7 +176,7 @@ export function Hero() {
             className="mb-6"
           >
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-              <span className="text-gradient-lime">200+</span> {t("hero.intg")}
+              <span className="text-primary">200+</span> {t("hero.intg")}
             </p>
             <p className="text-muted-foreground text-xs sm:text-sm">{t("hero.intgDesc")}</p>
           </motion.div>

@@ -1,0 +1,47 @@
+#ABE707 = oklch(0.855 0.218 126.3)
+background     oklch(0.140 0.006 130.0)  -> #080A07
+card           oklch(0.170 0.008 130.0)  -> #0E100C
+elevated       oklch(0.200 0.009 130.0)  -> #151713
+overlay        oklch(0.240 0.010 130.0)  -> #1E201B
+foreground     oklch(0.960 0.005 130.0)  -> #F1F2EF
+secondary      oklch(0.820 0.008 130.0)  -> #C2C5C0
+mutedFg        oklch(0.710 0.010 130.0)  -> #9FA39C
+border         oklch(0.260 0.008 130.0)  -> #232521
+borderStrong   oklch(0.350 0.010 130.0)  -> #393C36
+primary        oklch(0.855 0.218 126.3)  -> #ABE707
+primaryHover   oklch(0.900 0.200 126.3)  -> #BCF54C
+primaryActive  oklch(0.795 0.198 126.3)  -> #9CD11A
+primaryFg      oklch(0.170 0.020 130.0)  -> #0C1108
+primaryOnLight oklch(0.540 0.135 126.3)  -> #5A7C08
+ring           oklch(0.855 0.218 126.3)  -> #ABE707
+success        oklch(0.820 0.150 160.0)  -> #59E1A2
+warning        oklch(0.830 0.150 85.0)  -> #F4BF3F
+danger         oklch(0.700 0.180 25.0)  -> #FA6863
+info           oklch(0.800 0.100 245.0)  -> #86C5FA
+
+--- contrast pairs ---
+foreground/background        17.68:1  (min 4.5)  PASS
+foreground/card              17.02:1  (min 4.5)  PASS
+foreground/elevated          16.06:1  (min 4.5)  PASS
+secondary/background         11.39:1  (min 4.5)  PASS
+secondary/card               10.97:1  (min 4.5)  PASS
+mutedFg/background            7.75:1  (min 4.5)  PASS
+mutedFg/card                  7.46:1  (min 4.5)  PASS
+primary/background           13.40:1  (min 3)  PASS
+primary/card                 12.90:1  (min 3)  PASS
+primaryFg/primary            12.89:1  (min 4.5)  PASS
+primaryFg/primaryHover       14.83:1  (min 4.5)  PASS
+ring/background              13.40:1  (min 3)  PASS
+border/background             1.29:1  (min 1.2)  PASS
+borderStrong/card             1.71:1  (min 1.6)  PASS
+success/background           12.03:1  (min 4.5)  PASS
+warning/background           11.71:1  (min 4.5)  PASS
+danger/background             6.84:1  (min 4.5)  PASS
+info/background              10.77:1  (min 4.5)  PASS
+success/card                 11.58:1  (min 4.5)  PASS
+warning/card                 11.27:1  (min 4.5)  PASS
+danger/card                   6.58:1  (min 4.5)  PASS
+info/card                    10.36:1  (min 4.5)  PASS
+
+brand #ABE707 on #FFFFFF: 1.48 :1 (expected FAIL — accent never used on light)
+primaryOnLight on #FFFFFF: 4.86 :1 (min 4.5 for light-surface accents)

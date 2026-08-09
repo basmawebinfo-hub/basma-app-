@@ -24,7 +24,7 @@ export function HowItWorks() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-display mb-4">
-            {t("how.title1")} <span className="text-gradient-lime">{t("how.title2")}</span>
+            {t("how.title1")} <span className="text-primary">{t("how.title2")}</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">{t("how.subtitle")}</p>
         </motion.div>
