@@ -3,6 +3,7 @@
 set -e
 PREFIX="${1:-shot}"
 PORT=3100
+LANG_ARG="${2:-}"
 
 ./node_modules/.bin/next dev -p $PORT > /tmp/next-dev-$PORT.log 2>&1 &
 DEV_PID=$!
@@ -22,6 +23,6 @@ for i in $(seq 1 90); do
   sleep 1
 done
 
-cd KIMI_TASKS/tools && node snap.mjs "$PREFIX" "http://localhost:$PORT" && cd ../..
+cd KIMI_TASKS/tools && node snap.mjs "$PREFIX" "http://localhost:$PORT" "$LANG_ARG" && cd ../..
 
 echo "done: $PREFIX"

@@ -32,7 +32,7 @@ export function HowItWorks() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20">
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
-                <div className="absolute -top-2 -left-2 w-7 h-7 rounded-full bg-primary text-background flex items-center justify-center text-xs font-bold">
+                <div className="absolute -top-2 -start-2 w-7 h-7 rounded-full bg-primary text-background flex items-center justify-center text-xs font-bold">
                   {index + 1}
                 </div>
               </div>

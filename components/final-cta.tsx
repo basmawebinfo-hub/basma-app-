@@ -27,7 +27,7 @@ export function FinalCTA() {
               <Button size="xl" rounded="full" className="gap-2 min-w-50" asChild>
                 <Link href="#pricing">
                   {t("cta.join")}
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
                 </Link>
               </Button>
               <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-50 bg-transparent" asChild>

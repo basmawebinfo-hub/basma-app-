@@ -137,7 +137,7 @@ export function Pricing() {
                 href="#footer"
                 className={`flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-colors ${plan.featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
-                {plan.cta} <ArrowRight className="w-4 h-4" />
+                {plan.cta} <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
               </Link>
             </div>
           ))}

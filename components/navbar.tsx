@@ -61,7 +61,7 @@ export function Navbar() {
             <Button size="sm" rounded="full" className="gap-1.5 whitespace-nowrap" asChild>
               <Link href="#pricing">
                 {t("nav.getStarted")}
-                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             </Button>
             <div className="w-px h-5 bg-border/60 mx-1" />

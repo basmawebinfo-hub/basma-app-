@@ -132,22 +132,22 @@ export function Hero() {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   placeholder=""
-                  className="w-full bg-transparent px-4 sm:px-5 py-3 sm:py-4 pr-20 sm:pr-28 text-foreground focus:outline-none text-sm sm:text-base"
+                  className="w-full bg-transparent px-4 sm:px-5 py-3 sm:py-4 pe-20 sm:pe-28 text-foreground focus:outline-none text-sm sm:text-base"
                 />
                 {/* Animated placeholder */}
                 {!prompt && !isFocused && (
-                  <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground truncate max-w-[60%] sm:max-w-none">
+                  <div className="absolute start-4 sm:start-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground truncate max-w-[60%] sm:max-w-none">
                     {displayText}
-                    <span className="inline-block w-[2px] h-[1em] bg-primary ml-0.5 animate-pulse align-middle" />
+                    <span className="inline-block w-[2px] h-[1em] bg-primary ms-0.5 animate-pulse align-middle" />
                   </div>
                 )}
                 {!prompt && isFocused && (
-                  <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground/50">
+                  <div className="absolute start-4 sm:start-5 top-1/2 -translate-y-1/2 pointer-events-none text-sm sm:text-base text-muted-foreground/50">
                     {t("hero.simulate")}
                   </div>
                 )}
               </div>
-              <div className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <div className="absolute end-2 sm:end-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-1 text-muted-foreground/50 text-xs">
                   <Command className="w-3 h-3" />
                   <CornerDownLeft className="w-3 h-3" />
@@ -193,13 +193,13 @@ export function Hero() {
             <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
               <Link href="#pricing">
                 {t("hero.getStarted")}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
               </Link>
             </Button>
             <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto" asChild>
               <Link href="#how-it-works">
                 {t("hero.signin")}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
               </Link>
             </Button>
           </motion.div>

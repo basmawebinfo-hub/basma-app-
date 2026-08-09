@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url"
 
 const prefix = process.argv[2] || "shot"
 const url = process.argv[3] || "http://localhost:3100"
+const lang = process.argv[4] || "" // e.g. "en" to force basma_lang before load
 const TOOLS = path.dirname(fileURLToPath(import.meta.url))
 const OUT = path.resolve(TOOLS, "../reports/shots-phase-b")
 mkdirSync(OUT, { recursive: true })
@@ -25,6 +26,11 @@ const browser = await puppeteer.launch({
 for (const w of WIDTHS) {
   const page = await browser.newPage()
   await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1 })
+  if (lang) {
+    await page.evaluateOnNewDocument((l) => {
+      try { localStorage.setItem("basma_lang", l) } catch (e) {}
+    }, lang)
+  }
   await page.goto(url, { waitUntil: "networkidle0", timeout: 120000 })
   // let entrance animations settle
   await new Promise((r) => setTimeout(r, 2500))

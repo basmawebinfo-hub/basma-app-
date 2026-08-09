@@ -114,7 +114,7 @@ export function QuickStart() {
               <div className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-yellow-500" />
               <div className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-primary" />
             </div>
-            <span className="ml-2 sm:ml-3 text-xs sm:text-sm font-medium text-foreground tracking-wider uppercase">
+            <span className="ms-2 sm:ms-3 text-xs sm:text-sm font-medium text-foreground tracking-wider uppercase">
               API Reference
             </span>
           </div>
@@ -137,7 +137,7 @@ export function QuickStart() {
               variant="ghost"
               size="icon-sm"
               onClick={handleCopy}
-              className="ml-auto flex-shrink-0"
+              className="ms-auto flex-shrink-0"
               aria-label="Copy code"
             >
               {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
