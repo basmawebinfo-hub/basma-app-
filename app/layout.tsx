@@ -71,13 +71,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
+              "@type": "Organization",
               name: "BASMA بصمة",
-              applicationCategory: "BusinessApplication",
-              operatingSystem: "Web",
-              description: "أول منصة عربية لأتمتة واتساب وإدارة المحادثات.",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
               url: SITE,
+              logo: SITE + "/basma-icon.png",
             }),
           }}
         />

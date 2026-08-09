@@ -2,7 +2,7 @@
 
 /**
  * Branded 404. Fires when any URL under the app/ tree doesn't match.
- * Bilingual, matches app tokens, offers two escape hatches (home + dashboard).
+ * Bilingual, matches app tokens, offers an escape hatch back home.
  */
 
 import Link from "next/link"
@@ -35,12 +35,6 @@ export default function NotFound() {
             className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
           >
             {t({ ar: "الرئيسية", en: "Home" })}
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-5 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/30 transition"
-          >
-            {t({ ar: "لوحة التحكم", en: "Dashboard" })}
           </Link>
         </div>
       </div>

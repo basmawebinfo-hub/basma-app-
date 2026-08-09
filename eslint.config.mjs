@@ -63,7 +63,8 @@ const eslintConfig = [
   // Ignore build outputs, dependency trees, static assets, and generated files.
   // `components/ui/**` is shadcn-vendored code copied from an external source;
   // linting it would flag issues we don't own and can't fix without diverging
-  // from upstream.
+  // from upstream. `.github/**` holds external skill/tooling scripts (not app
+  // code); they are CLI scripts where console output is their interface.
   {
     ignores: [
       ".next/**",
@@ -71,6 +72,7 @@ const eslintConfig = [
       "public/**",
       "next-env.d.ts",
       "components/ui/**",
+      ".github/**",
     ],
   },
 ]

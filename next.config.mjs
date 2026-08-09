@@ -47,9 +47,9 @@
 //       https: as a defensive allowlist for future avatars/product images.
 //       Tightened later when we know exact origins.
 //
-//   - connect-src 'self' https://*.supabase.co wss://*.supabase.co
-//       Supabase JS SDK REST + Realtime WebSocket. Wildcard covers project
-//       subdomain. Vercel Analytics uses same-origin /_vercel/insights proxy.
+//   - connect-src 'self'
+//       No backend any more — the site is fully static. Vercel Analytics
+//       uses the same-origin /_vercel/insights proxy.
 //
 //   - frame-src 'self'
 //       We do not embed any third-party iframes today.
@@ -73,7 +73,7 @@ const CSP_REPORT_ONLY = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self'",
   "frame-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

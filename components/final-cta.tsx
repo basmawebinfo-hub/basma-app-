@@ -38,7 +38,7 @@ export function FinalCTA() {
                 </Link>
               </Button>
               <Button variant="outline" size="xl" rounded="full" className="gap-2 min-w-[200px] bg-transparent" asChild>
-                <Link href="/dashboard">{t("cta.dashboard")}</Link>
+                <Link href="#footer">{t("cta.dashboard")}</Link>
               </Button>
             </div>
           </motion.div>

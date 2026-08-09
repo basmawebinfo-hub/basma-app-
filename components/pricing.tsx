@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -8,24 +8,30 @@ import Link from "next/link"
 
 interface ApiPlan { id: string; name: string; price_monthly: number; max_instances: number; max_messages_mo: number; tier_slug?: string; is_trial?: boolean }
 
+// Static plan catalogue — replaces the deleted /api/pricing endpoint
+// (Phase A, T-A.2). Mirrors the plans that were served from Postgres,
+// in the same price-ascending order the API returned them.
+const STATIC_PLANS: ApiPlan[] = [
+  { id: "trial",      name: "تجريبي", price_monthly: 0,   max_instances: 1,  max_messages_mo: 500, tier_slug: "free",     is_trial: true },
+  { id: "numbers-3",  name: "3 أرقام", price_monthly: 20,  max_instances: 3,  max_messages_mo: 0,   tier_slug: "starter" },
+  { id: "numbers-8",  name: "8 أرقام", price_monthly: 50,  max_instances: 8,  max_messages_mo: 0,   tier_slug: "pro" },
+  { id: "numbers-13", name: "13 رقم",  price_monthly: 100, max_instances: 13, max_messages_mo: 0,   tier_slug: "pro" },
+  { id: "numbers-25", name: "25 رقم",  price_monthly: 200, max_instances: 25, max_messages_mo: 0,   tier_slug: "business" },
+  { id: "custom",     name: "مخصص",   price_monthly: 0,   max_instances: 0,  max_messages_mo: 0,   tier_slug: "custom" },
+]
+
+// Static fallback rates — identical to the component's previous
+// loading/fallback state (the live rate API is gone with the backend).
+const STATIC_RATES: Record<string, number> = { USD: 1, EGP: 50 }
+const STATIC_CURRENCIES = ["USD", "EGP"]
+
 export function Pricing() {
   const shouldReduceMotion = useReducedMotion()
   const { t } = useI18n()
-  const [plans, setPlans] = useState<ApiPlan[]>([])
-  const [rates, setRates] = useState<Record<string, number>>({ USD: 1, EGP: 50 })
-  const [currencies, setCurrencies] = useState<string[]>(["USD", "EGP"])
+  const [plans] = useState<ApiPlan[]>(STATIC_PLANS)
+  const [rates] = useState<Record<string, number>>(STATIC_RATES)
+  const [currencies] = useState<string[]>(STATIC_CURRENCIES)
   const [currency, setCurrency] = useState<string>("USD")
-
-  useEffect(() => {
-    fetch("/api/pricing")
-      .then((r) => r.json())
-      .then((d) => {
-        setPlans(d.plans ?? [])
-        setRates(d.rates ?? { USD: 1, EGP: d.usd_to_egp ?? 50 })
-        setCurrencies(d.currencies ?? ["USD", "EGP"])
-      })
-      .catch(() => {})
-  }, [])
 
   // Build display cards from real plans (skip the custom plan; it has its own CTA)
   const regular = plans.filter((p) => p.tier_slug !== "custom")
@@ -140,7 +146,7 @@ export function Pricing() {
               </ul>
 
               <Link
-                href="/register"
+                href="#footer"
                 className={`flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-colors ${plan.featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
                 {plan.cta} <ArrowRight className="w-4 h-4" />

@@ -188,13 +188,13 @@ export function Hero() {
             className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Button size="xl" rounded="full" className="gap-2 w-full sm:w-auto" asChild>
-              <Link href="/register">
+              <Link href="#pricing">
                 {t("hero.getStarted")}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
             <Button variant="outline" size="xl" rounded="full" className="gap-2 bg-transparent w-full sm:w-auto" asChild>
-              <Link href="/login">
+              <Link href="#how-it-works">
                 {t("hero.signin")}
                 <ArrowRight className="w-4 h-4" />
               </Link>

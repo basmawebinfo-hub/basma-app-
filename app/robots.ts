@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", allow: "/", disallow: ["/dashboard", "/admin", "/api"] },
+    rules: { userAgent: "*", allow: "/" },
     sitemap: "https://www.basmaweb.com/sitemap.xml",
   }
 }

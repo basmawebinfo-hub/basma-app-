@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LangToggle } from "@/components/lang-toggle"
-import { Menu, X, ArrowRight, MessageSquare, Webhook, BarChart3, Plug, Settings } from "lucide-react"
+import { Menu, X, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
@@ -13,14 +13,6 @@ const navLinks = [
   { href: "#pricing", key: "nav.pricing" },
   { href: "#faq", key: "nav.faq" },
   { href: "#footer", key: "nav.contact" },
-]
-
-const platformItems = [
-  { href: "/dashboard/inbox", label: "Inbox", icon: MessageSquare },
-  { href: "/dashboard/connect", label: "Connections", icon: Plug },
-  { href: "/dashboard/webhooks", label: "Webhooks", icon: Webhook },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 
 export function Navbar() {
@@ -67,7 +59,7 @@ export function Navbar() {
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-2.5">
             <Button size="sm" rounded="full" className="gap-1.5 whitespace-nowrap" asChild>
-              <Link href="/dashboard">
+              <Link href="#pricing">
                 {t("nav.getStarted")}
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
@@ -122,23 +114,6 @@ export function Navbar() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 pt-4 pb-4">
-                {/* Platform Section */}
-                <div className="px-4 py-2 text-xs font-medium text-primary uppercase tracking-wider">Platform</div>
-                {platformItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-2 px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/10"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <item.icon
-                      className="w-5 h-5 text-primary group-hover:text-black transition-colors"
-                      aria-hidden="true"
-                    />
-                    {item.label}
-                  </Link>
-                ))}
-                <div className="border-t border-border/50 my-3" />
                 {/* Nav Links Section */}
                 {navLinks.map((link) => (
                   <Link
@@ -153,9 +128,6 @@ export function Navbar() {
               </div>
 
               <div className="px-6 py-4 border-t border-border/50 bg-background flex flex-col gap-3">
-                <Button variant="ghost" rounded="lg" className="justify-center text-base py-6 w-full" asChild>
-                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-                </Button>
                 <Button rounded="full" className="py-6 text-base w-full" asChild>
                   <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>Get Started Free</Link>
                 </Button>

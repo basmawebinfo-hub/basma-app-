@@ -14,10 +14,8 @@
 #      resolve)
 #   5. run `pnpm lint` — enforces the ESLint gate from PR-B0b
 #   6. run `pnpm test` — runs the Vitest suite once, non-interactive
-#
-# Kept intentionally minimal. `pnpm build` is NOT run here — Vercel already
-# runs `next build` on every commit and reports back via commit status.
-# Duplicating it in Actions would burn CI minutes without adding coverage.
+#   7. run `pnpm exec tsc --noEmit` — full typecheck gate
+#   8. run `pnpm build` — production build must compile clean
 
 name: CI
 
@@ -30,7 +28,7 @@ on:
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,3 +52,9 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Build
+        run: pnpm build
