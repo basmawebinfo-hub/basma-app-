@@ -44,24 +44,31 @@ export function Hero() {
             {t("hero.badge")}
           </motion.div>
 
-          {/* Brutalist scale contrast: the headline goes as large as the grid
-              allows and the meta stays tiny. In the Latin reference that
-              contrast comes from condensing the type; Arabic has no condensed
-              display tradition, so weight and sheer size carry it instead.
-              `leading-[1.05]` is as tight as Arabic ascenders tolerate — below
-              that the diacritics start colliding. */}
+          {/* Brutalist scale contrast: the Arabic line carries the display
+              token and stays the largest type on the page; the Latin job title
+              is the subject, set smaller on one line inside the lime block.
+              Display-token line-height (1.25) keeps Arabic ink inside the line
+              box — `leading-[1.05]` clipped ascenders (122px ink in a 100.8px
+              box, measured in Phase G review). */}
           <motion.h1
             initial={shouldReduceMotion ? {} : fadeUp.initial}
             animate={fadeUp.animate}
             transition={enter(0.06)}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-display text-balance mb-8 leading-[1.05]"
+            className="text-display font-bold tracking-display text-balance mb-8 leading-[1.3]"
           >
             <span className="text-foreground">{t("hero.title1")}</span>
             <br />
             {/* The one solid lime field on the page. Black on lime, never lime
                 on black as text — it fails contrast as type and works as a
-                block. */}
-            <span className="inline-block block-lime px-3 py-1 mt-2">{t("hero.title2")}</span>
+                block. dir/lang are explicit: a Latin phrase inside an RTL
+                heading must not be left to the bidi algorithm to guess. */}
+            <span
+              dir="ltr"
+              lang="en"
+              className="inline-block whitespace-nowrap block-lime px-3 py-1 mt-2 text-[clamp(1.125rem,0.8rem+1.8vw,2.75rem)] leading-[1.3]"
+            >
+              {t("hero.title2")}
+            </span>
           </motion.h1>
 
           <motion.p
