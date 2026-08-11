@@ -43,7 +43,10 @@ export default function GlobalError({
             )}
             <button
               onClick={() => reset()}
-              style={{ padding: "0.625rem 1.25rem", borderRadius: "0.5rem", background: "oklch(0.855 0.218 126.3)", color: "oklch(0.17 0.02 130)", fontSize: "0.875rem", fontWeight: 500, border: "none", cursor: "pointer" }}
+              /* Inline styles because this renders outside the app shell when the
+                 root layout itself fails — no Tailwind, no tokens available.
+                 borderRadius stays 0 to match the brutalist scale in DESIGN.md. */
+              style={{ padding: "0.625rem 1.25rem", borderRadius: 0, background: "oklch(0.855 0.218 126.3)", color: "oklch(0.17 0.02 130)", fontSize: "0.875rem", fontWeight: 500, border: "none", cursor: "pointer" }}
             >
               Try again
             </button>

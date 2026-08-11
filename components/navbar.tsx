@@ -9,11 +9,12 @@ import { Menu, X, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
 
+// Absolute anchors (`/#…`) because the navbar renders on /services too, where a
+// bare fragment would resolve against the current page and go nowhere.
 const navLinks = [
-  { href: "#how-it-works", key: "nav.howItWorks" },
-  { href: "#pricing", key: "nav.pricing" },
-  { href: "#faq", key: "nav.faq" },
-  { href: "#footer", key: "nav.contact" },
+  { href: "/services", key: "nav.services" },
+  { href: "/#faq", key: "nav.faq" },
+  { href: "/#footer", key: "nav.contact" },
 ]
 
 export function Navbar() {
@@ -44,8 +45,8 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="container-site max-w-6xl py-4" aria-label="Main navigation">
-        <div className="flex h-14 items-center justify-between bg-background/60 backdrop-blur-xl border border-border/50 rounded-full px-4 sm:px-6">
-          <Link href="/" className="flex items-center shrink-0 me-6 lg:me-10" aria-label="Basma Web home">
+        <div className="flex h-14 items-center justify-between bg-background border border-border px-4 sm:px-6">
+          <Link href="/" className="flex items-center min-h-11 shrink-0 me-6 lg:me-10" aria-label="Basma Web home">
             <Image src="/basma-logo.png" alt="BASMA" width={1005} height={280} priority className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
 
@@ -69,8 +70,8 @@ export function Navbar() {
 
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-2.5">
-            <Button size="sm" rounded="full" className="gap-1.5 whitespace-nowrap" asChild>
-              <Link href="#pricing">
+            <Button size="sm" className="gap-1.5 whitespace-nowrap" asChild>
+              <Link href="/#academy">
                 {t("nav.getStarted")}
                 <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
@@ -82,7 +83,7 @@ export function Navbar() {
           {/* Mobile Menu Button - visible below lg */}
           <button
             type="button"
-            className="lg:hidden flex items-center justify-center min-h-11 min-w-11 -me-2 p-2 rounded-lg text-muted-foreground hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="lg:hidden flex items-center justify-center min-h-11 min-w-11 -me-2 p-2 text-muted-foreground hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
@@ -111,12 +112,12 @@ export function Navbar() {
               aria-label="Mobile navigation menu"
             >
               <div className="flex items-center justify-between px-6 py-4 bg-background border-b border-border/50">
-                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/" className="flex items-center min-h-11 gap-2" onClick={() => setMobileMenuOpen(false)}>
                   <Image src="/basma-logo.png" alt="BASMA" width={1005} height={280} className="h-8 w-auto object-contain" />
                 </Link>
                 <button
                   type="button"
-                  className="flex items-center justify-center min-h-11 min-w-11 p-2 rounded-lg text-foreground hover:text-primary transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  className="flex items-center justify-center min-h-11 min-w-11 p-2 text-foreground hover:text-primary transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close menu"
                 >
@@ -130,7 +131,7 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="block px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/10"
+                    className="block px-4 py-3 text-base text-muted-foreground hover:text-foreground transition-colors hover:bg-foreground/10"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t(link.key)}
@@ -139,8 +140,8 @@ export function Navbar() {
               </div>
 
               <div className="px-6 py-4 border-t border-border/50 bg-background flex flex-col gap-3">
-                <Button rounded="full" className="py-6 text-base w-full" asChild>
-                  <Link href="#pricing" onClick={() => setMobileMenuOpen(false)}>{t("nav.getStarted")}</Link>
+                <Button className="py-6 text-base w-full" asChild>
+                  <Link href="/#academy" onClick={() => setMobileMenuOpen(false)}>{t("nav.getStarted")}</Link>
                 </Button>
               </div>
             </motion.div>

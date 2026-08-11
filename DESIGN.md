@@ -1,6 +1,6 @@
 ---
 name: BASMA — بصمة
-description: Arabic-first WhatsApp automation platform — dark, quiet, one lime accent.
+description: Arabic-first AI academy and services — dark brutalist, hard-edged, one lime accent.
 colors:
   brand-lime: "oklch(0.855 0.218 126.3)"
   brand-lime-hover: "oklch(0.9 0.2 126.3)"
@@ -57,10 +57,8 @@ typography:
     micro: "10px"
     label: "11px"
 rounded:
-  sm: "4px"
-  md: "8px"
-  lg: "12px"
-  xl: "16px"
+  all: "0px"   # brutalist — --radius is 0, which de-rounds every shadcn primitive
+  full: "9999px"  # circles ONLY (spinner, status dot); never a softened rectangle
 spacing:
   gutter: "16px / 24px / 32px (sm / md / lg)"
   section: "64px / 96px / 128px (sm / md / lg)"
@@ -242,3 +240,58 @@ the inline-start and the button at the inline-end in both locales.
 - **Don't** letter-space Arabic text or force Latin uppercase styles onto Arabic labels.
 - **Don't** add a second accent hue — semantic hues stay clear of hue 126.
 - **Don't** introduce a light theme without deriving pairs from `--primary-on-light`.
+
+---
+
+## Brutalist direction (Phase G, 2026-08-10)
+
+The visual language changed from *dark, quiet, rounded* to **dark brutalist**.
+Reference: ASHFALL — heavy structure, extreme scale contrast, zero softness.
+The palette did not change; the treatment did.
+
+### Hard rules
+
+| Rule | Why |
+|------|-----|
+| **`--radius: 0`** | One token de-rounds every shadcn primitive. `rounded-full` survives only on genuine circles (spinner, status dot) — a circle is a shape, not a softened rectangle. |
+| **No `backdrop-blur`, no soft `box-shadow`, no radial glows** | Brutalism has no diffuse light source. `.glow-primary` is now a hard 4px offset, not a bloom. |
+| **Borders raised** (`0.26 → 0.34`, strong `0.35 → 0.48`) | A hairline you can barely see is decoration; one you can read is architecture. |
+| **Lime is a field, never coloured type** | `#ABE707` fails WCAG as text (1.48:1 on white, and it reads as glare on black at paragraph size). It appears as a solid block with `--primary-foreground` on top. |
+| **Grain over everything** | `.grain` on `<body>` — a fixed SVG fractal-noise overlay at 3.5% opacity. The reference's paper texture, translated to a dark surface. |
+
+### Why this is not a copy of the reference
+
+The reference gets its force from **typographic violence**: enormous condensed
+grotesques with tracking pulled tight. **That vocabulary is Latin and does not
+port.** Arabic has no condensed-grotesque display tradition, the script is
+connected so tracking cannot be pulled the same way, and `.tracking-display`
+already enforces `letter-spacing: 0` for exactly this reason.
+
+So the load moves to what Arabic *can* do:
+
+- **Scale and weight contrast** instead of condensation — an 8xl headline against
+  11px mono labels
+- **Literal structure** — `.cell`, `.rule`, bordered grids. In Latin brutalism
+  the type *is* the structure; in Arabic the structure has to be drawn.
+- **Latin monospace for all meta** — indices, prices, categories (`01`, `$25`).
+  Legitimate: technical Arabic writing genuinely mixes scripts. Always `dir="ltr"`
+  so bidi doesn't reorder numerals.
+
+### Primitives
+
+| Class | Use |
+|-------|-----|
+| `.cell` | bordered box — the default container, replaces every card |
+| `.cell-strong` | 2px border — the primary object on a screen |
+| `.block-lime` | solid brand field with dark text on it |
+| `.meta` | 11px uppercase mono, wide tracking — **Latin only** |
+| `.meta-ar` | 11px mono, no tracking — Arabic never gets tracked or uppercased |
+| `.rule` | full-bleed structural divider |
+| `.grain` | noise overlay (applied once, on `<body>`) |
+
+### Known gap
+
+**IBM Plex Sans Arabic is a text face, not a display face.** It holds at 16px and
+is merely adequate at 96px, where brutalism lives or dies. A dedicated Arabic
+display cut (Almarai Black, Tajawal Black, Readex Pro) should be tested
+side-by-side against real headlines before this is called finished.

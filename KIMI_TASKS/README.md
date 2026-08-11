@@ -45,8 +45,35 @@ Claude writes PHASE-N.md  →  Kimi implements  →  Kimi writes reports/PHASE-N
 5. **Never weaken a security control to make something pass.** If a fix is
    blocked, say so.
 
-6. **Do not commit or push.** Claude and the project owner handle git. Just
-   leave the working tree with your changes in it.
+6. **Commit locally, one commit per task ID. Never push.** (Revised after Phase B
+   — the original rule said don't commit at all; per-task commits turned out to
+   make review much easier, so they're now the expected way to work.) Message
+   format: `T-X.N: what changed`. `git push` remains off-limits — the owner
+   decides when anything leaves this machine.
+
+7. **⚠️ `pnpm run <script>` is broken on this machine.** `cmd.exe` is missing from
+   `C:\Windows\System32\`, so any tool that spawns through a shell fails with
+   `ENOENT -4058`. Run the binaries through node directly:
+
+   ```bash
+   node node_modules/eslint/bin/eslint.js .
+   ```
+   ```bash
+   node node_modules/typescript/bin/tsc --noEmit
+   ```
+   ```bash
+   node node_modules/vitest/vitest.mjs run
+   ```
+   ```bash
+   node node_modules/next/dist/bin/next build
+   ```
+
+   The Impeccable detector has the same problem via `npx` — run the vendored copy
+   instead:
+
+   ```bash
+   node .github/skills/impeccable/scripts/detect.mjs .
+   ```
 
 7. **Do not touch these without an explicit task telling you to:**
    - `next.config.mjs` → `typescript.ignoreBuildErrors` (must stay `false`)

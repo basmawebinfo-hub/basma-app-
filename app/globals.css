@@ -39,9 +39,13 @@
   --info: oklch(0.8 0.1 245);
   --destructive: oklch(0.7 0.18 25);
   --destructive-foreground: oklch(0.17 0.02 130);
-  /* borders and focus */
-  --border: oklch(0.26 0.008 130);
-  --border-strong: oklch(0.35 0.01 130);
+  /* Borders and focus.
+     Brutalist: structure has to be VISIBLE. Borders were raised from 0.26/0.35
+     because a hairline you can barely see is decoration; a hairline you can
+     read is architecture — and in Arabic the structure carries the load the
+     condensed Latin type carries in the reference. */
+  --border: oklch(0.34 0.008 130);
+  --border-strong: oklch(0.48 0.01 130);
   --input: oklch(0.24 0.01 130);
   --ring: oklch(0.855 0.218 126.3);
   /* alpha channel for decorative mask gradients (hero glow, use-cases) */
@@ -52,7 +56,11 @@
   --chart-3: oklch(0.7 0.14 190);
   --chart-4: oklch(0.72 0.12 245);
   --chart-5: oklch(0.75 0.13 85);
-  --radius: 0.5rem;
+  /* Brutalist: zero radius, globally. shadcn derives every primitive's rounding
+     from this one value, so setting it to 0 de-rounds the whole component
+     library at once. Circles (avatars, dots) still use explicit rounded-full —
+     a circle is a shape, not a softened rectangle. */
+  --radius: 0rem;
   --sidebar: oklch(0.155 0.007 130);
   --sidebar-foreground: oklch(0.96 0.005 130);
   --sidebar-primary: oklch(0.855 0.218 126.3);
@@ -156,10 +164,67 @@
   .section-strip {
     @apply relative py-12 lg:py-16;
   }
+  /* Was a soft double glow. Brutalism has no soft light — a hard offset border
+     does the same job of lifting an element off the page, without pretending
+     there's a light source. */
   .glow-primary {
-    box-shadow:
-      0 0 30px color-mix(in oklch, var(--primary) 15%, transparent),
-      0 0 60px color-mix(in oklch, var(--primary) 8%, transparent);
+    box-shadow: 4px 4px 0 0 var(--primary);
+  }
+
+  /* ── Brutalist primitives ──────────────────────────────────────────────
+     Structure is literal here: cells, rules, and blocks rather than tints and
+     shadows. See KIMI_TASKS/phases/PHASE-G.md §2 for why this matters more in
+     Arabic than it would in a Latin layout. */
+
+  /* A boxed cell. The default container for anything that used to be a card. */
+  .cell {
+    @apply border border-border bg-card;
+  }
+
+  /* A cell that reads as the primary object on screen. */
+  .cell-strong {
+    @apply border-2 border-border-strong bg-card;
+  }
+
+  /* Solid brand block with dark text on it. Lime is never coloured type —
+     it fails contrast as text and works as a field. */
+  .block-lime {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Small uppercase meta: indices, categories, labels. Latin/mono only —
+     Arabic must never be tracked or uppercased, so callers pass Arabic through
+     .meta-ar instead. */
+  .meta {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground;
+  }
+  .meta-ar {
+    @apply font-mono text-[11px] tracking-normal text-muted-foreground;
+  }
+
+  /* Full-bleed horizontal rule used to separate structural bands. */
+  .rule {
+    @apply border-t border-border;
+  }
+}
+
+/* Grain. The reference's paper texture, translated to a dark surface: an SVG
+   fractal-noise overlay at very low opacity, fixed so it doesn't swim while
+   scrolling. Pointer-events off so it never intercepts a click. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The grain is static, but users who ask for less visual noise get less. */
+  .grain::after {
+    opacity: 0.02;
   }
 }
 

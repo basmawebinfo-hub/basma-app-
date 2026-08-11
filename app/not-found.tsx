@@ -32,7 +32,7 @@ export default function NotFound() {
         <div className="flex items-center justify-center gap-3">
           <Link
             href="/"
-            className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+            className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
           >
             {t({ ar: "الرئيسية", en: "Home" })}
           </Link>

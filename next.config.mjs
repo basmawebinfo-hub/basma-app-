@@ -74,7 +74,7 @@ const CSP_REPORT_ONLY = [
   "font-src 'self' data:",
   "img-src 'self' data: blob: https:",
   "connect-src 'self'",
-  "frame-src 'self'",
+  "frame-src 'self' https://player.vimeo.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
