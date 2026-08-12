@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, MessageCircle } from "lucide-react"
+import { ArrowRight, MessageCircle } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { whatsappLink } from "@/config/contact"
@@ -129,8 +129,12 @@ export function Hero() {
               className="group inline-flex items-center justify-center gap-1.5 min-h-11 text-sm text-muted-foreground hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               {t("hero.ctaServices")}
-              <ArrowLeft
-                className="w-4 h-4 rtl:-scale-x-100 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5"
+              {/* ArrowRight, not ArrowLeft. "Forward" points right in LTR and
+                  left in RTL, so the base icon must point right and
+                  `rtl:-scale-x-100` flips it. Built with ArrowLeft first and
+                  it rendered backwards in BOTH locales. */}
+              <ArrowRight
+                className="w-4 h-4 rtl:-scale-x-100 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
                 aria-hidden="true"
               />
             </Link>
@@ -174,12 +178,16 @@ export function Hero() {
           {SKILLS.map((skill, i) => (
             <li
               key={skill}
-              className="flex items-baseline gap-2 border-b border-e border-border px-4 py-4"
+              /* min-w-0 on the grid item and the flex child both: `min-width:
+                 auto` is the default on each, so neither can shrink below its
+                 content and a longer skill name would push out of the cell.
+                 Defensive — nothing overflows at the current six names. */
+              className="flex min-w-0 items-baseline gap-2 border-b border-e border-border px-4 py-4"
             >
-              <span dir="ltr" className="font-mono text-[11px] text-primary">
+              <span dir="ltr" className="shrink-0 font-mono text-[11px] text-primary">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span dir="ltr" className="text-xs sm:text-sm font-semibold text-muted-foreground">
+              <span dir="ltr" className="min-w-0 text-xs sm:text-sm font-semibold text-muted-foreground">
                 {skill}
               </span>
             </li>

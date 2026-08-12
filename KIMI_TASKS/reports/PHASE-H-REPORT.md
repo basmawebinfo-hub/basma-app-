@@ -225,6 +225,35 @@ band. The owner has not supplied a bio, and writing one would be exactly the
 invented credibility the band exists to avoid. When he supplies one it belongs
 here — the placeholder note is in `components/proof.tsx`'s header comment.
 
+## 5b. Two defects the metrics did not catch
+
+Both found by looking at the rendered screenshots, which is the argument for not
+stopping at a green measurement table.
+
+**Directional arrows pointed backwards in both locales.** The hero's secondary
+link and the services teaser used `ArrowLeft` with `rtl:-scale-x-100`. That
+renders ← in English (backwards) and → in Arabic (also backwards): "forward" is
+right in LTR and left in RTL, so the base icon has to point **right** and the
+RTL flip does the rest. Both fixed. The navbar had it right already
+(`ArrowRight`), which is what made the inconsistency visible side by side.
+
+⚠️ **The same pattern survives outside this phase's scope** —
+`app/academy/academy-index.tsx:53`, `app/academy/[course]/course-view.tsx:25`,
+`app/academy/[course]/[level]/level-view.tsx:118`, `app/privacy/page.tsx`. Some
+of those are legitimately "back" links where a backwards arrow is correct; each
+needs a look. Not touched here: the academy is on hold.
+
+**One non-defect, recorded so nobody re-investigates it.** The skills strip
+appeared to clip its last label — "Prompt Engineering" rendering as "ompt
+Engineering" at 375px in three separate screenshot runs. It is not clipped: a
+3× zoom of the region shows the missing "Pr" is behind **Next.js's floating
+dev-tools badge**, which only exists in `next dev`. Measured, the label box is
+x=35→150 inside a cell spanning x=−1→187 — comfortably inside, `scrollWidth`
+equal to `clientWidth`. The `min-w-0` added to the cell and label during the
+investigation was kept as defensive CSS (grid and flex children both default to
+`min-width: auto` and cannot shrink below their content), but it fixed nothing,
+and the comments claiming otherwise were removed.
+
 ## 6. Open items for the owner / review
 
 1. **D0 is still unanswered.** The default was built: the roadmap is the story,

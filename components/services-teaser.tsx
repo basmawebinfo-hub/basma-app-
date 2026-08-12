@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, Sparkles } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SERVICES } from "@/config/services"
 import { useI18n } from "@/lib/i18n"
@@ -37,7 +37,10 @@ export function ServicesTeaser() {
               <p className="text-muted-foreground mb-5">{t(svc.taglineKey)}</p>
               <span className="inline-flex items-center gap-1.5 text-sm text-primary">
                 {t("services.viewOne")}
-                <ArrowLeft className="w-4 h-4 rtl:-scale-x-100 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
+                {/* Was ArrowLeft, which pointed backwards in both locales:
+                    "forward" is right in LTR and left in RTL, so the base icon
+                    must point right and `rtl:-scale-x-100` does the flipping. */}
+                <ArrowRight className="w-4 h-4 rtl:-scale-x-100 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
               </span>
             </Link>
           ))}
