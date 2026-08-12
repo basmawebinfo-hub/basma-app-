@@ -26,13 +26,58 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "nav.getStarted":     { ar: "ابدأ دلوقتي", en: "Start now" },
 
   // ── Hero ──────────────────────────────────────────────────────────────────
+  // hero.desc is capped at 25 words per locale (Phase H, T-H.4). The old copy
+  // ran 40 words in Arabic and 62 in English and spent its second sentence on
+  // services, which have their own track further down the page. Say who it's
+  // for and what they'll be able to do — then stop.
   "hero.badge":         { ar: "أكاديمية وخدمات ذكاء اصطناعي بالعربي", en: "Arabic-first AI academy and services" },
   "hero.title1":        { ar: "طريقك تبقى", en: "Your path to becoming an" },
   "hero.title2":        { ar: "AI Automation Engineer", en: "AI Automation Engineer" },
-  "hero.desc":          { ar: "مسار متدرّج بالعربي من الصفر: تتعلّم تفكّر في المشكلة، تبني الحل بالكود والأدوات، وتوصله بالذكاء الاصطناعي. وجنبه خدمات بتحل مشاكل عملية بتقابلك في الطريق.", en: "A step-by-step Arabic roadmap from zero: learn to think through the problem, build the solution with code and tools, and wire AI into it. Alongside it, services that solve the practical problems you hit on the way." },
+  "hero.desc":          { ar: "مسار بالعربي من الصفر لأي حد مالوش خلفية برمجية: تتعلّم تحلّل المشكلة، تبنيها بالكود والأدوات، وتوصّلها بالذكاء الاصطناعي.", en: "An Arabic roadmap from zero for people with no coding background: analyse the problem, build it with code and tools, then wire AI in." },
+  // The honest state of the roadmap, stated where the ask is made. {done} and
+  // {total} are interpolated from config/roadmap.ts — never typed in here.
+  "hero.state":         { ar: "{done} مستويات مكتوبة من {total} — والباقي بيتكتب دلوقتي.", en: "{done} of {total} levels written — the rest are being written now." },
+  // Deliberately NOT "كلّمنا على واتساب" — that is cta.join, the closing button
+  // at the bottom of the page. The hero opens the pitch and the final CTA
+  // closes it; the same words on both makes the page feel like it restarted.
+  "hero.ctaTalk":       { ar: "اسألنا عن المسار", en: "Ask us about the roadmap" },
   "hero.ctaAcademy":    { ar: "شوف المسار", en: "See the roadmap" },
   "hero.ctaServices":   { ar: "الخدمات", en: "Services" },
   "hero.skills":        { ar: "المهارات اللي المسار بيغطيها", en: "What the roadmap covers" },
+
+  // ── Outcomes — "what you'll be able to build" ──────────────────────────────
+  // Phase H, T-H.8. Every item is traceable to a level that is ACTUALLY
+  // WRITTEN in D:\Basma agancy\BasmaProgram — the source sections are cited in
+  // components/outcomes.tsx. If a claim can't be traced to a written level, it
+  // does not ship. Do not add a fifth item to balance a grid.
+  "outcomes.title1":    { ar: "بعد المسار", en: "After the roadmap" },
+  "outcomes.title2":    { ar: "هتقدر تعمل إيه", en: "you'll be able to" },
+  "outcomes.subtitle":  { ar: "مش وعود عامة — دي مخرجات المستويات المكتوبة فعلًا.", en: "Not general promises — these are the outcomes of the levels that are actually written." },
+  "outcomes.i1.title":  { ar: "تحوّل مشكلة شغل لمتطلبات تقنية", en: "Turn a business problem into technical requirements" },
+  "outcomes.i1.body":   { ar: "تكتشف المشكلة الحقيقية جوه أي بيزنس، تقسّمها لأجزاء، وترسم الـ workflow وتحدد إيه اللي ينفع يتأتمت — قبل ما تكتب سطر كود.", en: "Find the real problem inside a business, break it into parts, map the workflow, and decide what can actually be automated — before writing a line of code." },
+  "outcomes.i2.title":  { ar: "تبني بالكود، مش بس تستخدم أدوات جاهزة", en: "Build with code, not just wire up tools" },
+  "outcomes.i2.body":   { ar: "Python من الأساسيات: بيانات، ملفات، JSON و CSV، والتعامل مع الـ APIs بنفسك بدل ما تستنى أداة تعملها لك.", en: "Python from the basics: data, files, JSON and CSV, and calling APIs yourself instead of waiting for a tool to do it for you." },
+  "outcomes.i3.title":  { ar: "تشتغل زي أي developer", en: "Work like a developer" },
+  "outcomes.i3.body":   { ar: "الـ terminal، وGit وGitHub، وتنظيم المشروع، والـ‎ .env، وتقرا رسالة الخطأ وتفهمها بدل ما تخاف منها.", en: "The terminal, Git and GitHub, project structure, .env files, and reading an error message instead of fearing it." },
+  "outcomes.i4.title":  { ar: "توصّل نظامين ببعض", en: "Make two systems talk to each other" },
+  "outcomes.i4.body":   { ar: "REST APIs والـ authentication، والـ webhooks وتأمينها، والتعامل مع rate limits وpagination والأخطاء.", en: "REST APIs and authentication, webhooks and how to secure them, and handling rate limits, pagination, and errors." },
+
+  // ── Proof ─────────────────────────────────────────────────────────────────
+  // Phase H, T-H.9. HARD RULE, restating the file header: every line here maps
+  // to something that exists in this repo or in KIMI_TASKS/STATUS.md. No
+  // student counts, no testimonials, no ratings, no partner logos, no
+  // percentages. If the owner later supplies a founder bio it goes here — do
+  // not write one for him.
+  "proof.title1":       { ar: "ليه", en: "Why" },
+  "proof.title2":       { ar: "تصدّقنا", en: "trust this" },
+  "proof.i1.title":     { ar: "المسار مكتوب، مش موعود", en: "The roadmap is written, not promised" },
+  "proof.i1.body":      { ar: "{done} مستويات كاملة من {total}، كل واحد فيه شرح مبسّط ومثال عملي ومصادر وأسئلة تقييم.", en: "{done} complete levels of {total}, each with a plain-language explanation, a worked example, references, and assessment questions." },
+  "proof.i2.title":     { ar: "في خدمة شغالة دلوقتي", en: "One service is live today" },
+  "proof.i2.body":      { ar: "خدمة الاشتراكات موجودة بصفحتها، بشروطها وسعرها معلنين — مش «كلّمنا نتفق».", en: "The subscriptions service has its own page with its terms and its fee published — not \"message us and we'll see\"." },
+  "proof.i3.title":     { ar: "بنرد بنفسنا", en: "You reach a person" },
+  "proof.i3.body":      { ar: "واتساب على رقم حقيقي. مفيش فورم ولا تذكرة ولا بوت بيرد بدل حد.", en: "WhatsApp on a real number. No form, no ticket queue, no bot answering on someone's behalf." },
+  "proof.i4.title":     { ar: "بنقول الحالة زي ما هي", en: "We tell you the actual state" },
+  "proof.i4.body":      { ar: "المستوى اللي لسه مكتبش بنقول عليه، والرقم اللي لسه مش متحدد بنقول إنه مش متحدد.", en: "A level that isn't written says so. A number that isn't decided says it isn't decided." },
 
   // ── Academy ───────────────────────────────────────────────────────────────
   "academy.title1":     { ar: "مسار", en: "The" },
@@ -175,6 +220,10 @@ export const translations: Record<string, { ar: string; en: string }> = {
   "wa.msg.aiService":   { ar: "السلام عليكم، عايز أستفسر عن خدمة الاشتراك في أدوات الذكاء الاصطناعي.", en: "Hi, I'd like to ask about the AI subscription service." },
   "wa.msg.academy":     { ar: "السلام عليكم، عايز أعرف أول ما مسار AI Automation Engineer يفتح.", en: "Hi, I'd like to know when the AI Automation Engineer roadmap opens." },
   "wa.msg.footer":      { ar: "السلام عليكم، عايز أستفسر عن بصمة.", en: "Hi, I'd like to ask about BASMA." },
+  // Distinct from wa.msg.academy and from each other: the owner should be able
+  // to tell a hero lead from a navbar lead before reading the message.
+  "wa.msg.hero":        { ar: "السلام عليكم، جاي من الصفحة الرئيسية وعايز أعرف أول ما المسار يفتح.", en: "Hi, I'm coming from the home page and I'd like to know when the roadmap opens." },
+  "wa.msg.nav":         { ar: "السلام عليكم، عايز أبدأ مع بصمة — أعمل إيه؟", en: "Hi, I'd like to get started with BASMA — what's the first step?" },
   "wa.msg.item":        { ar: "السلام عليكم، عايز أشترك في {item}.", en: "Hi, I'd like to subscribe to {item}." },
 
   // ── Price breakdown ───────────────────────────────────────────────────────

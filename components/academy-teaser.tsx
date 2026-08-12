@@ -2,6 +2,7 @@
 
 import { Check, Lock } from "lucide-react"
 import { WhatsAppCta } from "@/components/services/whatsapp-cta"
+import { REMAINING_COUNT, WRITTEN_LEVELS } from "@/config/roadmap"
 import { useI18n } from "@/lib/i18n"
 
 /**
@@ -14,18 +15,12 @@ import { useI18n } from "@/lib/i18n"
  * The CTA is WhatsApp, not a link to /academy: those pages are built in Phase C
  * and linking to them now would be a 404. Swap it when they exist.
  */
-const WRITTEN_LEVELS = [
-  { n: 1, key: "academy.l1" },
-  { n: 2, key: "academy.l2" },
-  { n: 3, key: "academy.l3" },
-  { n: 4, key: "academy.l4" },
-]
-
-const TOTAL_LEVELS = 14
+/* The level list and the counts moved to config/roadmap.ts in Phase H — the
+   hero now states how far along the roadmap is, and two surfaces quoting the
+   same number from two places is how they drift apart. */
 
 export function AcademyTeaser() {
   const { t } = useI18n()
-  const remaining = TOTAL_LEVELS - WRITTEN_LEVELS.length
 
   return (
     <section id="academy" className="section-shell">
@@ -59,7 +54,7 @@ export function AcademyTeaser() {
               <Lock className="w-4 h-4" aria-hidden="true" />
             </span>
             <span className="flex-1 text-sm sm:text-base text-muted-foreground">
-              {t("academy.remaining").replace("{n}", String(remaining))}
+              {t("academy.remaining").replace("{n}", String(REMAINING_COUNT))}
             </span>
           </li>
         </ol>
@@ -70,7 +65,9 @@ export function AcademyTeaser() {
             they carry noindex. This is a visibility decision, not a teardown. */}
         <div className="mt-10 text-center">
           <p className="text-sm text-muted-foreground mb-5">{t("academy.ctaNote")}</p>
-          <WhatsAppCta messageKey="wa.msg.academy" labelKey="academy.cta" />
+          {/* min-h-11: `size="lg"` is h-10, which measured 40px at 375px —
+              under the 44px floor Phase B set for touch targets. */}
+          <WhatsAppCta messageKey="wa.msg.academy" labelKey="academy.cta" className="min-h-11" />
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { LangToggle } from "@/components/lang-toggle"
+import { whatsappLink } from "@/config/contact"
 import { Menu, X, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useI18n } from "@/lib/i18n"
@@ -61,7 +62,10 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                /* min-h-6: these measured 20px tall, under WCAG 2.5.8 (AA)'s
+                   24×24 floor. Phase B gave the footer links `sm:min-h-6` for
+                   exactly this reason and the navbar was missed. */
+                className="inline-flex items-center min-h-6 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
               >
                 {t(link.key)}
               </Link>
@@ -70,11 +74,24 @@ export function Navbar() {
 
           {/* Desktop Buttons - hidden below lg */}
           <div className="hidden lg:flex items-center gap-2.5">
-            <Button size="sm" className="gap-1.5 whitespace-nowrap" asChild>
-              <Link href="/#academy">
+            {/* Was `/#academy` — the highest-contrast control on the page
+                pointing at a قريبًا section nobody can act on. It now opens the
+                same conversation as the hero primary, with a different
+                prefilled message so the owner can tell a navbar lead from a
+                hero lead before reading it. min-h-11: this was a 32px target. */}
+            {/* Outline, not filled. The first screen gets exactly one lime
+                fill and the hero owns it — a navbar button competing at the
+                same weight is what made the old page offer three equally loud
+                next actions. */}
+            <Button variant="outline" size="sm" className="gap-1.5 whitespace-nowrap min-h-11" asChild>
+              <a
+                href={whatsappLink(t("wa.msg.nav"))}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {t("nav.getStarted")}
                 <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100" aria-hidden="true" />
-              </Link>
+              </a>
             </Button>
             <div className="w-px h-5 bg-border/60 mx-1" />
             <LangToggle />
@@ -141,7 +158,14 @@ export function Navbar() {
 
               <div className="px-6 py-4 border-t border-border/50 bg-background flex flex-col gap-3">
                 <Button className="py-6 text-base w-full" asChild>
-                  <Link href="/#academy" onClick={() => setMobileMenuOpen(false)}>{t("nav.getStarted")}</Link>
+                  <a
+                    href={whatsappLink(t("wa.msg.nav"))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t("nav.getStarted")}
+                  </a>
                 </Button>
               </div>
             </motion.div>

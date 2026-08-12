@@ -44,7 +44,9 @@ export function ServicesTeaser() {
         </div>
 
         <div className="flex justify-center mt-8">
-          <Button asChild variant="outline">
+          {/* min-h-11: the default size is h-9, which measured 36px at 375px —
+              under the 44px floor Phase B set for touch targets. */}
+          <Button asChild variant="outline" className="min-h-11">
             <Link href="/services">{t("home.svc.cta")}</Link>
           </Button>
         </div>
