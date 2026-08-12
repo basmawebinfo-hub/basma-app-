@@ -56,6 +56,7 @@ typography:
   scale:
     micro: "10px"
     label: "11px"
+    labelArabic: "13px"
 rounded:
   all: "0px"   # brutalist — --radius is 0, which de-rounds every shadcn primitive
   full: "9999px"  # circles ONLY (spinner, status dot); never a softened rectangle
@@ -160,12 +161,22 @@ and self-hosted as woff2 via `next/font/local`.
 - **Lead** (400, `clamp(1.0625rem → 1.25rem)`, 1.8): section intros.
 - **Body** (400, 1rem, 1.85): Arabic prose needs more air than Latin at the same size —
   `--leading-prose: 1.85` is the default reading rhythm.
-- **Label** (500, 11px): badges, plan captions, incident IDs — the smallest readable step.
+- **Label** (500, 11px): badges, plan captions, incident IDs — the smallest readable step
+  **in Latin** (`.meta`).
+- **Label Arabic** (400, 13px): the Arabic sibling of Label (`.meta-ar`). Two steps larger
+  because Arabic carries less optical size than Latin at the same nominal font-size — an
+  11px Arabic label reads meaningfully smaller than an 11px Latin one, and Plex Arabic's
+  effective x-height makes the gap wider still. Added in Phase H.
 - **Micro** (400, 10px): roles/footnotes under cards; never below 10px anywhere.
 
 ### Named Rules
 **The No-Tracking Rule.** Letter-spacing is never applied to Arabic letterforms
 (`.tracking-display` resolves to `0`); uppercase tracked labels are Latin-only.
+**The Arabic-Needs-A-Bigger-Step Rule.** Small type has two ramps, not one. Anything
+below body size that carries Arabic uses the Arabic step (`.meta-ar`, 13px), never the
+Latin one — and never the mono stack, which has no Arabic coverage at all and silently
+falls through to a metric-adjusted Arial (this shipped twice: T-B.10, then again through
+`.meta-ar` until Phase H).
 
 ## Layout
 

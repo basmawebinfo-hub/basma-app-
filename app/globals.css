@@ -198,8 +198,18 @@
   .meta {
     @apply font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground;
   }
+  /* The Arabic sibling of .meta. It must NOT inherit font-mono: --font-mono is
+     IBM Plex Mono, which has no Arabic coverage, so every Arabic string set in
+     it fell through to next/font's auto-generated "plexMono Fallback" — an
+     Arial derivative carrying Plex Mono's metric overrides. Measured at 11px,
+     `المهارات اللي المسار بيغطيها` rendered 141.83px wide against 114.83px for
+     real Plex Arabic: T-B.10 reintroduced through a new class. font-sans puts
+     it back on plexArabic.
+     13px, not 11px: Arabic needs ~10–15% more size than Latin for equal
+     legibility, and Plex Arabic's smaller effective x-height makes an 11px
+     Arabic label meaningfully harder to read than an 11px Latin one. */
   .meta-ar {
-    @apply font-mono text-[11px] tracking-normal text-muted-foreground;
+    @apply font-sans text-[13px] tracking-normal text-muted-foreground;
   }
 
   /* Full-bleed horizontal rule used to separate structural bands. */
