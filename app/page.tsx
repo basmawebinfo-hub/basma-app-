@@ -1,7 +1,9 @@
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
+import { Outcomes } from "@/components/outcomes"
 import { AcademyTeaser } from "@/components/academy-teaser"
 import { ServicesTeaser } from "@/components/services-teaser"
+import { Proof } from "@/components/proof"
 import { FAQ } from "@/components/faq"
 import { FinalCTA } from "@/components/final-cta"
 import { Footer } from "@/components/footer"
@@ -16,25 +18,30 @@ import { Footer } from "@/components/footer"
 export default function Home() {
   return (
     <main id="main" className="relative z-0 min-h-screen bg-background overflow-x-hidden">
-      {/* The corner field. Was a soft radial fade — brutalism has no diffuse
-          light source, so the mask now falls off hard and the whole thing is
-          dimmed well below the headline's lime block. It reads as a printed
-          halftone panel bleeding off the corner rather than as a glow. */}
+      {/* The corner field. Logical `end-0` + a dir-aware mask class, so it
+          mirrors with the locale: in Arabic it bleeds off the top-left, in
+          English off the top-right — always opposite the headline's entry
+          point. Smaller and dimmer than Phase G shipped it: the lime budget
+          for the whole first screen is 10% and the headline block owns most
+          of it. */}
       <div
-        className="absolute top-0 right-0 w-[1100px] h-[900px] -z-10 bg-primary/70 pointer-events-none"
-        style={{
-          maskImage:
-            "linear-gradient(215deg, var(--mask-shade) 0%, var(--mask-shade) 38%, transparent 62%)",
-        }}
+        className="corner-field absolute top-0 end-0 w-[720px] h-[400px] sm:h-[520px] -z-10 bg-primary/40 pointer-events-none"
       >
-        <div className="absolute inset-0 bg-cover bg-right-top" style={{ backgroundImage: "url('/grade.png')" }} />
+        <div className="absolute inset-0 bg-cover ltr:bg-right-top rtl:bg-left-top" style={{ backgroundImage: "url('/grade.png')" }} />
       </div>
 
       <Navbar />
 
+      {/* One story, in order: what you'll be able to build → the roadmap that
+          gets you there and how far along it actually is → the services beside
+          it → why any of this is credible → the questions that remain → the
+          ask. Outcomes come before the roadmap because a level list means
+          nothing to someone who doesn't yet know what it's for. */}
       <Hero />
+      <Outcomes />
       <AcademyTeaser />
       <ServicesTeaser />
+      <Proof />
       <FAQ />
       <FinalCTA />
       <Footer />

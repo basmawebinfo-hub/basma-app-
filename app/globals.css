@@ -208,6 +208,17 @@
   }
 }
 
+/* The hero corner field: a printed halftone panel bleeding off the
+   top-inline-end corner. Mask angles are physical, so the gradient flips with
+   the document direction — opaque at the inline-end corner in both locales.
+   Keeps the hard falloff from Phase G. */
+.corner-field {
+  mask-image: linear-gradient(145deg, var(--mask-shade) 0%, var(--mask-shade) 22%, transparent 44%);
+}
+[dir="ltr"] .corner-field {
+  mask-image: linear-gradient(215deg, var(--mask-shade) 0%, var(--mask-shade) 22%, transparent 44%);
+}
+
 /* Grain. The reference's paper texture, translated to a dark surface: an SVG
    fractal-noise overlay at very low opacity, fixed so it doesn't swim while
    scrolling. Pointer-events off so it never intercepts a click. */
