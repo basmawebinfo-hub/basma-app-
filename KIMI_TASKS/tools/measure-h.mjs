@@ -100,7 +100,15 @@ for (const vp of VIEWPORTS) {
         out.inkBoxCanvas = Math.round((met.actualBoundingBoxAscent + met.actualBoundingBoxDescent) * 100) / 100
         const range = document.createRange()
         range.selectNodeContents(arSpan)
-        out.inkBox = Math.round(range.getBoundingClientRect().height * 100) / 100
+        // Per LINE, not per span. The span wraps to two lines in the English
+        // locale at 375px ("Your path to becoming an"), and comparing a
+        // two-line bounding box against a one-line `line-height` reported a
+        // 113.19-vs-57.2 "overflow" that isn't one. `getClientRects()` returns
+        // one rect per line fragment, so dividing by that count restores the
+        // measurement the acceptance criterion actually means.
+        out.inkLines = range.getClientRects().length || 1
+        out.inkBoxSpan = Math.round(range.getBoundingClientRect().height * 100) / 100
+        out.inkBox = Math.round((out.inkBoxSpan / out.inkLines) * 100) / 100
         out.lineBox = parseFloat(cs.lineHeight)
         out.h1FontSize = cs.fontSize
       }

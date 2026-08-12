@@ -1,7 +1,11 @@
 # Project Status Board
 
 **Manager:** Claude (Opus 5) — reviews · **Implementer:** Kimi K3 — builds
-**Last updated:** 2026-08-11 — **Phase H spec written** (hero rebuild)
+**Last updated:** 2026-08-12 — **Phase H built**, awaiting review
+
+> ⚠️ **Phase H had two implementers.** Kimi committed T-H.0–T-H.2 then stopped
+> mid-T-H.3; Claude finished T-H.3–T-H.11. Do not re-run the Phase H prompt
+> against Kimi — see `reports/PHASE-H-REPORT.md` §0.
 
 ---
 
@@ -32,8 +36,8 @@ it dies with the code it describes.
 | **D** | Services | `/services` + the **AI-subscriptions** service, live | ✅ **Done** — built by Claude 2026-08-10, `reports/PHASE-D-REPORT.md` | B ✅ |
 | **E** | SEO & copy rewrite | **Full repositioning** — done: page rebuilt, dictionary 700→188 lines, SEO + JSON-LD + legal pages rewritten | ✅ **Done** — Claude 2026-08-10, `reports/PHASE-E-REPORT.md` | C, D |
 | **G** | **Brutalist redesign + catalogue** | Catalogue + USD pricing live; radius 0, grain, hard structure | ✅ **Done** — Claude 2026-08-10, `reports/PHASE-G-REPORT.md` | E ✅ |
-| **H** | **Hero rebuild + landing structure** | Hero is two bands not a floating footer; lime back inside budget; the page gets its missing middle | ⬜ **Spec written** 2026-08-11 — `phases/PHASE-H.md` | G ✅ |
-| **F** | Deploy | GitHub → Vercel → production hosting + domain | 🟦 **Ready** — *hold until H lands* | G ✅, H |
+| **H** | **Hero rebuild + landing structure** | Hero is two bands not a floating footer; lime back inside budget; the page gets its missing middle | 🟨 **Built, awaiting review** 2026-08-12 — Kimi T-H.0–2, Claude T-H.3–11, `reports/PHASE-H-REPORT.md` | G ✅ |
+| **F** | Deploy | GitHub → Vercel → production hosting + domain | 🟦 **Ready** — *hold until H is reviewed* | G ✅, H 🟨 |
 
 ---
 
